@@ -1,0 +1,21 @@
+
+@Data Reef Genomics Pocillopora damicornis 
+@Data-URI http://pdam.reefgenomics.org 
+@Data-Type Website 
+@Data-Flag recorded
+
+@Contributor Ross Cunning 
+@Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA. 
+@Contributor-Role First Author, Corresponding Author
+@Contributor-Email ross.cunning@gmail.com 
+@Contributor-Type Individual
+
+@Project Some Project Here
+
+# How to deal w/ the fact that cruise doesn't actually have a desc?
+# It actually NEEDS a desc, so what do we do about that?
+# Just leave it as an empty desc?
+@Cruise-ShipName Ship
+@Cruise-CruiseID 39849
+
+# Always just have as a list
