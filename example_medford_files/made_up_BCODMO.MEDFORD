@@ -14,7 +14,8 @@
 
 # How to deal w/ the fact that cruise doesn't actually have a desc?
 # It actually NEEDS a desc, so what do we do about that?
-# Just leave it as an empty desc?
+# Just leave it as an empty desc? Can't do that either
+@Cruise ..
 @Cruise-ShipName Ship
 @Cruise-CruiseID 39849
 

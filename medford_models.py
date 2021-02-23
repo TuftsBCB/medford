@@ -20,52 +20,52 @@ from enum import Enum
 # Helper Models                #
 ################################
 class StrDescModel(BaseModel):
-    desc: str
-    Note: Optional[Union[str, List[str]]]
+    desc: List[str] #TODO: Find a way to make an exception?
+    Note: Optional[List[str]]
 
 ################################
 # Field Models                 #
 ################################
 class Paper(StrDescModel):
-    Link: Optional[AnyUrl]
-    PMID: Optional[int]
+    Link: Optional[List[AnyUrl]]
+    PMID: Optional[List[int]]
     #Add a validator for PMID?
-    DOI: Optional[datetime.date]
+    DOI: Optional[List[datetime.date]]
 
 class Journal(StrDescModel):
-    Volume: int
-    Issue: int
-    Pages: Optional[str] #TODO: Validation?
+    Volume: List[int]
+    Issue: List[int]
+    Pages: Optional[List[str]] #TODO: Validation?
 
 class Date(BaseModel):
-    desc: Union[datetime.date, datetime.datetime, str]
-    Note: str 
+    desc: Union[List[datetime.date], List[datetime.datetime], List[str]]
+    Note: List[str]
     #changed type to note because type is a reserved keyword
 
 class Contributor(StrDescModel) :
-    Type: str
-    ORCID: Optional[int]
-    Assocation: Optional[str]
-    Role: Optional[str]
-    Email: Optional[str] #TODO: Email validation
+    Type: List[str]
+    ORCID: Optional[List[int]]
+    Assocation: Optional[List[str]]
+    Role: Optional[List[str]]
+    Email: Optional[List[str]] #TODO: Email validation
 
 class Keyword(StrDescModel):
     pass
 
 class Species(StrDescModel):
-    Loc: str
-    ReefCollection: str # TODO: Change to date with note?
-    Cultured: str
-    CultureCollection: str
+    Loc: List[str]
+    ReefCollection: List[str] # TODO: Change to date with note?
+    Cultured: List[str]
+    CultureCollection: List[str]
 
 class Method(StrDescModel):
-    Type: str
-    Company: Optional[str]
-    Sample: Optional[str]
+    Type: List[str]
+    Company: Optional[List[str]]
+    Sample: Optional[List[str]]
 
 class Software(StrDescModel) :
-    Type: str
-    Version: Optional[str]
+    Type: List[str]
+    Version: Optional[List[str]]
 
 class DataTypeEnum(str, Enum):
     # TODO : How do we avoid caring about capitalization, tho?
@@ -73,58 +73,53 @@ class DataTypeEnum(str, Enum):
     referenced = "referenced"
 
 class Data(StrDescModel) :
-    Type: str
-    URI: Optional[AnyUrl]
-    Flag: DataTypeEnum = DataTypeEnum.referenced
+    Type: List[str]
+    URI: Optional[List[AnyUrl]]
+    Flag: List[DataTypeEnum] = [DataTypeEnum.referenced]
 
 class Project(StrDescModel):
     pass
 
 class Cruise(StrDescModel):
-    ShipName: Optional[str]
-    CruiseID: Optional[str]
-    MooringID: Optional[str]
-    DiveNumber: Optional[int]
-    Synonyms: Optional[Iterable[str]]
+    ShipName: Optional[List[str]]
+    CruiseID: Optional[List[str]]
+    MooringID: Optional[List[str]]
+    DiveNumber: Optional[List[int]]
+    Synonyms: Optional[List[str]]
 
 ################################
 # Overarching Model            #
 ################################
 class Entity(BaseModel):
-    Paper: Paper
-    Journal: Journal
-    Date: Union[Date, List[Date]]
-    Contributor: Union[Contributor, List[Contributor]]
-    Keyword: Union[Keyword, List[Keyword]]
-    Species: Union[Species, List[Species]]
-    Method: Union[Method, List[Method]]
-    Software: Union[Software, List[Software]]
-    Data: Union[Data, List[Data]]
+    Paper: List[Paper]
+    Journal: List[Journal]
+    Date: List[Date]
+    Contributor: List[Contributor]
+    Keyword: List[Keyword]
+    Species: List[Species]
+    Method: List[Method]
+    Software: List[Software]
+    Data: List[Data]
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
 class BCODMO(BaseModel):
-    Data: Union[Data, List[Data]]
+    Data: List[Data]
 
     @validator('Data')
     def check_at_least_one_recorded(cls, v) :
-        if isinstance(v, List) :
-            if not any(map(lambda x: x.Flag == DataTypeEnum.recorded, v)):
-                raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
-                                 ' to mark the new data being submitted.')
-        else :
-            if not v.Flag == DataTypeEnum.recorded :
-                raise ValueError('Data entry must be flagged as "recorded" for the BCO-DMO format, to represent the ' + 
-                                ' new data being submitted.')
+        if not any(map(lambda x: x.Flag == [DataTypeEnum.recorded], v)):
+            raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
+                                ' to mark the new data being submitted.')
 
-    Contributor: Union[Contributor, List[Contributor]]
-    Project: Project
-    Cruise: Cruise
+    Contributor: List[Contributor]
+    Project: List[Project]
+    Cruise: List[Cruise]
 
     # https://github.com/samuelcolvin/pydantic/issues/506
     # Check for at least one acceptable form of cruise identifier.
     @validator('Cruise')
     def check_at_least_one_identifier(cls, v) :
-        values = {key:value for key, value in v.__dict__.items() if not key.startswith('__') and not callable(key)}
+        values = {key:value for key, value in v[0].__dict__.items() if not key.startswith('__') and not callable(key)}
         has_shipname = values['ShipName'] is not None and values['CruiseID'] is not None
         has_mooring = values['MooringID'] is not None 
         has_divenumber = values['DiveNumber'] is not None 
