@@ -18,6 +18,9 @@
 @Date 2018-10-31 00:00:00
 @Date-Note Published
 
+# Catch stray fields 
+
+
 # ADD TYPE REQUIREMENT FOR INDIVIDUAL CONTRIBUTORS?
 # i.e. 'Individual' vs 'Funding'
 #Contributors will be names, they can have subtypes of association, role, contact, etc.

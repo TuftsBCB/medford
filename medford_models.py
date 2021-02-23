@@ -1,6 +1,7 @@
-from pydantic import BaseModel, AnyUrl
-from typing import List, Optional, Union
+from pydantic import BaseModel, AnyUrl, validator
+from typing import List, Optional, Union, Iterable
 import datetime
+from enum import Enum
 
 # bcodmo? + bag
 # export to rtf?
@@ -66,13 +67,25 @@ class Software(StrDescModel) :
     Type: str
     Version: Optional[str]
 
+class DataTypeEnum(str, Enum):
+    # TODO : How do we avoid caring about capitalization, tho?
+    recorded = "recorded"
+    referenced = "referenced"
+
 class Data(StrDescModel) :
     Type: str
     URI: Optional[AnyUrl]
+    Flag: DataTypeEnum = DataTypeEnum.referenced
 
 class Project(StrDescModel):
     pass
 
+class Cruise(StrDescModel):
+    ShipName: Optional[str]
+    CruiseID: Optional[str]
+    MooringID: Optional[str]
+    DiveNumber: Optional[int]
+    Synonyms: Optional[Iterable[str]]
 
 ################################
 # Overarching Model            #
@@ -88,9 +101,34 @@ class Entity(BaseModel):
     Software: Union[Software, List[Software]]
     Data: Union[Data, List[Data]]
 
+# Temporarily set to BaseModel instead of Entity for testing purposes.
+class BCODMO(BaseModel):
+    Data: Union[Data, List[Data]]
 
-class BCODMO(Entity):
-    Data: Data #How do we enforce a description?
+    @validator('Data')
+    def check_at_least_one_recorded(cls, v) :
+        if isinstance(v, List) :
+            if not any(map(lambda x: x.Flag == DataTypeEnum.recorded, v)):
+                raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
+                                 ' to mark the new data being submitted.')
+        else :
+            if not v.Flag == DataTypeEnum.recorded :
+                raise ValueError('Data entry must be flagged as "recorded" for the BCO-DMO format, to represent the ' + 
+                                ' new data being submitted.')
+
     Contributor: Union[Contributor, List[Contributor]]
     Project: Project
+    Cruise: Cruise
+
+    # https://github.com/samuelcolvin/pydantic/issues/506
+    # Check for at least one acceptable form of cruise identifier.
+    @validator('Cruise')
+    def check_at_least_one_identifier(cls, v) :
+        values = {key:value for key, value in v.__dict__.items() if not key.startswith('__') and not callable(key)}
+        has_shipname = values['ShipName'] is not None and values['CruiseID'] is not None
+        has_mooring = values['MooringID'] is not None 
+        has_divenumber = values['DiveNumber'] is not None 
+        if not any([has_shipname, has_mooring, has_divenumber]) :
+            raise ValueError('BCO-DMO requires at least one cruise identifier. Your choices are: \n' +
+                                '     ShipName and CruiseID, MooringID, or DiveNumber.')
     

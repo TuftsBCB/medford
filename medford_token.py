@@ -2,6 +2,12 @@ class Token:
     class TokenException(Exception) :
         pass 
 
+        # Aspell?
+        # Python library?
+        # Custom dictionary?
+        # DL edit distance?
+        
+    # Recorded vs Referenced data
     defined_tokens = ['Paper','Link','PMID','DOI',
                 'Date','Note','desc',
                 'Journal', 'Volume', 'Issue', 'Pages',
@@ -41,8 +47,9 @@ class Token:
         return cls(level, [], main_token, tokens[1:], body, lineno)
 
     # Given a file location, generates all of the tokens in the file.
-    @staticmethod
-    def generate_tokens(fileloc) :
+    @classmethod
+    def generate_tokens(cls, fileloc) :
+        print(fileloc)
         tokens = []
         with open(fileloc, 'r') as f:
             all_lines = f.readlines()
@@ -56,29 +63,31 @@ class Token:
     # Returns only tokens that are 'top-level' (are not sub-tokens.)
     # This is not necessarily tokens that are top level of the paper, as we may
     #   have 'reveal'ed already, entering a token block (such as a Paper block.)
-    @staticmethod
-    def get_major_tokens(tokens) :
+    @classmethod
+    def get_major_tokens(cls, tokens) :
         only_toplevel = Token._get_top_level(tokens)
         return(list(map(lambda x: x.major_token, only_toplevel)))
     
     # Given a lsit of tokens, return the indices of major tokens (as the range
     #   between two major tokens should contain all sub-tokens of the first major
     #   token.)
-    @staticmethod
-    def get_token_blocks(tokens) :
+    @classmethod
+    def get_token_blocks(cls, tokens) :
         indices = []
+        prev_major = None
         for i, token in enumerate(tokens) :
-            if token.level == 1:
+            if token.major_token != prev_major:
                 indices.append(i)
+                prev_major = token.major_token
         return(indices)
 
     # Private
-    @staticmethod
-    def _get_top_level(tokens) :
+    @classmethod
+    def _get_top_level(cls, tokens) :
         return(list(filter(lambda x: x.level == 1, tokens)))
 
-    @staticmethod
-    def reveal_several(tokens) :
+    @classmethod
+    def reveal_several(cls, tokens) :
         revealed = []
         for token in tokens :
             revealed.append(token.reveal())
@@ -122,7 +131,3 @@ class Token:
         return("(" + 
                ",".join([str(self.level), str(self.lineno), self.major_token, "-".join(self.other_tokens), self.body]) +
                ")")
-
-filename = "pdam_cunning.MEDFORD"
-tokens = Token.generate_tokens(filename)
-print(Token.get_major_tokens(tokens))

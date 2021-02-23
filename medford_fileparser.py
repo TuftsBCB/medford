@@ -2,8 +2,11 @@ from medford_models import *
 from medford_smartdict import SmartDict
 from functools import reduce 
 from medford_token import Token
+import json
 
-filename = "example_medford_files/pdam_cunning.MEDFORD"
+#filename = "example_medford_files/pdam_cunning.MEDFORD"
+filename = "example_medford_files/made_up_BCODMO.MEDFORD"
+output_json = True
 # Jack - work on how to turn JSON into other file format?
 # Unrecognized token warning, not error
 class FieldError(Exception):
@@ -40,6 +43,7 @@ for i, index in enumerate(blocks):
     output.add(tokens[index].get_major(), curdict.export())
 
 final_dict = output.export()
-p = Entity(**final_dict)
-#print(final_dict)
-print(p)
+p = BCODMO(**final_dict)
+if(output_json) :
+    with open(filename + "_JSON", 'w') as f:
+        json.dump(final_dict, f)
