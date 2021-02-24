@@ -1,3 +1,25 @@
+from copy import deepcopy
+
+class TokenBlock:
+    major_token = None
+    all_tokens = None
+
+    def __init__(self, first_token):
+        self.all_tokens = [first_token]
+        self.major_token = first_token.major_token
+
+    def get_major(self) :
+        return self.major_token
+
+    def same_block(self, token) :
+        return token.major_token == self.major_token and token.level >= self.all_tokens[-1].level
+    
+    def add_token(self, token) :
+        self.all_tokens.append(token)
+    
+    def get_iterable(self) :
+        return(deepcopy(self.all_tokens))
+
 class Token:
     class TokenException(Exception) :
         pass 
