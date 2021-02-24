@@ -1,11 +1,11 @@
-from medford_models import *
-from medford_smartdict import SmartDict
+from src.medford_models import *
+from src.medford_smartdict import SmartDict
 from functools import reduce 
-from medford_token import Token, TokenBlock
+from src.medford_token import Token, TokenBlock
 import json
 
-#filename = "example_medford_files/pdam_cunning.MEDFORD"
-filename = "example_medford_files/made_up_BCODMO.MEDFORD"
+#filename = "samples/pdam_cunning.MEDFORD"
+filename = "samples/made_up_BCODMO.MEDFORD"
 output_json = True
 # Jack - work on how to turn JSON into other file format?
 # Unrecognized token warning, not error
