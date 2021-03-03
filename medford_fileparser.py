@@ -4,8 +4,8 @@ from functools import reduce
 from src.medford_token import Token, TokenBlock
 import json
 
-#filename = "samples/pdam_cunning.MEDFORD"
-filename = "samples/made_up_BCODMO.MEDFORD"
+filename = "samples/pdam_cunning.MEDFORD"
+#filename = "samples/made_up_BCODMO.MEDFORD"
 output_json = True
 # Jack - work on how to turn JSON into other file format?
 # Unrecognized token warning, not error
@@ -52,8 +52,8 @@ for i, block in enumerate(blocks):
     output.add(block.get_major(), curdict.export())
 
 final_dict = output.export()
-p = BCODMO(**final_dict)
-#p = Entity(**final_dict)
+#p = BCODMO(**final_dict)
+p = Entity(**final_dict)
 if(output_json) :
     with open(filename + "_JSON", 'w') as f:
         json.dump(final_dict, f, indent=2)

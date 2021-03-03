@@ -1,1 +1,361 @@
-{"desc": [], "Paper": [{"desc": ["Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution"], "Link": ["https://www.nature.com/articles/s41598-018-34459-8"]}], "Journal": [{"desc": ["Nature Scientific Reports"], "Volume": ["8"], "Issue": ["1"], "Pages": ["1-10"]}], "Date": [{"desc": ["2018-05-09"], "Note": ["Received"]}, {"desc": ["2018-10-19 00:00:00"], "Note": ["Accepted"]}, {"desc": ["2018-10-31 00:00:00"], "Note": ["Published"]}], "Contributor": [{"desc": ["Ross Cunning"], "Association": ["Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA."], "Role": ["First Author, Corresponding Author"], "Email": ["ross.cunning@gmail.com"], "Type": ["Individual"]}, {"desc": ["R.A. Bay"], "Association": ["Department of Evolution and Ecology, University of California Davis, Davis, CA, USA."], "Role": ["Author"], "Type": ["Individual"]}, {"desc": ["P. Gillette"], "Association": ["Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA"], "Role": ["Author"], "Type": ["Individual"]}, {"desc": ["Andrew C. Baker"], "Association": ["Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA"], "Role": ["Author"], "Type": ["Individual"]}, {"desc": ["N. Traylor-Knowles"], "Association": ["Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA"], "Role": ["Last Author, Corresponding Author"], "Email": ["ntraylorknowles@rsmas.miami.edu"], "Type": ["Individual"]}, {"desc": ["P.W. Glynn"], "Note": ["Field collection"], "Type": ["Individual"]}, {"desc": ["National Science Foundation (OCE-1358699)"], "Type": ["Funding"]}], "Keyword": [{"desc": ["Coral", "genome", "Immune system", "Evolution"]}], "Species": [{"desc": ["Pocillopora damicornis"], "Loc": ["Sabago Isthmus, Panama"], "ReefCollection": ["March 2005"], "Cultured": ["University of Miami Coral Resource Facility"], "CultureCollection": ["Sept. 2016"], "Note": ["study used two healthy fragments and two bleached fragments"]}], "Method": [{"desc": ["Qiagen DNAeasy Midi kit"], "Type": ["DNA extraction"]}, {"desc": ["Illumina HiSeqX"], "Type": ["Sequencing"], "Company": ["Dovetail Genomics, Santa Cruz, CA, USA"], "Sample": ["Bleached"], "Note": ["Shotgun libraries for de novo assemblies, more sensitive to contamination"]}, {"desc": ["Illumina HiSeq2500"], "Type": ["Sequencing"], "Company": ["Dovetail Genomics, Santa Cruz, CA, USA"], "Sample": ["Healthy"], "Note": ["Chicago libraries, more sensitive to DNA size"]}], "Software": [{"desc": ["HiRise"], "Type": ["Assembly of genome scaffolds"]}, {"desc": ["BLAST"], "Type": ["Identify and remove scaffolds of non-coral origin"], "Note": ["Searched against databases from Symbiodiniaceae, Bacteria, and viruses"]}, {"desc": ["BUSCO"], "Type": ["Completeness analysis"], "Note": ["Search for 978 universal metazoan single-copy orthologs"]}, {"desc": ["Augustus"], "Type": ["ab initio gene predictor"]}, {"desc": ["SNAP"], "Type": ["ab initio gene predictor"]}, {"desc": ["MAKER"], "Type": ["Annotate gene models"], "Note": ["Using gene predictor results (Augustus and SNAP); run iteratively", "Supporting evidence from two RNA-seq datasets from P. damicornis, one from S. pistillata, and protein sequences from 20 coral species"]}, {"desc": ["BLAST"], "Type": ["Add putative functional annotations"], "Note": ["Homologous protein search in UniProt Swiss-Prot database"]}, {"desc": ["InterProScan"], "Type": ["Add putative functional annotations"], "Note": ["Protein domain search"]}, {"desc": ["Genome Annotation Generator"], "Type": ["Genome annotation summary statistics"], "Note": ["Related to NCBI"]}, {"desc": ["InterProScan"], "Type": ["Assign GO terms to protein sequences"]}], "Data": [{"desc": ["P. damicornis annotation github repository"], "URI": ["https://github.com/jrcunning/pdam-genome"], "Type": ["Github"]}, {"desc": ["Reef Genomics Pocillopora damicornis"], "URI": ["http://pdam.reefgenomics.org"], "Type": ["Website"]}, {"desc": ["NCBI Pocillopora damicornis"], "Type": ["Database"]}]}
+{
+  "desc": [],
+  "Paper": [
+    {
+      "desc": [
+        "Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution"
+      ],
+      "Link": [
+        "https://www.nature.com/articles/s41598-018-34459-8"
+      ]
+    }
+  ],
+  "Journal": [
+    {
+      "desc": [
+        "Nature Scientific Reports"
+      ],
+      "Volume": [
+        "8"
+      ],
+      "Issue": [
+        "1"
+      ],
+      "Pages": [
+        "1-10"
+      ]
+    }
+  ],
+  "Date": [
+    {
+      "desc": [
+        "2018-05-09"
+      ],
+      "Note": [
+        "Received"
+      ]
+    },
+    {
+      "desc": [
+        "2018-10-19 00:00:00"
+      ],
+      "Note": [
+        "Accepted"
+      ]
+    },
+    {
+      "desc": [
+        "2018-10-31 00:00:00"
+      ],
+      "Note": [
+        "Published"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "desc": [
+        "Ross Cunning"
+      ],
+      "Association": [
+        "Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA."
+      ],
+      "Role": [
+        "First Author, Corresponding Author"
+      ],
+      "Email": [
+        "ross.cunning@gmail.com"
+      ],
+      "Type": [
+        "Individual"
+      ]
+    },
+    {
+      "desc": [
+        "R.A. Bay"
+      ],
+      "Association": [
+        "Department of Evolution and Ecology, University of California Davis, Davis, CA, USA."
+      ],
+      "Role": [
+        "Author"
+      ],
+      "Type": [
+        "Individual"
+      ]
+    },
+    {
+      "desc": [
+        "P. Gillette"
+      ],
+      "Association": [
+        "Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA"
+      ],
+      "Role": [
+        "Author"
+      ],
+      "Type": [
+        "Individual"
+      ]
+    },
+    {
+      "desc": [
+        "Andrew C. Baker"
+      ],
+      "Association": [
+        "Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA"
+      ],
+      "Role": [
+        "Author"
+      ],
+      "Type": [
+        "Individual"
+      ]
+    },
+    {
+      "desc": [
+        "N. Traylor-Knowles"
+      ],
+      "Association": [
+        "Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA"
+      ],
+      "Role": [
+        "Last Author, Corresponding Author"
+      ],
+      "Email": [
+        "ntraylorknowles@rsmas.miami.edu"
+      ],
+      "Type": [
+        "Individual"
+      ]
+    },
+    {
+      "desc": [
+        "P.W. Glynn"
+      ],
+      "Note": [
+        "Field collection"
+      ],
+      "Type": [
+        "Individual"
+      ]
+    },
+    {
+      "desc": [
+        "National Science Foundation (OCE-1358699)"
+      ],
+      "Type": [
+        "Funding"
+      ]
+    }
+  ],
+  "Keyword": [
+    {
+      "desc": [
+        "Coral",
+        "genome",
+        "Immune system",
+        "Evolution"
+      ]
+    }
+  ],
+  "Species": [
+    {
+      "desc": [
+        "Pocillopora damicornis"
+      ],
+      "Loc": [
+        "Sabago Isthmus, Panama"
+      ],
+      "ReefCollection": [
+        "March 2005"
+      ],
+      "Cultured": [
+        "University of Miami Coral Resource Facility"
+      ],
+      "CultureCollection": [
+        "Sept. 2016"
+      ],
+      "Note": [
+        "study used two healthy fragments and two bleached fragments"
+      ]
+    }
+  ],
+  "Method": [
+    {
+      "desc": [
+        "Qiagen DNAeasy Midi kit"
+      ],
+      "Type": [
+        "DNA extraction"
+      ]
+    },
+    {
+      "desc": [
+        "Illumina HiSeqX"
+      ],
+      "Type": [
+        "Sequencing"
+      ],
+      "Company": [
+        "Dovetail Genomics, Santa Cruz, CA, USA"
+      ],
+      "Sample": [
+        "Bleached"
+      ],
+      "Note": [
+        "Shotgun libraries for de novo assemblies, more sensitive to contamination"
+      ]
+    },
+    {
+      "desc": [
+        "Illumina HiSeq2500"
+      ],
+      "Type": [
+        "Sequencing"
+      ],
+      "Company": [
+        "Dovetail Genomics, Santa Cruz, CA, USA"
+      ],
+      "Sample": [
+        "Healthy"
+      ],
+      "Note": [
+        "Chicago libraries, more sensitive to DNA size"
+      ]
+    }
+  ],
+  "Software": [
+    {
+      "desc": [
+        "HiRise"
+      ],
+      "Type": [
+        "Assembly of genome scaffolds"
+      ]
+    },
+    {
+      "desc": [
+        "BLAST"
+      ],
+      "Type": [
+        "Identify and remove scaffolds of non-coral origin"
+      ],
+      "Note": [
+        "Searched against databases from Symbiodiniaceae, Bacteria, and viruses"
+      ]
+    },
+    {
+      "desc": [
+        "BUSCO"
+      ],
+      "Type": [
+        "Completeness analysis"
+      ],
+      "Note": [
+        "Search for 978 universal metazoan single-copy orthologs"
+      ]
+    },
+    {
+      "desc": [
+        "Augustus"
+      ],
+      "Type": [
+        "ab initio gene predictor"
+      ]
+    },
+    {
+      "desc": [
+        "SNAP"
+      ],
+      "Type": [
+        "ab initio gene predictor"
+      ]
+    },
+    {
+      "desc": [
+        "MAKER"
+      ],
+      "Type": [
+        "Annotate gene models"
+      ],
+      "Note": [
+        "Using gene predictor results (Augustus and SNAP); run iteratively",
+        "Supporting evidence from two RNA-seq datasets from P. damicornis, one from S. pistillata, and protein sequences from 20 coral species"
+      ]
+    },
+    {
+      "desc": [
+        "BLAST"
+      ],
+      "Type": [
+        "Add putative functional annotations"
+      ],
+      "Note": [
+        "Homologous protein search in UniProt Swiss-Prot database"
+      ]
+    },
+    {
+      "desc": [
+        "InterProScan"
+      ],
+      "Type": [
+        "Add putative functional annotations"
+      ],
+      "Note": [
+        "Protein domain search"
+      ]
+    },
+    {
+      "desc": [
+        "Genome Annotation Generator"
+      ],
+      "Type": [
+        "Genome annotation summary statistics"
+      ],
+      "Note": [
+        "Related to NCBI"
+      ]
+    },
+    {
+      "desc": [
+        "InterProScan"
+      ],
+      "Type": [
+        "Assign GO terms to protein sequences"
+      ]
+    }
+  ],
+  "Data": [
+    {
+      "desc": [
+        "P. damicornis annotation github repository"
+      ],
+      "URI": [
+        "https://github.com/jrcunning/pdam-genome"
+      ],
+      "Type": [
+        "Github"
+      ]
+    },
+    {
+      "desc": [
+        "Reef Genomics Pocillopora damicornis"
+      ],
+      "URI": [
+        "http://pdam.reefgenomics.org"
+      ],
+      "Type": [
+        "Website"
+      ]
+    },
+    {
+      "desc": [
+        "NCBI Pocillopora damicornis"
+      ],
+      "Type": [
+        "Database"
+      ]
+    }
+  ]
+}
