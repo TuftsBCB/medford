@@ -1,0 +1,57 @@
+NOTE: This is still in rough state.
+
+<TagLine>   -> @<TagLine>
+<MajorTag>  -> 
+            -> <Contributor>
+            -> <Data>
+            -> <Date>
+            -> <Expedition>
+            -> <Journal>
+            -> <Keyword>
+            -> <Method>
+            -> <Paper>
+            -> <Project>
+            -> <Software>
+            -> <Species>
+<Contributor>   -> Contributor <str>
+                -> Contributor-ORCID <int>
+                -> Contributor-Association <str>
+                -> Contributor-Role <str>
+                -> Contributor-Email <str>
+                -> Contributor-Type (Individual|Funding)
+<Data>      -> Data <str>
+            -> Data-Type (Github|Database|Website)
+            -> Data-URI <URI>
+            -> Data-Flag (Recorded|Referenced)
+<Date>      -> Date <DateType>
+<Expedition>-> Expedition <str>
+            -> Expedition-ShipName <str>
+            -> Expedition-CruiseID <str>
+            -> Expedition-MooringID <str>
+            -> Expedition-DiveNumber <int>
+            -> Expedition-Synonyms <str>
+<Journal>   -> Journal <str>
+            -> Journal-Volume: <int>
+            -> Journal-Issue: <int>
+            -> Journal-Pages <int>-<int>
+<Keyword>   -> Keyword <str>
+<Method>    -> Method <desc>
+            -> Method-Type <>
+            -> Method-Company <>
+            -> Method-Sample <>
+<Paper>     -> Paper <desc>
+            -> Paper-Link <URI>
+            -> Paper-PMID <int>
+            -> Paper-DOI <DateType>
+<Project>   -> Project <desc>
+<Software>  -> Software <desc>
+            -> Software-Type <str>
+            -> Software-Version <str>
+<Species>   -> Species <desc>
+            -> Species-Loc <str>
+            -> Species-ReefCollection <MonthYear>
+            -> Species-Cultured <str>
+            -> Species-Collection <MonthYear>
+<DateType>  -> 2018-10-31 00:00:00 #TODO: Context-Free-Grammar-Ize
+<MonthYear> -> (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [0-9]^4
+<Comment>   -> Anything else
