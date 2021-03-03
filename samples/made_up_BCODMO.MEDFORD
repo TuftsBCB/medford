@@ -12,7 +12,8 @@
 
 @Project Some Project Here
 
-@Cruise-ShipName Ship
-@Cruise-CruiseID 39849
+@Expedition Coral cruise
+@Expedition-ShipName Ship
+@Expedition-CruiseID 39849
 
 # Always just have as a list

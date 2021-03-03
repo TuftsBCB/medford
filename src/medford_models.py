@@ -38,7 +38,7 @@ class Journal(StrDescModel):
     Pages: Optional[List[str]] #TODO: Validation?
 
 class Date(BaseModel):
-    desc: Union[List[datetime.date], List[datetime.datetime], List[str]]
+    desc: Union[List[datetime.date], List[datetime.datetime]]
     Note: List[str]
     #changed type to note because type is a reserved keyword
 
@@ -80,7 +80,7 @@ class Data(StrDescModel) :
 class Project(StrDescModel):
     pass
 
-class Cruise(StrDescModel):
+class Expedition(StrDescModel):
     ShipName: Optional[List[str]]
     CruiseID: Optional[List[str]]
     MooringID: Optional[List[str]]
@@ -113,11 +113,11 @@ class BCODMO(BaseModel):
 
     Contributor: List[Contributor]
     Project: List[Project]
-    Cruise: List[Cruise]
+    Expedition: List[Expedition]
 
     # https://github.com/samuelcolvin/pydantic/issues/506
     # Check for at least one acceptable form of cruise identifier.
-    @validator('Cruise')
+    @validator('Expedition')
     def check_at_least_one_identifier(cls, v) :
         values = {key:value for key, value in v[0].__dict__.items() if not key.startswith('__') and not callable(key)}
         has_shipname = values['ShipName'] is not None and values['CruiseID'] is not None
