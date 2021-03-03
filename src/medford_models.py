@@ -106,6 +106,7 @@ class BCODMO(BaseModel):
     Data: List[Data]
 
     @validator('Data')
+    @classmethod
     def check_at_least_one_recorded(cls, v) :
         if not any(map(lambda x: x.Flag == [DataTypeEnum.recorded], v)):
             raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
@@ -118,6 +119,7 @@ class BCODMO(BaseModel):
     # https://github.com/samuelcolvin/pydantic/issues/506
     # Check for at least one acceptable form of cruise identifier.
     @validator('Expedition')
+    @classmethod
     def check_at_least_one_identifier(cls, v) :
         values = {key:value for key, value in v[0].__dict__.items() if not key.startswith('__') and not callable(key)}
         has_shipname = values['ShipName'] is not None and values['CruiseID'] is not None

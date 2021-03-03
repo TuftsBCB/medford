@@ -1,4 +1,4 @@
-from src.medford_models import *
+from src.medford_models import BCODMO, Entity
 from src.medford_smartdict import SmartDict
 from functools import reduce 
 from src.medford_token import Token, TokenBlock
@@ -56,4 +56,4 @@ p = BCODMO(**final_dict)
 #p = Entity(**final_dict)
 if(output_json) :
     with open(filename + "_JSON", 'w') as f:
-        json.dump(final_dict, f)
+        json.dump(final_dict, f, indent=2)
