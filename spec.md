@@ -50,7 +50,28 @@ If a contributor tag is being used to describe a source of funding, the sub-tags
 
 ## Data
 
-...
+A tag describing a data set involved in the research within the MEDFORD file. All data, be it new or a reference to existing data, should have its own data tag, as the purpose is for future readers to be able to know exactly which dataset and what version of the dataset was used.
+
+The sub-tags are as follows:
+1. **Data**: A description of the data.
+2. **Data-Type**: A string describing the way the data is stored in relation to this MEDFORD file. 'Website', 'Database', 'Github' are some examples.
+3. **Data-URI**: If applicable, the URL to the data. This could be a github repository link or a database link.
+4. **Data-Flag**: 'recorded' or 'referenced'; a description of whether the data is new to the research within this MEDFORD file ('recorded') or taken from another source ('referenced'). This is set to 'referenced' by default.
+
+### Examples
+An example of how RNA-seq data generated for the research within a MEDFORD document would be:
+```
+@Data P.damicornis RNA-seq
+@Data-Type ???
+@Data-Flag recorded
+```
+
+An example of data stored within a database would be:
+```
+@Data NCBI Pocillopora damicornis genome
+@Data-Type Database
+@Data-URI https://www.ncbi.nlm.nih.gov/genome/?term=Pocillopora+damicornis
+```
 
 ## Date
 
