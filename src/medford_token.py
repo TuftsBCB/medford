@@ -40,7 +40,8 @@ class Token:
                 'Method','XREF',
                 'Software','Version',
                 'Instrument',
-                'Data','Repo-Type','Size']
+                'Data','Repo-Type','Size',
+                'File', 'Path', 'Subdirectory']
     # Note: Spellchecking stuff we were thinking about earlier?
 
     # Called multiple times, not only when tokens are created from a file.

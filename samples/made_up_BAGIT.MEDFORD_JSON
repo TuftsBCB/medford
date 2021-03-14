@@ -1,0 +1,52 @@
+{
+  "desc": [],
+  "Paper": [
+    {
+      "desc": [
+        "Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution"
+      ],
+      "Link": [
+        "https://www.nature.com/articles/s41598-018-34459-8"
+      ]
+    }
+  ],
+  "Journal": [
+    {
+      "desc": [
+        "Nature Scientific Reports"
+      ],
+      "Volume": [
+        "8"
+      ],
+      "Issue": [
+        "1"
+      ],
+      "Pages": [
+        "1-10"
+      ]
+    }
+  ],
+  "Date": [
+    {
+      "desc": [
+        "2018-05-09"
+      ],
+      "Note": [
+        "Received"
+      ]
+    }
+  ],
+  "File": [
+    {
+      "desc": [
+        "A random File"
+      ],
+      "Path": [
+        "LICENSE"
+      ],
+      "Subdirectory": [
+        "licensing/"
+      ]
+    }
+  ]
+}

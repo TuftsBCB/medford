@@ -2,6 +2,7 @@ from pydantic import BaseModel, AnyUrl, validator
 from typing import List, Optional, Union, Iterable
 import datetime
 from enum import Enum
+from src.output_compatibility.filename_validation import *
 
 # bcodmo? + bag
 # export to rtf?
@@ -87,19 +88,62 @@ class Expedition(StrDescModel):
     DiveNumber: Optional[List[int]]
     Synonyms: Optional[List[str]]
 
+class ArbitraryFile(StrDescModel):
+    Path: List[str]
+    Subdirectory: Optional[List[str]]
+
 ################################
 # Overarching Model            #
 ################################
+# Meant to store every single possible tag that we have defined
 class Entity(BaseModel):
-    Paper: List[Paper]
-    Journal: List[Journal]
-    Date: List[Date]
-    Contributor: List[Contributor]
-    Keyword: List[Keyword]
-    Species: List[Species]
-    Method: List[Method]
-    Software: List[Software]
-    Data: List[Data]
+    Paper: Optional[List[Paper]]
+    Journal: Optional[List[Journal]]
+    Date: Optional[List[Date]]
+    Contributor: Optional[List[Contributor]]
+    Keyword: Optional[List[Keyword]]
+    Species: Optional[List[Species]]
+    Method: Optional[List[Method]]
+    Software: Optional[List[Software]]
+    Data: Optional[List[Data]]
+    File: Optional[List[ArbitraryFile]]
+
+class BagIt(Entity) :
+    # A BagIt requires:
+    #   - at least one recorded Data
+    #       (otherwise, what is the point of the bag?)
+    #   - arbitrary file definitions?
+    #   - The input MEDFORD file
+    #
+    # For every file (recorded data or arbitrary file definition), MEDFORD
+    #   parser has to:
+    #   - create a sha-512 hash or sha-256 hash
+    #   - copy into an appropriate subdirectory
+    #       (default: data/
+    #           alternative can be defined using the Subdirectory attribute)
+    #   - write down name & final location into a manifest file:
+    #       manifest-sha512.txt (or manifest-sha256.txt, depending on which was
+    #                               used)
+    #     in the format:
+    #       checksum filepath
+    #     NOTE: for now, don't allow any spaces, %, or linebreaks in file name
+    @validator('File')
+    @classmethod
+    def check_singular_path_subdirectory(cls, values):
+        for v in values:
+            if len(v.Path) > 1 :
+                raise ValueError("Please create a separate @File tag for each recorded file.")
+            if len(v.Subdirectory) > 1:
+                raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
+                                "Please use a separate @File tag for each output file.")
+            output_name = generate_output_name(v.Subdirectory[0], v.Path[0])
+            can_write_new = valid_filename_bagit(output_name)
+            if not can_write_new :
+                raise ValueError("Inappropriate output filename for file " + v.Path[0] + ": " + output_name +"\n" +
+                                    "Output filenames must have no whitespaces, and cannot contain the '%' symbol.")
+            can_read_old, reason = valid_input_file(v.Path[0])
+            if not can_read_old :
+                raise ValueError("Cannot copy file, reason: " + reason)
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
 class BCODMO(BaseModel):
