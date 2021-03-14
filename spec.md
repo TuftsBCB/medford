@@ -36,25 +36,25 @@ Example of what BCO-DMO needs here.
 A contributor tag is used to describe either an individual involved in the research described by this MEDFORD file, or a funding source. A contributor is not necessarily an author but may be some other collaborator, such as an individual who performed the sample collection.
 
 If a contributor tag is being used to describe an individual, the sub-tags are as follows:
-1. Contributor: The name of the contributor.
-2. Contributor-ORCID: ...
-3. Contributor-Association: ...
-4. Contributor-Role: ...
-5. Contributor-Email: ...
-6. Contributor-Type: Individual
+1. **Contributor**: (REQUIRED) The name of the contributor.
+2. **Contributor-ORCID**: The ORCID of the contributor, if applicable.
+3. **Contributor-Association**: The name of the association of the contributor.
+4. **Contributor-Role**: A string explanation of the role of the contributor. This can be a standardized value, such as "First Author", or a string description of choice, such as "Sample collection at Hawaii Reef"
+5. **Contributor-Email**: An email the contributor can be reached at.
+6. **Contributor-Type**: Individual
 
 If a contributor tag is being used to describe a source of funding, the sub-tags are as follows:
-1. Contributor: The name of the funding source.
-2. Contributor-Type: Funding
-3. Contributor-???: **TODO** Additional tag for funding #?
+1. **Contributor**: The name of the funding source.
+2. **Contributor-Type**: Funding
+3. **Contributor-???**: **TODO** Additional tag for funding #?
 
 ## Data
 
 A tag describing a data set involved in the research within the MEDFORD file. All data, be it new or a reference to existing data, should have its own data tag, as the purpose is for future readers to be able to know exactly which dataset and what version of the dataset was used.
 
 The sub-tags are as follows:
-1. **Data**: A description of the data.
-2. **Data-Type**: A string describing the way the data is stored in relation to this MEDFORD file. 'Website', 'Database', 'Github' are some examples.
+1. **Data**: (REQUIRED) A description of the data.
+2. **Data-Type**: (REQUIRED) A string describing the way the data is stored in relation to this MEDFORD file. 'Website', 'Database', 'Github' are some examples.
 3. **Data-URI**: If applicable, the URL to the data. This could be a github repository link or a database link.
 4. **Data-Flag**: 'recorded' or 'referenced'; a description of whether the data is new to the research within this MEDFORD file ('recorded') or taken from another source ('referenced'). This is set to 'referenced' by default.
 
@@ -77,10 +77,11 @@ An example of data stored within a database would be:
 
 A tag describing dates of interest for the research within the MEDFORD file. Common examples include: date submitted for publishing, date accepted for publishing, and date published. Dates should be written in the following format:
 
-1. Date YYYY-MM-DD
-2. Date-Note ...
+1. **Date**: (REQUIRED) YYYY-MM-DD format date.
+2. **Date-Note**: A description of the relevance of the date.
 
-For example, the date this was example was written would be documented as follows:
+### Example
+The date this example was written would be documented as follows:
 
 ```
 @Date 2021-03-02
