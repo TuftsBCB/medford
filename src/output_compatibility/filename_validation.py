@@ -20,5 +20,5 @@ def valid_input_file(filename) :
 
 def swap_file_loc(file_obj) :
     # TODO: Find a way that doesn't delete all other parameters.
-    new_obj = {'desc': file_obj.desc, 'Path': ['data/' + file_obj.NewName]}
+    new_obj = {'desc': file_obj.desc, 'Path': [file_obj.NewName]}
     return new_obj
