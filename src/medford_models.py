@@ -138,7 +138,8 @@ class BagIt(Entity) :
             if len(v.Subdirectory) > 1:
                 raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
                                 "Please use a separate @File tag for each output file.")
-            output_name = generate_output_name(v.Subdirectory[0], v.Path[0])
+            # TODO: Move this logic elsewhere
+            output_name = 'data/' + generate_output_name(v.Subdirectory[0], v.Path[0])
             can_write_new = valid_filename_bagit(output_name)
             if not can_write_new :
                 raise ValueError("Inappropriate output filename for file " + v.Path[0] + ": " + output_name +"\n" +
