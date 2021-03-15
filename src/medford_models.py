@@ -91,6 +91,7 @@ class Expedition(StrDescModel):
 class ArbitraryFile(StrDescModel):
     Path: List[str]
     Subdirectory: Optional[List[str]]
+    NewName: Optional[str]
 
 ################################
 # Overarching Model            #
@@ -131,6 +132,7 @@ class BagIt(Entity) :
     @classmethod
     def check_singular_path_subdirectory(cls, values):
         for v in values:
+            # TODO: Don't allow remote files, yet... Separate tag? RemoteFile?
             if len(v.Path) > 1 :
                 raise ValueError("Please create a separate @File tag for each recorded file.")
             if len(v.Subdirectory) > 1:
@@ -144,6 +146,8 @@ class BagIt(Entity) :
             can_read_old, reason = valid_input_file(v.Path[0])
             if not can_read_old :
                 raise ValueError("Cannot copy file, reason: " + reason)
+            v.NewName = output_name
+        return values
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
 class BCODMO(BaseModel):
@@ -155,6 +159,7 @@ class BCODMO(BaseModel):
         if not any(map(lambda x: x.Flag == [DataTypeEnum.recorded], v)):
             raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
                                 ' to mark the new data being submitted.')
+        return v
 
     Contributor: List[Contributor]
     Project: List[Project]
@@ -172,4 +177,5 @@ class BCODMO(BaseModel):
         if not any([has_shipname, has_mooring, has_divenumber]) :
             raise ValueError('BCO-DMO requires at least one cruise identifier. Your choices are: \n' +
                                 '     ShipName and CruiseID, MooringID, or DiveNumber.')
+        return v
     

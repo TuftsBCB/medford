@@ -17,3 +17,8 @@ def valid_input_file(filename) :
         return (False, "File " + filename + " is a directory. MEDFORD does not currently support " + 
                         "copying directories into bagit files.")
     return (True, None)
+
+def swap_file_loc(file_obj) :
+    # TODO: Find a way that doesn't delete all other parameters.
+    new_obj = {'desc': file_obj.desc, 'Path': [file_obj.NewName]}
+    return new_obj

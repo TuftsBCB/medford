@@ -2,8 +2,10 @@ from src.medford_models import BCODMO, Entity, BagIt
 from src.medford_smartdict import SmartDict
 from functools import reduce 
 from src.medford_token import Token, TokenBlock
+from src.output_compatibility.filename_validation import swap_file_loc
 import json
 
+MODE = "BAGIT"
 #filename = "samples/pdam_cunning.MEDFORD"
 #filename = "samples/made_up_BCODMO.MEDFORD"
 filename = "samples/made_up_BAGIT.MEDFORD"
@@ -59,3 +61,12 @@ p = BagIt(**final_dict)
 if(output_json) :
     with open(filename + "_JSON", 'w') as f:
         json.dump(final_dict, f, indent=2)
+
+# TODO: Better output mode catching rofl
+if MODE == "BAGIT" :
+    # Change all file paths to be relative to the bag, so as to not reveal
+    #   the user's directory structure when the bag is handed to other people.
+    for i,f in enumerate(p.File) :
+        p.File[i] = swap_file_loc(f)
+
+print(p.File)
