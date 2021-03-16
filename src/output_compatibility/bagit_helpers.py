@@ -11,3 +11,7 @@ def calculate_sha_256(filename) :
         bytes = f.read()
         hash = hashlib.sha256(bytes).hexdigest()
     return hash
+
+class bagit_settings:
+    prefix = "data/"
+    regex = "^[^%\s]+$"
