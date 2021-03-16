@@ -2,7 +2,7 @@ from pydantic import BaseModel, AnyUrl, validator
 from typing import List, Optional, Union, Iterable
 import datetime
 from enum import Enum
-from src.output_compatibility.filename_validation import *
+from src.output_compatibility.file_helpers import *
 
 # bcodmo? + bag
 # export to rtf?
