@@ -29,38 +29,32 @@
 @Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA. 
 @Contributor-Role First Author, Corresponding Author
 @Contributor-Email ross.cunning@gmail.com 
-@Contributor-Type Individual
 
 @Contributor R.A. Bay
 @Contributor-Association Department of Evolution and Ecology, University of California Davis, Davis, CA, USA. 
 @Contributor-Role Author
-@Contributor-Type Individual
 
 @Contributor P. Gillette
 @Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA
 @Contributor-Role Author
-@Contributor-Type Individual
 
 @Contributor Andrew C. Baker 
 @Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA
 @Contributor-Role Author
-@Contributor-Type Individual
 
 @Contributor N. Traylor-Knowles 
 @Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA
 @Contributor-Role Last Author, Corresponding Author
 @Contributor-Email ntraylorknowles@rsmas.miami.edu
-@Contributor-Type Individual
 
 @Contributor P.W. Glynn
 # Changed Type to Note, as Type seemeded like the wrong field.
 #@Contributor-Type Field collection 
 @Contributor-Note Field collection 
-@Contributor-Type Individual
 
 #Funding 
-@Contributor National Science Foundation (OCE-1358699)
-@Contributor-Type Funding
+@Funding National Science Foundation
+@Funding-ID OCE-1358699
 
 #Keywords are one to several words. Any notes under them will be parsed and relevant keywords will be entered
 @Keyword Coral 

@@ -5,10 +5,11 @@ from src.medford_token import Token, TokenBlock
 from src.output_compatibility.file_helpers import swap_file_loc
 import json
 
-MODE = "BAGIT"
-#filename = "samples/pdam_cunning.MEDFORD"
+MODE = "OTHER"
+#MODE = "BAGIT"
+filename = "samples/pdam_cunning.MEDFORD"
 #filename = "samples/made_up_BCODMO.MEDFORD"
-filename = "samples/made_up_BAGIT.MEDFORD"
+#filename = "samples/made_up_BAGIT.MEDFORD"
 output_json = True
 # Jack - work on how to turn JSON into other file format?
 # Unrecognized token warning, not error
@@ -56,8 +57,8 @@ for i, block in enumerate(blocks):
 
 final_dict = output.export()
 #p = BCODMO(**final_dict)
-#p = Entity(**final_dict)
-p = BagIt(**final_dict)
+p = Entity(**final_dict)
+#p = BagIt(**final_dict)
 if(output_json) :
     with open(filename + "_JSON", 'w') as f:
         json.dump(final_dict, f, indent=2)

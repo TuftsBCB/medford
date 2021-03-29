@@ -44,11 +44,13 @@ class Date(BaseModel):
     #changed type to note because type is a reserved keyword
 
 class Contributor(StrDescModel) :
-    Type: List[str]
     ORCID: Optional[List[int]]
     Assocation: Optional[List[str]]
     Role: Optional[List[str]]
     Email: Optional[List[str]] #TODO: Email validation
+
+class Funding(StrDescModel) :
+    ID: Optional[List[str]] #TODO: Funding ID validation?
 
 class Keyword(StrDescModel):
     pass
@@ -102,6 +104,7 @@ class Entity(BaseModel):
     Journal: Optional[List[Journal]]
     Date: Optional[List[Date]]
     Contributor: Optional[List[Contributor]]
+    Funding: Optional[List[Funding]]
     Keyword: Optional[List[Keyword]]
     Species: Optional[List[Species]]
     Method: Optional[List[Method]]

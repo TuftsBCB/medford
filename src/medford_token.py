@@ -34,6 +34,7 @@ class Token:
                 'Date','Note','desc',
                 'Journal', 'Volume', 'Issue', 'Pages',
                 'Contributor', 'Association', 'Contact', 'Fax', 'Email',
+                'Funding', 'ID',
                 'Keyword',
                 'Species','Reef','Loc','Coord','ID',
                 'Location','City','Country',
