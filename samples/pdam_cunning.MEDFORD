@@ -6,8 +6,6 @@
 @Journal-Issue 1
 @Journal-Pages 1-10
 
-# INCORRECT DATETIME FORMAT...
-#Dates will be formatted YYYY-DD-MMM:HH:MM:SS.ss where the ss is optional
 @Date 2018-05-09
 # @Date 2018-05-09 00:00:00
 # TODO : Catch typos! This was written 'Data'!

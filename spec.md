@@ -23,6 +23,26 @@ Every tag in MEDFORD has the \<tag\>-Note sub tag unless specified otherwise, wh
 * [Project](#Project): Brief description of the research stored within this MEDFORD file.
 * [Software](#Software): Software used in the research described by this MEDFORD file, such as rna-seq software.
 * [Species](#Species): Species involved in the research, including locality information if applicable.
+* [Structure](#Structure): Details about the overall structure of this particular MEDFORD file.
+
+# Validation and "Freeform" Tags
+
+All tags described in this document have some form of validation. If an author wants to add data that may not validate but fits under one of the describe tags, it is recommended to use the 'Freeform' prefix. This signals to the MEDFORD parser that this tag is not to be validated nor indexed.
+
+## Examples
+
+A date could first be written in freeform format while at the field:
+
+```
+@Freeform-Date Jun 19 - Took sample
+```
+
+Later, in the lab, this can be adjusted to follow standard Date formatting and replaced with:
+
+```
+@Date 2021-06-19
+@Date-Note Obtained sample #42 from reef #3
+```
 
 # Required Tags for Datatype Conversion
 
@@ -119,3 +139,10 @@ A funding tab is used to describe a grant or other funding source used in the re
 ## Species
 
 ...
+
+## Structure
+
+Structure tags define file-wide settings about the specific MEDFORD file being written. For example, setting the TimeZone structure tag will define what time zone all times are written in.
+
+The sub-tags are as follows:
+1. **TimeZone**: The time zone all dates are written in in this file. They should be written in the standard time zone abbreviation, such as GMT or EST. The defined time zone is GMT.

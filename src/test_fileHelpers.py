@@ -1,6 +1,6 @@
 import unittest
 
-from src.output_compatibility.file_helpers import *
+from helpers_file import *
 
 class TestFilenameMethods(unittest.TestCase) :
     def test_generated_name_wslash(self) :

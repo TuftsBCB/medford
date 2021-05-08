@@ -1,5 +1,5 @@
 import re, os
-from src.output_compatibility.bagit_helpers import bagit_settings
+from helpers_bagit import bagit_settings
 
 def generate_output_name(directory_name, input_file) :
     """
