@@ -1,8 +1,8 @@
-from src.medford_models import BCODMO, Entity, BagIt
-from src.medford_smartdict import SmartDict
+from medford_models import BCODMO, Entity, BagIt
+from medford_smartdict import SmartDict
 from functools import reduce 
-from src.medford_token import Token, TokenBlock
-from src.output_compatibility.file_helpers import swap_file_loc
+from medford_token import Token, TokenBlock
+from helpers_file import swap_file_loc
 import json
 
 MODE = "OTHER"

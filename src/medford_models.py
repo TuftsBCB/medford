@@ -95,6 +95,11 @@ class ArbitraryFile(StrDescModel):
     Subdirectory: Optional[List[str]]
     NewName: Optional[str]
 
+class Freeform(BaseModel):
+    class Config:
+        extra = 'allow'
+    pass
+
 ################################
 # Overarching Model            #
 ################################
