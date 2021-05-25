@@ -1,5 +1,4 @@
 {
-  "desc": [],
   "Data": [
     {
       "desc": [
@@ -49,6 +48,53 @@
       ],
       "CruiseID": [
         "39849"
+      ]
+    }
+  ],
+  "Date": [
+    {
+      "Freeform": [
+        {
+          "desc": [
+            "05-22"
+          ],
+          "Note": [
+            "Hello Workd"
+          ]
+        }
+      ]
+    }
+  ],
+  "Code": [
+    {
+      "Primary": [
+        {
+          "desc": [
+            "1"
+          ]
+        },
+        {
+          "desc": [
+            "2"
+          ],
+          "note": [
+            "ADFG",
+            "KDJFI"
+          ]
+        },
+        {
+          "desc": [
+            "3"
+          ]
+        },
+        {
+          "desc": [
+            "4"
+          ],
+          "URL": [
+            "/some/other/code/Here"
+          ]
+        }
       ]
     }
   ]

@@ -7,8 +7,9 @@ import json
 
 MODE = "OTHER"
 #MODE = "BAGIT"
-filename = "samples/pdam_cunning.MEDFORD"
+#filename = "samples/pdam_cunning.MEDFORD"
 #filename = "samples/made_up_BCODMO.MEDFORD"
+filename = "samples/made_up_Freeform.MEDFORD"
 #filename = "samples/made_up_BAGIT.MEDFORD"
 output_json = True
 # Jack - work on how to turn JSON into other file format?

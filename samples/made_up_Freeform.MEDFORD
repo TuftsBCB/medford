@@ -1,0 +1,29 @@
+
+@Data Reef Genomics Pocillopora damicornis 
+@Data-URI http://pdam.reefgenomics.org 
+@Data-Type Website 
+@Data-Flag recorded
+
+@Contributor Ross Cunning 
+@Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA. 
+@Contributor-Role First Author, Corresponding Author
+@Contributor-Email ross.cunning@gmail.com 
+
+@Project Some Project Here
+
+@Expedition Coral cruise
+@Expedition-ShipName Ship
+@Expedition-CruiseID 39849
+
+@Date_Freeform 05-22
+@Date_Freeform-Note Hello Workd
+
+@Code_Primary 1
+@Code_Primary 2
+@Code_Primary-note ADFG
+@Code_Primary-note KDJFI
+
+@Code_Primary 3
+
+@Code_Primary 4
+@Code_Primary-URL /some/other/code/Here
