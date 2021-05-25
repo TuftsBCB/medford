@@ -22,11 +22,11 @@ with open(filename, 'r') as f:
         # TODO: Add logic for catching multi-line details...
         if(line.strip() != "" and line[0] == '@') :
             details.append(detail.FromLine(line, i))
-            
+
 parser = detailparser(details)
 final_dict = parser.export()
 
-#p = Entity(**final_dict)
+p = Entity(**final_dict)
 
 if(output_json) :
     with open(filename + "_JSON", 'w') as f:

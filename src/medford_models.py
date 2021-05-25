@@ -116,6 +116,7 @@ class Entity(BaseModel):
     Software: Optional[List[Software]]
     Data: Optional[List[Data]]
     File: Optional[List[ArbitraryFile]]
+    Freeform: Optional[List[Freeform]]
 
 class BagIt(Entity) :
     # A BagIt requires:

@@ -51,12 +51,20 @@
       ]
     }
   ],
-  "Date": [
+  "Freeform": [
     {
-      "Freeform": [
+      "Date": [
         {
           "desc": [
             "05-22"
+          ],
+          "Note": [
+            "Hello Workd"
+          ]
+        },
+        {
+          "desc": [
+            "05-24"
           ],
           "Note": [
             "Hello Workd"
