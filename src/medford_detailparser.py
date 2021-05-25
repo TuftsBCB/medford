@@ -3,9 +3,9 @@ from copy import deepcopy
 from medford_detail import *
 
 class detailparser :
-    data = {}
 
     def __init__(self, details) :
+        self.data = {}
         self.parse_details(details)
 
     def parse_details(self, details) :
