@@ -1,5 +1,5 @@
-@Paper Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution
-@Paper-Link https://www.nature.com/articles/s41598-018-34459-8
+@Paper_Primary Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution
+@Paper_Primary-Link https://www.nature.com/articles/s41598-018-34459-8
 
 @Journal Nature Scientific Reports 
 @Journal-Volume 8
@@ -19,9 +19,6 @@
 
 # Catch stray fields 
 
-
-# ADD TYPE REQUIREMENT FOR INDIVIDUAL CONTRIBUTORS?
-# i.e. 'Individual' vs 'Funding'
 #Contributors will be names, they can have subtypes of association, role, contact, etc.
 @Contributor Ross Cunning 
 @Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA. 
@@ -86,50 +83,50 @@
 @Method-Sample Healthy
 @Method-Note Chicago libraries, more sensitive to DNA size 
 
-@Software HiRise 
-@Software-Type Assembly of genome scaffolds 
+@Code_Ref HiRise 
+@Code_Ref-Type Assembly of genome scaffolds 
 
-@Software BLAST
-@Software-Type Identify and remove scaffolds of non-coral origin 
-@Software-Note Searched against databases from Symbiodiniaceae, Bacteria, and viruses 
+@Code_Ref BLAST
+@Code_Ref-Type Identify and remove scaffolds of non-coral origin 
+@Code_Ref-Note Searched against databases from Symbiodiniaceae, Bacteria, and viruses 
 
-@Software BUSCO 
-@Software-Type Completeness analysis 
-@Software-Note Search for 978 universal metazoan single-copy orthologs 
+@Code_Ref BUSCO 
+@Code_Ref-Type Completeness analysis 
+@Code_Ref-Note Search for 978 universal metazoan single-copy orthologs 
 
-@Software Augustus
-@Software-Type ab initio gene predictor 
+@Code_Ref Augustus
+@Code_Ref-Type ab initio gene predictor 
 
-@Software SNAP
-@Software-Type ab initio gene predictor 
+@Code_Ref SNAP
+@Code_Ref-Type ab initio gene predictor 
 
-@Software MAKER
-@Software-Type Annotate gene models
-@Software-Note Using gene predictor results (Augustus and SNAP); run iteratively 
-@Software-Note Supporting evidence from two RNA-seq datasets from P. damicornis, one from S. pistillata, and protein sequences from 20 coral species 
+@Code_Ref MAKER
+@Code_Ref-Type Annotate gene models
+@Code_Ref-Note Using gene predictor results (Augustus and SNAP); run iteratively 
+@Code_Ref-Note Supporting evidence from two RNA-seq datasets from P. damicornis, one from S. pistillata, and protein sequences from 20 coral species 
 
-@Software BLAST 
-@Software-Type Add putative functional annotations 
-@Software-Note Homologous protein search in UniProt Swiss-Prot database 
+@Code_Ref BLAST 
+@Code_Ref-Type Add putative functional annotations 
+@Code_Ref-Note Homologous protein search in UniProt Swiss-Prot database 
 
-@Software InterProScan
-@Software-Type Add putative functional annotations 
-@Software-Note Protein domain search 
+@Code_Ref InterProScan
+@Code_Ref-Type Add putative functional annotations 
+@Code_Ref-Note Protein domain search 
 
-@Software Genome Annotation Generator 
-@Software-Type Genome annotation summary statistics 
-@Software-Note Related to NCBI
+@Code_Ref Genome Annotation Generator 
+@Code_Ref-Type Genome annotation summary statistics 
+@Code_Ref-Note Related to NCBI
 
-@Software InterProScan 
-@Software-Type Assign GO terms to protein sequences 
+@Code_Ref InterProScan 
+@Code_Ref-Type Assign GO terms to protein sequences 
 
-@Data P. damicornis annotation github repository 
-@Data-URI https://github.com/jrcunning/pdam-genome 
-@Data-Type Github
+@Data_Ref P. damicornis annotation github repository 
+@Data_Ref-URI https://github.com/jrcunning/pdam-genome 
+@Data_Ref-Type Github
 
-@Data Reef Genomics Pocillopora damicornis 
-@Data-URI http://pdam.reefgenomics.org 
-@Data-Type Website 
+@Data_Ref Reef Genomics Pocillopora damicornis 
+@Data_Ref-URI http://pdam.reefgenomics.org 
+@Data_Ref-Type Website 
 
-@Data NCBI Pocillopora damicornis 
-@Data-Type Database
+@Data_Ref NCBI Pocillopora damicornis 
+@Data_Ref-Type Database

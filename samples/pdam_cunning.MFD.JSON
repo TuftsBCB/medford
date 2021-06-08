@@ -1,12 +1,15 @@
 {
-  "desc": [],
   "Paper": [
     {
-      "desc": [
-        "Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution"
-      ],
-      "Link": [
-        "https://www.nature.com/articles/s41598-018-34459-8"
+      "Primary": [
+        {
+          "desc": [
+            "Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution"
+          ],
+          "Link": [
+            "https://www.nature.com/articles/s41598-018-34459-8"
+          ]
+        }
       ]
     }
   ],
@@ -136,9 +139,21 @@
   "Keyword": [
     {
       "desc": [
-        "Coral",
-        "genome",
-        "Immune system",
+        "Coral"
+      ]
+    },
+    {
+      "desc": [
+        "genome"
+      ]
+    },
+    {
+      "desc": [
+        "Immune system"
+      ]
+    },
+    {
+      "desc": [
         "Evolution"
       ]
     }
@@ -209,136 +224,144 @@
       ]
     }
   ],
-  "Software": [
+  "Code": [
     {
-      "desc": [
-        "HiRise"
-      ],
-      "Type": [
-        "Assembly of genome scaffolds"
-      ]
-    },
-    {
-      "desc": [
-        "BLAST"
-      ],
-      "Type": [
-        "Identify and remove scaffolds of non-coral origin"
-      ],
-      "Note": [
-        "Searched against databases from Symbiodiniaceae, Bacteria, and viruses"
-      ]
-    },
-    {
-      "desc": [
-        "BUSCO"
-      ],
-      "Type": [
-        "Completeness analysis"
-      ],
-      "Note": [
-        "Search for 978 universal metazoan single-copy orthologs"
-      ]
-    },
-    {
-      "desc": [
-        "Augustus"
-      ],
-      "Type": [
-        "ab initio gene predictor"
-      ]
-    },
-    {
-      "desc": [
-        "SNAP"
-      ],
-      "Type": [
-        "ab initio gene predictor"
-      ]
-    },
-    {
-      "desc": [
-        "MAKER"
-      ],
-      "Type": [
-        "Annotate gene models"
-      ],
-      "Note": [
-        "Using gene predictor results (Augustus and SNAP); run iteratively",
-        "Supporting evidence from two RNA-seq datasets from P. damicornis, one from S. pistillata, and protein sequences from 20 coral species"
-      ]
-    },
-    {
-      "desc": [
-        "BLAST"
-      ],
-      "Type": [
-        "Add putative functional annotations"
-      ],
-      "Note": [
-        "Homologous protein search in UniProt Swiss-Prot database"
-      ]
-    },
-    {
-      "desc": [
-        "InterProScan"
-      ],
-      "Type": [
-        "Add putative functional annotations"
-      ],
-      "Note": [
-        "Protein domain search"
-      ]
-    },
-    {
-      "desc": [
-        "Genome Annotation Generator"
-      ],
-      "Type": [
-        "Genome annotation summary statistics"
-      ],
-      "Note": [
-        "Related to NCBI"
-      ]
-    },
-    {
-      "desc": [
-        "InterProScan"
-      ],
-      "Type": [
-        "Assign GO terms to protein sequences"
+      "Ref": [
+        {
+          "desc": [
+            "HiRise"
+          ],
+          "Type": [
+            "Assembly of genome scaffolds"
+          ]
+        },
+        {
+          "desc": [
+            "BLAST"
+          ],
+          "Type": [
+            "Identify and remove scaffolds of non-coral origin"
+          ],
+          "Note": [
+            "Searched against databases from Symbiodiniaceae, Bacteria, and viruses"
+          ]
+        },
+        {
+          "desc": [
+            "BUSCO"
+          ],
+          "Type": [
+            "Completeness analysis"
+          ],
+          "Note": [
+            "Search for 978 universal metazoan single-copy orthologs"
+          ]
+        },
+        {
+          "desc": [
+            "Augustus"
+          ],
+          "Type": [
+            "ab initio gene predictor"
+          ]
+        },
+        {
+          "desc": [
+            "SNAP"
+          ],
+          "Type": [
+            "ab initio gene predictor"
+          ]
+        },
+        {
+          "desc": [
+            "MAKER"
+          ],
+          "Type": [
+            "Annotate gene models"
+          ],
+          "Note": [
+            "Using gene predictor results (Augustus and SNAP); run iteratively",
+            "Supporting evidence from two RNA-seq datasets from P. damicornis, one from S. pistillata, and protein sequences from 20 coral species"
+          ]
+        },
+        {
+          "desc": [
+            "BLAST"
+          ],
+          "Type": [
+            "Add putative functional annotations"
+          ],
+          "Note": [
+            "Homologous protein search in UniProt Swiss-Prot database"
+          ]
+        },
+        {
+          "desc": [
+            "InterProScan"
+          ],
+          "Type": [
+            "Add putative functional annotations"
+          ],
+          "Note": [
+            "Protein domain search"
+          ]
+        },
+        {
+          "desc": [
+            "Genome Annotation Generator"
+          ],
+          "Type": [
+            "Genome annotation summary statistics"
+          ],
+          "Note": [
+            "Related to NCBI"
+          ]
+        },
+        {
+          "desc": [
+            "InterProScan"
+          ],
+          "Type": [
+            "Assign GO terms to protein sequences"
+          ]
+        }
       ]
     }
   ],
   "Data": [
     {
-      "desc": [
-        "P. damicornis annotation github repository"
-      ],
-      "URI": [
-        "https://github.com/jrcunning/pdam-genome"
-      ],
-      "Type": [
-        "Github"
-      ]
-    },
-    {
-      "desc": [
-        "Reef Genomics Pocillopora damicornis"
-      ],
-      "URI": [
-        "http://pdam.reefgenomics.org"
-      ],
-      "Type": [
-        "Website"
-      ]
-    },
-    {
-      "desc": [
-        "NCBI Pocillopora damicornis"
-      ],
-      "Type": [
-        "Database"
+      "Ref": [
+        {
+          "desc": [
+            "P. damicornis annotation github repository"
+          ],
+          "URI": [
+            "https://github.com/jrcunning/pdam-genome"
+          ],
+          "Type": [
+            "Github"
+          ]
+        },
+        {
+          "desc": [
+            "Reef Genomics Pocillopora damicornis"
+          ],
+          "URI": [
+            "http://pdam.reefgenomics.org"
+          ],
+          "Type": [
+            "Website"
+          ]
+        },
+        {
+          "desc": [
+            "NCBI Pocillopora damicornis"
+          ],
+          "Type": [
+            "Database"
+          ]
+        }
       ]
     }
   ]

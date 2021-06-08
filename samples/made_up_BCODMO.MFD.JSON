@@ -1,18 +1,18 @@
 {
-  "desc": [],
   "Data": [
     {
-      "desc": [
-        "Reef Genomics Pocillopora damicornis"
-      ],
-      "URI": [
-        "http://pdam.reefgenomics.org"
-      ],
-      "Type": [
-        "Website"
-      ],
-      "Flag": [
-        "recorded"
+      "Ref": [
+        {
+          "desc": [
+            "Reef Genomics Pocillopora damicornis"
+          ],
+          "URI": [
+            "http://pdam.reefgenomics.org"
+          ],
+          "Type": [
+            "Website"
+          ]
+        }
       ]
     }
   ],

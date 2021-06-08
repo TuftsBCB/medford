@@ -27,11 +27,6 @@ class StrDescModel(BaseModel):
 ################################
 # Field Models                 #
 ################################
-class Paper(StrDescModel):
-    Link: Optional[List[AnyUrl]]
-    PMID: Optional[List[int]]
-    #Add a validator for PMID?
-    DOI: Optional[List[datetime.date]]
 
 class Journal(StrDescModel):
     Volume: List[int]
@@ -66,19 +61,10 @@ class Method(StrDescModel):
     Company: Optional[List[str]]
     Sample: Optional[List[str]]
 
-class Software(StrDescModel) :
-    Type: List[str]
-    Version: Optional[List[str]]
-
 class DataTypeEnum(str, Enum):
     # TODO : How do we avoid caring about capitalization, tho?
     recorded = "recorded"
     referenced = "referenced"
-
-class Data(StrDescModel) :
-    Type: List[str]
-    URI: Optional[List[AnyUrl]]
-    Flag: List[DataTypeEnum] = [DataTypeEnum.referenced]
 
 class Project(StrDescModel):
     pass
@@ -100,6 +86,63 @@ class Freeform(BaseModel):
         extra = 'allow'
     pass
 
+## Multi-Typed tags (data, code, paper)
+class D_Ref(StrDescModel) :
+    Type: Optional[List[str]]
+    URI: Optional[List[AnyUrl]]
+
+class D_Copy(StrDescModel) :
+    Type: Optional[List[str]]
+    URI: Optional[List[AnyUrl]]
+
+class D_Primary(StrDescModel) :
+    Type: Optional[List[str]]
+    URI: Optional[List[AnyUrl]]
+
+class Data(BaseModel) :
+    Ref: Optional[List[D_Ref]]
+    Copy: Optional[List[D_Copy]]
+    Primary: Optional[List[D_Primary]]
+
+class P_Ref(StrDescModel) :
+    Link: Optional[List[AnyUrl]]
+    PMID: Optional[List[int]]
+    #Add a validator for PMID?
+    DOI: Optional[List[datetime.date]]
+
+class P_Copy(StrDescModel) :
+    Link: Optional[List[AnyUrl]]
+    PMID: Optional[List[int]]
+    #Add a validator for PMID?
+    DOI: Optional[List[datetime.date]]
+
+class P_Primary(StrDescModel) :
+    Link: Optional[List[AnyUrl]]
+    PMID: Optional[List[int]]
+    #Add a validator for PMID?
+    DOI: Optional[List[datetime.date]]
+
+class Paper(BaseModel) :
+    Ref: Optional[List[P_Ref]]
+    Copy: Optional[List[P_Copy]]
+    Primary: Optional[List[P_Primary]]
+
+class S_Ref(StrDescModel):
+    Type: List[str]
+    Version: Optional[List[str]]
+    
+class S_Copy(StrDescModel):
+    Type: List[str]
+    Version: Optional[List[str]]
+
+class S_Primary(StrDescModel):
+    Type: List[str]
+    Version: Optional[List[str]]
+
+class Software(BaseModel): 
+    Ref: Optional[List[S_Ref]]
+    Copy: Optional[List[S_Copy]]
+    Primary: Optional[List[S_Primary]]
 ################################
 # Overarching Model            #
 ################################
@@ -154,13 +197,14 @@ class BagIt(Entity) :
 class BCODMO(BaseModel):
     Data: List[Data]
 
-    @validator('Data')
-    @classmethod
-    def check_at_least_one_recorded(cls, v) :
-        if not any(map(lambda x: x.Flag == [DataTypeEnum.recorded], v)):
-            raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
-                                ' to mark the new data being submitted.')
-        return v
+    # TODO: FIX
+    #@validator('Data')
+    #@classmethod
+    #def check_at_least_one_recorded(cls, v) :
+    #    if not len(v['Primary']) > 0:
+    #        raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
+    #                            ' to mark the new data being submitted.')
+    #    return v
 
     Contributor: List[Contributor]
     Project: List[Project]
