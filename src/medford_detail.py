@@ -45,7 +45,12 @@ class detail() :
 
             return (True, True, cls(major_tokens, minor_token, lineno, depth, data))
         else :
+            if prev_detail is None:
+                raise ValueError("ERROR: Line " + str(lineno) + \
+                    " does not lead with a @ or a # (has neither a token nor is a comment.) " + \
+                    "Did you forget to declare a token? Or did you mean to make this a comment?\n\tLINE: " + line)
             return(True, False, prev_detail.addData(line))
+
 
     def addData(self, line) :
         self.Data = self.Data + " " + line
