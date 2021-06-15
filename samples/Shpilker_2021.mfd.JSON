@@ -1,0 +1,150 @@
+{
+  "Paper": [
+    {
+      "Primary": [
+        {
+          "desc": [
+            "MEDFORD: A human and machine readable markup language to facilitate FAIR coral metadata"
+          ],
+          "Note": [
+            "A paper describing the implementation of the MEDFORD file format, which has a parser that can take a provided MEDFORD file and additional arbitrary files and put them into a bag. A MEDFORD file can also be translated into other formats, such as the BCODMO submission format."
+          ]
+        }
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "desc": [
+        "Polina Shpilker"
+      ],
+      "Association": [
+        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+      ],
+      "Role": [
+        "First Author",
+        "Corresponding Author"
+      ],
+      "Email": [
+        "polina.shpilker@tufts.edu"
+      ]
+    },
+    {
+      "desc": [
+        "John Freeman"
+      ],
+      "Association": [
+        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Hailey McKelvie"
+      ],
+      "Association": [
+        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Jill Ashey"
+      ],
+      "Association": [
+        "Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Jay-Miguel Fonticella"
+      ],
+      "Association": [
+        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Hollie Putnam"
+      ],
+      "Association": [
+        "Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Jane Greenberg"
+      ],
+      "Association": [
+        "Department if Information Science, Drexel University, Street, Postcode, PA, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Lenore Cowen"
+      ],
+      "Association": [
+        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Alva Couch"
+      ],
+      "Association": [
+        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "desc": [
+        "Noah Daniels"
+      ],
+      "Association": [
+        "Department of Computer Science and Statistics, University of Rhode Island, Street, Postcode, RI, USA"
+      ],
+      "Role": [
+        "Last Author",
+        "Corresponding Author"
+      ],
+      "Email": [
+        "noah_daniels@uri.edu"
+      ]
+    }
+  ],
+  "Code": [
+    {
+      "Copy": [
+        {
+          "desc": [
+            "MEDFORD Parser Source Code"
+          ],
+          "URI": [
+            "https://github.com/infispiel/MEDFORD"
+          ]
+        }
+      ]
+    }
+  ]
+}

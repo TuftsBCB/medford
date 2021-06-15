@@ -19,10 +19,14 @@ def runMedford(filename, output_json, mode):
     details = []
     with open(filename, 'r') as f:
         all_lines = f.readlines()
+        prev_detail = None
         for i, line in enumerate(all_lines):
-            # TODO: Add logic for catching multi-line details...
-            if(line.strip() != "" and line[0] == '@') :
-                details.append(detail.FromLine(line, i))
+            if(line.strip() != "") :
+                noncomment, new_detail, returned_detail = detail.FromLine(line, i, prev_detail = prev_detail)
+                if noncomment and new_detail :
+                    details.append(returned_detail)
+                if noncomment:
+                    prev_detail = details[-1]
 
     parser = detailparser(details)
     final_dict = parser.export()
@@ -43,7 +47,8 @@ def runMedford(filename, output_json, mode):
 if __name__ == "__main__":
     #filename = "samples/pdam_cunning.MFD"
     #filename = "samples/made_up_BCODMO.MFD"
-    filename = "samples/made_up_Freeform.MFD"
+    #filename = "samples/made_up_Freeform.MFD"
+    filename = "samples/Shpilker_2021.mfd"
     #filename = "samples/made_up_BAGIT.MFD"
     output_json = True
 

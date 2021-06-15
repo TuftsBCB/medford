@@ -1,0 +1,55 @@
+# Author: Polina Shpilker
+# Last Modified: 06/15/2021
+
+# This is a MEDFORD file to describe the publication defining what a MEDFORD file is!
+@Paper_Primary MEDFORD: A human and machine readable markup language to facilitate FAIR coral metadata
+@Paper_Primary-Note A paper describing the implementation of the MEDFORD file format, which has a parser that
+can take a provided MEDFORD file and additional arbitrary files and put them into a bag. A MEDFORD file can also
+be translated into other formats, such as the BCODMO submission format.
+
+@Contributor Polina Shpilker
+@Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
+@Contributor-Role First Author
+@Contributor-Role Corresponding Author
+@Contributor-Email polina.shpilker@tufts.edu
+
+@Contributor John Freeman
+@Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
+@Contributor-Role Author
+
+@Contributor Hailey McKelvie
+@Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
+@Contributor-Role Author
+
+@Contributor Jill Ashey
+@Contributor-Association Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA
+@Contributor-Role Author
+
+@Contributor Jay-Miguel Fonticella
+@Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
+@Contributor-Role Author
+
+@Contributor Hollie Putnam
+@Contributor-Association Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA
+@Contributor-Role Author
+
+@Contributor Jane Greenberg
+@Contributor-Association Department if Information Science, Drexel University, Street, Postcode, PA, USA
+@Contributor-Role Author
+
+@Contributor Lenore Cowen
+@Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
+@Contributor-Role Author
+
+@Contributor Alva Couch
+@Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
+@Contributor-Role Author
+
+@Contributor Noah Daniels
+@Contributor-Association Department of Computer Science and Statistics, University of Rhode Island, Street, Postcode, RI, USA
+@Contributor-Role Last Author
+@Contributor-Role Corresponding Author
+@Contributor-Email noah_daniels@uri.edu
+
+@Code_Copy MEDFORD Parser Source Code
+@Code_Copy-URI https://github.com/infispiel/MEDFORD

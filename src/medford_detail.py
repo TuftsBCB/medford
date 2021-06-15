@@ -26,21 +26,29 @@ class detail() :
         self.Data = data
 
     @classmethod
-    def FromLine(cls, line, lineno) :
+    def FromLine(cls, line, lineno, prev_detail) :
         line = line.strip()
-        tokens, body = str.split(line, " ", 1)
-        tokens = str.replace(tokens, '@', "")
-        tokens_list = tokens.split("-")
+        if(line[0] == "#") :
+            return (False, False, None)
+        elif line[0] == "@" :
+            tokens, body = str.split(line, " ", 1)
+            tokens = str.replace(tokens, '@', "")
+            tokens_list = tokens.split("-")
 
-        if len(tokens_list) == 1 :
-            minor_token = "desc"
+            if len(tokens_list) == 1 :
+                minor_token = "desc"
+            else :
+                minor_token = tokens_list[1]
+            depth = len(tokens_list)
+            major_tokens = tokens_list[0].split("_")
+            data = body
+
+            return (True, True, cls(major_tokens, minor_token, lineno, depth, data))
         else :
-            minor_token = tokens_list[1]
-        depth = len(tokens_list)
-        major_tokens = tokens_list[0].split("_")
-        data = body
+            return(True, False, prev_detail.addData(line))
 
-        return cls(major_tokens, minor_token, lineno, depth, data)
+    def addData(self, line) :
+        self.Data = self.Data + " " + line
     
     def tabstring(self) :
         if self.Minor_Token != 'desc' :

@@ -152,6 +152,15 @@ class Entity(BaseModel):
     Journal: Optional[List[Journal]]
     Date: Optional[List[Date]]
     Contributor: Optional[List[Contributor]]
+
+    @validator('Contributor')
+    @classmethod
+    def ensure_corresponding_have_email(cls, v) :
+        for contributor in v:
+            roles = [str.lower(x).strip() for x in contributor.Role]
+            if 'corresponding author' in roles and contributor.Email is None:
+                raise ValueError("ERROR: Contributor " + contributor.desc[0] + " is marked as a corresponding author, but has no provided email.")
+                
     Funding: Optional[List[Funding]]
     Keyword: Optional[List[Keyword]]
     Species: Optional[List[Species]]
