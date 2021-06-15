@@ -28,6 +28,12 @@ class detail() :
     @classmethod
     def FromLine(cls, line, lineno, prev_detail) :
         line = line.strip()
+
+        if line[0] != "#" :
+            if "[...]" in line :
+                raise ValueError("ERROR: Line " + str(lineno) + \
+                    " contains the template marker [...]. Please substitute this with actual data!" + \
+                    "\n\tLINE: " + line)
         if(line[0] == "#") :
             return (False, False, None)
         elif line[0] == "@" :

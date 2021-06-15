@@ -22,7 +22,7 @@ def runMedford(filename, output_json, mode):
         prev_detail = None
         for i, line in enumerate(all_lines):
             if(line.strip() != "") :
-                noncomment, new_detail, returned_detail = detail.FromLine(line, i, prev_detail = prev_detail)
+                noncomment, new_detail, returned_detail = detail.FromLine(line, i+1, prev_detail = prev_detail)
                 if noncomment and new_detail :
                     details.append(returned_detail)
                 if noncomment:
