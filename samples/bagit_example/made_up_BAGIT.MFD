@@ -12,3 +12,7 @@
 @File A random File
 @File-Path LICENSE
 @File-Subdirectory licensing/
+
+@Data_Ref A random Data
+@Data_Ref-type lalala
+@Data_Ref-URI https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it

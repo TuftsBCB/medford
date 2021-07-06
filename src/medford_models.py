@@ -1,4 +1,4 @@
-from pydantic import BaseModel, AnyUrl, validator
+from pydantic import BaseModel, AnyUrl, validator, root_validator
 from typing import List, Optional, Union, Iterable
 import datetime
 from enum import Enum
@@ -61,11 +61,6 @@ class Method(StrDescModel):
     Company: Optional[List[str]]
     Sample: Optional[List[str]]
 
-class DataTypeEnum(str, Enum):
-    # TODO : How do we avoid caring about capitalization, tho?
-    recorded = "recorded"
-    referenced = "referenced"
-
 class Project(StrDescModel):
     pass
 
@@ -79,7 +74,7 @@ class Expedition(StrDescModel):
 class ArbitraryFile(StrDescModel):
     Path: List[str]
     Subdirectory: Optional[List[str]]
-    NewName: Optional[str]
+    bagName: Optional[str]
 
 class Freeform(BaseModel):
     class Config:
@@ -87,24 +82,27 @@ class Freeform(BaseModel):
     pass
 
 ## Multi-Typed tags (data, code, paper)
-class D_Ref(StrDescModel) :
+class LocalBase(StrDescModel):
+    Path: Optional[List[str]]
+    Subdirectory: Optional[List[str]]
+    bagName: Optional[str]
+
+class D_Ref(LocalBase) :
     Type: Optional[List[str]]
     URI: Optional[List[AnyUrl]]
 
-class D_Copy(StrDescModel) :
+class D_Copy(LocalBase) :
     Type: Optional[List[str]]
-    URI: Optional[List[AnyUrl]]
 
-class D_Primary(StrDescModel) :
+class D_Primary(LocalBase) :
     Type: Optional[List[str]]
-    URI: Optional[List[AnyUrl]]
 
 class Data(BaseModel) :
     Ref: Optional[List[D_Ref]]
     Copy: Optional[List[D_Copy]]
     Primary: Optional[List[D_Primary]]
 
-class P_Ref(StrDescModel) :
+class P_Ref(LocalBase) :
     Link: Optional[List[AnyUrl]]
     PMID: Optional[List[int]]
     #Add a validator for PMID?
@@ -131,11 +129,11 @@ class S_Ref(StrDescModel):
     Type: List[str]
     Version: Optional[List[str]]
     
-class S_Copy(StrDescModel):
+class S_Copy(LocalBase):
     Type: List[str]
     Version: Optional[List[str]]
 
-class S_Primary(StrDescModel):
+class S_Primary(LocalBase):
     Type: List[str]
     Version: Optional[List[str]]
 
@@ -171,6 +169,7 @@ class Entity(BaseModel):
     Freeform: Optional[List[Freeform]]
 
 class BagIt(Entity) :
+    Data: List[Data]
     # A BagIt requires:
     #   - at least one recorded Data
     #       (otherwise, what is the point of the bag?)
@@ -199,7 +198,45 @@ class BagIt(Entity) :
             if len(v.Subdirectory) > 1:
                 raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
                                 "Please use a separate @File tag for each output file.")
-            v = create_new_bagit_loc(v)
+            v = create_new_bagit_loc(v, "local")
+        return values
+
+    @validator('Data')
+    @classmethod
+    def create_bag_names(cls, values) :
+        for dtentry in values :
+            if dtentry.Primary:
+                for dentry in dtentry.Primary:
+                    dentry = create_new_bagit_loc(dentry, "local")
+            if dtentry.Copy:
+                for dentry in dtentry.Copy:
+                    dentry = create_new_bagit_loc(dentry, "local")
+            if dtentry.Ref:
+                for dentry in dtentry.Ref:
+                    dentry = create_new_bagit_loc(dentry, "remote")
+
+        return values
+    
+    @root_validator
+    @classmethod
+    def create_list_things_to_copy(cls, values) :
+        to_bag = []
+        to_bag_and_rm = []
+        if values.get("Files") and len(values.get("Files")) > 0 :
+            all_to_copy.extend(values.get("Files"))
+        
+        for major in ["Data", "Software"] :
+            if values.get(major) :
+                for maj in values.get(major) :
+                    if maj.Ref and len(maj.Ref) > 0 :
+                        to_bag_and_rm.extend(maj.Ref)
+                    if maj.Copy and len(maj.Copy) > 0:
+                        to_bag.extend(maj.Copy)
+                    if maj.Primary and len(maj.Primary) > 0:
+                        to_bag.extend(maj.Primary)
+
+        values["to_bag"] = to_bag
+        values["to_bag_and_rm"] = to_bag_and_rm
         return values
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
