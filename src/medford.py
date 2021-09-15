@@ -2,10 +2,10 @@ import os
 import shutil
 from medford_detailparser import *
 from medford_detail import *
-from medford_models import BCODMO, Entity, BagIt
+from medford_models import BCODMO, Entity
 from functools import reduce 
 from helpers_file import swap_file_loc
-from helpers_bagit import *
+from medford_BagIt import runBagitMode, BagIt
 import json
 
 from enum import Enum
@@ -33,7 +33,7 @@ def runMedford(filename, output_json, mode):
 
     parser = detailparser(details)
     final_dict = parser.export()
-
+    parser.write("tmp.txt")
     if mode == MFDMode.BCODMO:
         p = BCODMO(**final_dict)
     elif mode == MFDMode.BAGIT:
@@ -41,7 +41,7 @@ def runMedford(filename, output_json, mode):
         # Iterate through all Files and:
         #   - create hash
         #   - copy to new subdir & location in data/
-        run_bagit_mode(p, filename)
+        runBagitMode(p, filename)
     elif mode == MFDMode.OTHER:
         p = Entity(**final_dict)
     else :
@@ -50,42 +50,6 @@ def runMedford(filename, output_json, mode):
     if(output_json) :
         with open(filename + ".JSON", 'w') as f:
             json.dump(final_dict, f, indent=2)
-
-def run_bagit_mode(parameters, filename) :
-    bagdir = filename + "_BAG/"
-    if not os.path.isdir(bagdir) :
-        os.mkdir(bagdir)
-    if not os.path.isdir(bagdir + "data") :
-        os.mkdir(bagdir + "data/")
-    hash_file = bagdir + "manifest-sha512.txt"
-
-    with open(hash_file, 'w') as hashfile:
-
-        for f in parameters.to_bag :
-            dir_path = os.path.dirname(f.bagName)
-
-            if not os.path.isdir(bagdir + dir_path) :
-                os.makedirs(bagdir + dir_path)
-
-            f_hash = calculate_sha_512(f.Path[0])
-            shutil.copyfile(f.Path[0], bagdir + f.bagName)
-
-            hashfile.write("%s %s" % (f_hash, f.bagName))
-
-            dir_path = os.path.dirname(f.bagName)
-
-        for f in parameters.to_bag_and_rm :
-            dir_path = os.path.dirname(f.bagName)
-
-            if not os.path.isdir(bagdir + dir_path) :
-                os.makedirs(bagdir + dir_path)
-
-            f_hash = calculate_sha_512(f.Path[0])
-            shutil.copyfile(f.Path[0], bagdir + f.bagName)
-
-            hashfile.write("%s %s" % (f_hash, f.bagName))
-            os.remove(f.Path[0])
-        
 
 if __name__ == "__main__":
     #filename = "samples/pdam_cunning.MFD"

@@ -48,4 +48,23 @@ class detailparser :
     def export(self) :
         return deepcopy(self.data)
 
-    
+    def recursive_write(self, f, keystring, curdict) :
+        for idx, tag in enumerate(curdict.keys()) :
+            for dat in curdict[tag] :
+                if isinstance(dat, dict) :
+                    if keystring != "" :
+                        self.recursive_write(f, keystring + "_" + tag, dat)
+                    else :
+                        self.recursive_write(f, tag, dat)
+                else :
+                    if keystring == "" :
+                        f.write("@" + tag + " " + dat + "\n")
+                    else :
+                        f.write("@" + keystring + "-" + tag + " " + dat + "\n")
+                    if(idx == len(curdict.keys()) - 1) :
+                        f.write("\n")
+                        
+    def write(self, location) :
+        with open(location, 'w') as f:
+            self.recursive_write(f, "", self.data)
+            

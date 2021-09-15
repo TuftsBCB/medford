@@ -17,6 +17,10 @@ from helpers_file import *
 #       Return which ones *can* submit to & which *cannot*
 #       Can then re-run on specific mode to see specific errors
 
+
+class Config:
+    extra = 'allow'
+    
 ################################
 # Helper Models                #
 ################################
@@ -74,7 +78,8 @@ class Expedition(StrDescModel):
 class ArbitraryFile(StrDescModel):
     Path: List[str]
     Subdirectory: Optional[List[str]]
-    bagName: Optional[str]
+    URI: Optional[List[AnyUrl]]
+    output_path: Optional[str]
 
 class Freeform(BaseModel):
     class Config:
@@ -85,7 +90,7 @@ class Freeform(BaseModel):
 class LocalBase(StrDescModel):
     Path: Optional[List[str]]
     Subdirectory: Optional[List[str]]
-    bagName: Optional[str]
+    output_path: Optional[str]
 
 class D_Ref(LocalBase) :
     Type: Optional[List[str]]
@@ -167,77 +172,6 @@ class Entity(BaseModel):
     Data: Optional[List[Data]]
     File: Optional[List[ArbitraryFile]]
     Freeform: Optional[List[Freeform]]
-
-class BagIt(Entity) :
-    Data: List[Data]
-    # A BagIt requires:
-    #   - at least one recorded Data
-    #       (otherwise, what is the point of the bag?)
-    #   - arbitrary file definitions?
-    #   - The input MEDFORD file
-    #
-    # For every file (recorded data or arbitrary file definition), MEDFORD
-    #   parser has to:
-    #   - create a sha-512 hash or sha-256 hash
-    #   - copy into an appropriate subdirectory
-    #       (default: data/
-    #           alternative can be defined using the Subdirectory attribute)
-    #   - write down name & final location into a manifest file:
-    #       manifest-sha512.txt (or manifest-sha256.txt, depending on which was
-    #                               used)
-    #     in the format:
-    #       checksum filepath
-    #     NOTE: for now, don't allow any spaces, %, or linebreaks in file name
-    @validator('File')
-    @classmethod
-    def check_singular_path_subdirectory(cls, values):
-        for v in values:
-            # TODO: Don't allow remote files, yet... Separate tag? RemoteFile?
-            if len(v.Path) > 1 :
-                raise ValueError("Please create a separate @File tag for each recorded file.")
-            if len(v.Subdirectory) > 1:
-                raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
-                                "Please use a separate @File tag for each output file.")
-            v = create_new_bagit_loc(v, "local")
-        return values
-
-    @validator('Data')
-    @classmethod
-    def create_bag_names(cls, values) :
-        for dtentry in values :
-            if dtentry.Primary:
-                for dentry in dtentry.Primary:
-                    dentry = create_new_bagit_loc(dentry, "local")
-            if dtentry.Copy:
-                for dentry in dtentry.Copy:
-                    dentry = create_new_bagit_loc(dentry, "local")
-            if dtentry.Ref:
-                for dentry in dtentry.Ref:
-                    dentry = create_new_bagit_loc(dentry, "remote")
-
-        return values
-    
-    @root_validator
-    @classmethod
-    def create_list_things_to_copy(cls, values) :
-        to_bag = []
-        to_bag_and_rm = []
-        if values.get("Files") and len(values.get("Files")) > 0 :
-            all_to_copy.extend(values.get("Files"))
-        
-        for major in ["Data", "Software"] :
-            if values.get(major) :
-                for maj in values.get(major) :
-                    if maj.Ref and len(maj.Ref) > 0 :
-                        to_bag_and_rm.extend(maj.Ref)
-                    if maj.Copy and len(maj.Copy) > 0:
-                        to_bag.extend(maj.Copy)
-                    if maj.Primary and len(maj.Primary) > 0:
-                        to_bag.extend(maj.Primary)
-
-        values["to_bag"] = to_bag
-        values["to_bag_and_rm"] = to_bag_and_rm
-        return values
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
 class BCODMO(BaseModel):

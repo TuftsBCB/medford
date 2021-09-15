@@ -1,6 +1,5 @@
 import re, os
 import urllib3
-from helpers_bagit import bagit_settings
 
 def generate_output_name(directory_name, input_file) :
     """
@@ -49,41 +48,3 @@ def swap_file_loc(file_obj) :
     new_obj.pop('bagName', None)
     new_obj.pop('Subdirectory', None)
     return new_obj
-
-def create_new_bagit_loc(FileObj, fileType) :
-    """
-    Adjusts a given File object such that it is guaranteed that the file fulfills all requirements for copying.
-
-    These requirements are:
-        - valid input file (see valid_input_file)
-        - valid output location (see valid_filename_bagit)
-    
-    It then defines the File object's NewName parameter to contain a string representation of the location it should be
-        copied to.
-    """
-    if fileType == "remote" :
-        # copy the file using FileObj.URI
-        http = urllib3.PoolManager()
-        filename = os.path.basename(FileObj.URI[0])
-        request = http.request('GET', FileObj.URI[0])
-        if (request.status != 200) :
-            raise ValueError("Cannot reach file...")
-        with open(filename, "wb") as f:
-            f.write(request.data)
-        # Strip out to just the name of the file
-        # Then generate output name and continue as expected
-        FileObj.Path = [filename]
-
-    if FileObj.Subdirectory :
-        output_name = bagit_settings.prefix + generate_output_name(FileObj.Subdirectory[0], FileObj.Path[0])
-    else :
-        output_name = bagit_settings.prefix + "/" + FileObj.Path[0]
-    
-    can_write_new, reason = valid_filename_bagit(output_name)
-    if not can_write_new:
-        raise ValueError("Cannot copy file, reason: " + reason)
-    can_read_old, reason = valid_input_file(FileObj.Path[0])
-    if not can_read_old :
-        raise ValueError("Cannot copy file, reason: " + reason)
-    FileObj.bagName = output_name
-    return FileObj
