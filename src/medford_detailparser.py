@@ -68,3 +68,33 @@ class detailparser :
         with open(location, 'w') as f:
             self.recursive_write(f, "", self.data)
             
+    def recursive_write_from_dict(f, keystring, curdict, newline = False) :
+        for idx, tag in enumerate(curdict.keys()) :
+            if curdict[tag] is not None :
+                if isinstance(curdict[tag], list) :
+                    for dat in curdict[tag] :
+                        if isinstance(dat, dict):
+                            if keystring == "" :
+                                detailparser.recursive_write_from_dict(f, tag, dat)
+                            else :
+                                detailparser.recursive_write_from_dict(f, keystring + "_" + tag, dat)
+                        else :
+                            if keystring == "" :
+                                f.write("@" + tag + " " + str(dat) + "\n")
+                            else :
+                                if tag != "desc" :
+                                    f.write("@" + keystring + "-" + tag + " " + str(dat) + "\n")
+                                else :
+                                    f.write("@" + keystring + " " + str(dat) + "\n")
+                else :
+                    dat = curdict[tag]
+                    if tag != "desc" :
+                        f.write("@" + keystring + "-" + tag + " " + str(dat) + "\n")
+                    else :
+                        f.write("@" + keystring + " " + str(dat) + "\n")
+                if newline :
+                    f.write("\n")
+
+    def write_from_dict(d, location):
+        with open(location, 'w') as f:
+            detailparser.recursive_write_from_dict(f, "", d, newline = True)
