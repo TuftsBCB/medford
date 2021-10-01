@@ -1,1 +1,1 @@
-https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it - data//how-to-extract-a-filename-from-a-url-append-a-word-to-it
+https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it	-	data/file

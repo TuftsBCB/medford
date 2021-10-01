@@ -14,7 +14,7 @@ class MFDMode(Enum) :
     OTHER = 1
     BCODMO = 2
     BAGIT = 3
-
+    
 def runMedford(filename, output_json, mode):
     class FieldError(Exception):
         pass
@@ -33,7 +33,6 @@ def runMedford(filename, output_json, mode):
 
     parser = detailparser(details)
     final_dict = parser.export()
-    parser.write("tmp.txt")
     if mode == MFDMode.BCODMO:
         p = BCODMO(**final_dict)
     elif mode == MFDMode.BAGIT:
@@ -41,10 +40,6 @@ def runMedford(filename, output_json, mode):
         # Iterate through all Files and:
         #   - create hash
         #   - copy to new subdir & location in data/
-        print(p.dict())
-        t = p.dict()
-        detailparser.write_from_dict(p.dict(), "tmp.txt")
-        print("a")
         runBagitMode(p, filename)
     elif mode == MFDMode.OTHER:
         p = Entity(**final_dict)

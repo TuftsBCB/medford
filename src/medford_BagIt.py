@@ -1,8 +1,11 @@
 from medford_models import *
 from shutil import copyfile
-from typing import List, Optional, Union, Iterable
+from typing import Callable, List, Optional, Tuple, Union, Iterable
+from medford_detailparser import detailparser
 import hashlib
 import errno
+import itertools
+from copy import Error, deepcopy
 
 ## Helper Functions
 ### Hashing
@@ -24,112 +27,118 @@ class bagit_settings:
     regex = "^[^%\s]+$"
     output_location = ""
 
+LocalFile = Union[ArbitraryFile, D_Copy, D_Primary, S_Copy, S_Primary]
+RemoteFile = Union[ArbitraryFile, D_Ref, S_Ref]
+
 ### Complex Helpers
-def adjust_mfd_add_to_local(parameters, mfd_file) :
-    
-    with open(mfd_file, 'a') as f:
-        f.write("")
-        f.write("#Added by medford-BagIt parser")
-        f.write("@File Medford File")
-        f.write("@File-Path data/" + mfd_file)
-    
-
-
-def create_new_bagit_loc(FileObj, fileType) :
+def manage_local_file(inp_file: LocalFile) -> Tuple[str, int]:
     """
-    Adjusts a given File object such that it is guaranteed that the file fulfills all requirements for copying.
-
-    These requirements are:
-        - valid input file (see valid_input_file)
-        - valid output location (see valid_filename_bagit)
+    Given a "local" file (file with a defined PATH), defines its new bag-relative location, copies it to that location, and adjusts its internal stored path to that new location. Then, returned the calculated SHA of the file.
     
-    It then defines the File object's NewName parameter to contain a string representation of the location it should be
-        copied to.
+    INPUT:
+        **inp_file** (required) : the pydantic model of the file's information. Must have a Name and a non-empty Path. Subdirectory may or may not be defined.
+    
+    OUTPUT:
+        integer - the calculated sha of the copied file.
+
+    SIDE EFFECTS:
+        - changes inp_file's path, deletes subdirectory if defined.
+        - creates a new file in the user's system, under the BAG output location defined by bagit_settings.output_location
     """
-    if fileType == "remote" :
-        # copy the file using FileObj.URI
-        # http = urllib3.PoolManager()
-        filename = os.path.basename(FileObj.URI[0])
-        #request = http.request('GET', FileObj.URI[0])
-        #if (request.status != 200) :
-        #    raise ValueError("Cannot reach file...")
-        #with open(filename, "wb") as f:
-        #    f.write(request.data)
-        # Strip out to just the name of the file
-        # Then generate output name and continue as expected
-        FileObj.Path = [filename]
+    copy_location, relative_location = create_bagit_loc(inp_file)
+    copy_local_file(inp_file, copy_location)
+    mutate_local_file(inp_file, relative_location)
+    return (relative_location + inp_file.Name[0], calculate_sha_512(copy_location + inp_file.Name[0]))
 
-    if FileObj.Subdirectory :
-        output_name = bagit_settings.prefix + generate_output_name(FileObj.Subdirectory[0], FileObj.Path[0])
-    else :
-        output_name = bagit_settings.prefix + "/" + FileObj.Path[0]
-    FileObj.output_path = output_name
+def create_bagit_loc(inp_file: Union[LocalFile, RemoteFile]) -> Tuple[str, str]:
+    """Given a either a remote or local file, defines its new bag-relative location.
     
-    #can_write_new, reason = valid_filename_bagit(output_name)
-    #if not can_write_new:
-    #    raise ValueError("Cannot copy file, reason: " + reason)
-    #can_read_old, reason = valid_input_file(FileObj.Path[0])
-    #if not can_read_old :
-    #    raise ValueError("Cannot copy file, reason: " + reason)
-    #FileObj.bagName = output_name
-    #return FileObj
+    INPUT:
+        inp_file (r)    : the pydantic model of the file's information. Must have a Name. Subdirectory may or may not be defined.
 
-def create_fetch_txt(remote_files) :
-    # From the RFC documentation:
-    # (https://datatracker.ietf.org/doc/html/rfc8493#section-2.2.3)
+    OUTPUT:
+        Tuple[str,str] - A tuple of two strings, the first being the full run-relative path to copy the given file to and the second being the new bag-relative location of the file after copy. Both of these are generated using the prefix and bag_location defined in bagit_settings.
+    """
+    relative_location = bagit_settings.prefix
+    if inp_file.Subdirectory is not None and len(inp_file.Subdirectory) > 0 :
+        if inp_file.Subdirectory[0][-1] != "/" :
+            inp_file.Subdirectory[0] = inp_file.Subdirectory[0] + "/"
+        relative_location = relative_location + inp_file.Subdirectory[0]
+    return (bagit_settings.output_location + relative_location, relative_location)
 
-    # The fetch file MUST be named "fetch.txt".  Every file listed in the
-    # fetch file MUST be listed in every payload manifest.  A fetch file
-    # MUST NOT list any tag files.
+def copy_local_file(inp_file: LocalFile, copy_location: str) -> Tuple[bool, Union[None, Error]]:
+    """
+    Given a "local" file (file with a defined PATH), copies it from its original path to its bag-relative location.
+    
+    INPUT: 
+        **inp_file** (required) : the pydantic model of the file's information. Must have a Name and a Path.
+        **copy_location** (required) : the location that was determined to be the bag-relative location this file should be copied to.
+    
+    OUTPUT:
+        Tuple[bool, None | Error] - a tuple where the first bool represents whether or not the copy was successful. If the copy was unsuccessful (bool is False), the error message is stored in the second entry of the Tuple.
 
-    # Each line of a fetch file MUST be of the form
-
-    # url length filepath
-
-    # where _url_ identifies the file to be fetched and MUST be an absolute
-    # URI as defined in [RFC3986], _length_ is the number of octets in the
-    # file (or "-", to leave it unspecified), and _filepath_ identifies the
-    # corresponding payload file, relative to the base directory.
-
-    # The slash character ('/') MUST be used as a path separator in
-    # _filepath_. One or more linear whitespace characters (spaces or tabs)
-    # MUST separate these three values, and any such characters in the
-    # _url_ MUST be percent-encoded [RFC3986].  If _filename_ includes an
-    # LF, a CR, a CRLF, or a percent sign (%), those characters (and only
-    # those) MUST be percent-encoded as described in [RFC3986].  There is
-    # no limitation on the length of any of the fields in the fetch file.
-    with open(bagit_settings.output_location + "/fetch.txt", 'w') as fetchtxt:
-        for f in remote_files :
-            fetchtxt.write(f.URI[0] + " - " + f.output_path + "\n")
-    pass
-
-def copy_local_files(files) :
-    copied_files = []
+    SIDE EFFECTS:
+        - Copies the local file from Path to _output_path.
+    """
     try:
-        for f in files :
-            outdir = bagit_settings.output_location + bagit_settings.prefix
-            if f.Subdirectory and len(f.Subdirectory) > 0 :
-                outdir = outdir + f.Subdirectory[0]
-            os.makedirs(outdir, exist_ok=True)
-
-            copyfile(f.Path[0], bagit_settings.output_location + f.output_path)
-            copied_files.append(f.output_path)
-        # to copy the files
-        pass
+        os.makedirs(copy_location, exist_ok=True)
+        copyfile(inp_file.Path[0], copy_location + inp_file.Name[0])
+        return((True, None))
     except OSError as e:
-        if e.errno == errno.ENOSPC :
-            print("Ran out of disk space while copying! Deleting the duplicated files."+
-                  "\nPlease make sure you have enough space to make a copy of every file you want to include in the bag.")
-        else :
-            print(e)
-        for f in copied_files :
-            os.remove(f)
+        return((False, e))
 
-def create_hash_file(files) :
-    with open(bagit_settings.output_location + "manifest-sha512.txt", 'w') as hashfile:
-        for f in files :
-           f_hash = calculate_sha_512(f.Path[0])
-           hashfile.write("%s %s" % (f_hash, f.output_path)) 
+def mutate_local_file(inp_file: LocalFile, relative_location: str) -> None :
+    """
+    Given a local file and its relative location, adjusts its pydantic model to represent the new bag-relative location.
+
+    INPUT:
+        **inp_file** (required) : the pydantic model of the file's information. Must have a Name.
+        **relative_location** (required) : the new location of the copied file, relative to the root of the bag.
+    
+    SIDE EFFECTS:
+        - changes Path in input_file to point to relative_location + inp_file.Name[0], and deletes Subdirectory if defined.
+    """
+    inp_file.Path = [relative_location + inp_file.Name[0]]
+    inp_file.Subdirectory = None
+
+def manage_remote_file(inp_file: RemoteFile) -> str:
+    """Creates the fetch.txt line for a file
+
+    Given a "remote file", generates the line to be entered into fetch.txt.
+
+    INPUT:
+        inp_file (r)    : the pydantic model of the file's information. Must have a Name and a URI.
+    
+    OUTPUT:
+        str     - a string that fulfills all the requirements for fetchtxt, formatted as follows:
+            (inp_file URI)  -   (inp_file output location)
+    """
+    copy_location, relative_location = create_bagit_loc(inp_file)
+    fetchstring = inp_file.URI[0] + "\t-\t" + relative_location + inp_file.Name[0]
+    return fetchstring
+
+def perform_medford_munging(mfd_input: str, howto_write: Callable[[ArbitraryFile, str],None]) -> Tuple[str, int] :
+    # TODO: foolproof way of getting medford file name
+    mfd_name = os.path.basename(mfd_input)
+    mfd_model = ArbitraryFile(desc = ['Medford File'], Name = [mfd_name])
+    output_location, relative_location = create_bagit_loc(mfd_model)
+    mutate_local_file(mfd_model, relative_location)
+    howto_write(mfd_model, output_location + mfd_name)
+
+    sha = calculate_sha_512(output_location + mfd_name)
+    return((relative_location + mfd_name, sha))
+
+def write_manifest(sha_entries) :
+    with open(bagit_settings.output_location + "manifest-sha512.txt", 'w') as f:
+        for entry in sha_entries:
+            f.write("%s %s" % entry)
+            f.write("\n")
+
+def write_fetch(fetch_entries) :
+    with open(bagit_settings.output_location + "fetch.txt", 'w') as f:
+        for entry in fetch_entries :
+            f.write(entry)
+            f.write("\n")
 
 ## Models
 class BagIt(Entity) :
@@ -162,50 +171,7 @@ class BagIt(Entity) :
             if len(v.Subdirectory) > 1:
                 raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
                                 "Please use a separate @File tag for each output file.")
-            v = create_new_bagit_loc(v, "local")
-        return values
-
-    @validator('Data')
-    @classmethod
-    def create_bag_names(cls, values) :
-        for dtentry in values :
-            if dtentry.Primary:
-                for dentry in dtentry.Primary:
-                    dentry = create_new_bagit_loc(dentry, "local")
-            if dtentry.Copy:
-                for dentry in dtentry.Copy:
-                    dentry = create_new_bagit_loc(dentry, "local")
-            if dtentry.Ref:
-                for dentry in dtentry.Ref:
-                    dentry = create_new_bagit_loc(dentry, "remote")
-
-        return values
-    
-    @root_validator
-    @classmethod
-    def create_list_things_to_copy(cls, values) :
-        local = []
-        remote = []
-        if values.get("File") and len(values.get("File")) > 0 :
-            arbfiles = values.get("File")
-            for f in arbfiles :
-                if f.URI and len(f.URI) > 0 :
-                    remote.append(f)
-                else : 
-                    local.append(f)
-        
-        for major in ["Data", "Software"] :
-            if values.get(major) :
-                for maj in values.get(major) :
-                    if maj.Ref and len(maj.Ref) > 0 :
-                        remote.extend(maj.Ref)
-                    if maj.Copy and len(maj.Copy) > 0:
-                        local.extend(maj.Copy)
-                    if maj.Primary and len(maj.Primary) > 0:
-                        local.extend(maj.Primary)
-
-        values["local"] = local
-        values["remote"] = remote
+            #v = create_new_bagit_loc(v, "local")
         return values
 
 ## Runners
@@ -215,10 +181,47 @@ def runBagitMode(parameters, medford_input) :
         os.mkdir(bagdir)
     if not os.path.isdir(bagdir + "data") :
         os.mkdir(bagdir + "data/")
+    
+    # Deep copying parameters because we are about to do a LOT of mutation
+    _parameters = deepcopy(parameters)
     bagit_settings.output_location = bagdir
 
-    #adjust_mfd_add_to_local(parameters.local)
-    copy_local_files(parameters.local)
-    create_fetch_txt(parameters.remote)
-    create_hash_file(parameters.local)
+    sha_entries = []
+    fetch_entries = []
+    if _parameters.File is not None and len(_parameters.File) > 0 :
+        for possible_file in _parameters.File :
+            if possible_file.Path is not None :
+                sha_entries.append(manage_local_file(possible_file))
+            elif possible_file.URI is not None :
+                fetch_entries.append(manage_remote_file(possible_file))
+            else :
+                raise NotImplementedError #fix error type
+
+    local_named = []
+    remote_named = []
+    if _parameters.Data is not None :
+        local_named = itertools.chain(itertools.dropwhile(lambda x: x is None, [_parameters.Data[0].Copy, _parameters.Data[0].Primary]))
+        remote_named = _parameters.Data[0].Ref if _parameters.Data[0].Ref is not None else []
+    if _parameters.Software is not None :
+        local_named = local_named + itertools.chain(itertools.dropwhile(lambda x: x is None, [_parameters.Data[0].Software, _parameters.Software[0].Primary]))
+        remote_named = remote_named + _parameters.Software[0].Ref if _parameters.Software[0].Ref is not None else []
+    
+    for lf in local_named:
+        sha_entries.append(manage_local_file(lf))
+
+    for rf in remote_named:
+        fetch_entries.append(manage_remote_file(rf))
+
+    if _parameters.File is None:
+        _parameters.File = []
+
+    def write_medford_file(mfd_model, final_location) :
+        _parameters.File.append(mfd_model)
+        detailparser.write_from_dict(_parameters.dict(), final_location)
+
+    sha_entries.append(perform_medford_munging(medford_input, write_medford_file))
+    
+    write_manifest(sha_entries)
+    write_fetch(fetch_entries)
+
     #zip_all_files()

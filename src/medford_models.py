@@ -76,7 +76,8 @@ class Expedition(StrDescModel):
     Synonyms: Optional[List[str]]
 
 class ArbitraryFile(StrDescModel):
-    Path: List[str]
+    Name: List[str]
+    Path: Optional[List[str]]
     Subdirectory: Optional[List[str]]
     URI: Optional[List[AnyUrl]]
     output_path: Optional[str]
@@ -88,6 +89,7 @@ class Freeform(BaseModel):
 
 ## Multi-Typed tags (data, code, paper)
 class LocalBase(StrDescModel):
+    Name: List[str]
     Path: Optional[List[str]]
     Subdirectory: Optional[List[str]]
     output_path: Optional[str]

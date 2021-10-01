@@ -44,6 +44,9 @@
       "desc": [
         "A random File"
       ],
+      "Name": [
+        "LICENSE"
+      ],
       "Path": [
         "LICENSE"
       ],
@@ -58,6 +61,9 @@
         {
           "desc": [
             "A random Data"
+          ],
+          "Name": [
+            "file"
           ],
           "type": [
             "lalala"
