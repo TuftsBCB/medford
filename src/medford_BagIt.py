@@ -1,5 +1,5 @@
 from medford_models import *
-from shutil import copyfile
+from shutil import copyfile, make_archive
 from typing import Callable, List, Optional, Tuple, Union, Iterable
 from medford_detailparser import detailparser
 import hashlib
@@ -39,7 +39,7 @@ def manage_local_file(inp_file: LocalFile) -> Tuple[str, int]:
         **inp_file** (required) : the pydantic model of the file's information. Must have a Name and a non-empty Path. Subdirectory may or may not be defined.
     
     OUTPUT:
-        integer - the calculated sha of the copied file.
+        Tuple[str, int] - the calculated sha of the copied file and the bag-relative file location.
 
     SIDE EFFECTS:
         - changes inp_file's path, deletes subdirectory if defined.
@@ -118,6 +118,17 @@ def manage_remote_file(inp_file: RemoteFile) -> str:
     return fetchstring
 
 def perform_medford_munging(mfd_input: str, howto_write: Callable[[ArbitraryFile, str],None]) -> Tuple[str, int] :
+    """Create an entry for the current medford file, write the adjusted file into the bag.
+
+    Given the current medford file location, creates an ArbitraryFile entry for the medford. Then, calculates what its location inside the bag should be and modifies the ArbitraryFile entry appropriately. Then uses the passed howto_write function to write the fully adjusted medford file to the correct location before finally returning all the information required for the manifest.
+
+    INPUT:
+        mfd_input (r)   : (str) The location of the .mfd file that MEDFORD is currently running on.
+        howto_write (r) : (Callable[[ArbitraryFile, str], None] A function that given the medford pydantic model and an output location, writes the adjusted medford file in medford format to that location.
+        
+    OUTPUT:
+        Tuple[str, int] : A tuple containing all of the information required for the manifest (bag-relative location and sha integer.))
+    """
     # TODO: foolproof way of getting medford file name
     mfd_name = os.path.basename(mfd_input)
     mfd_model = ArbitraryFile(desc = ['Medford File'], Name = [mfd_name])
@@ -139,6 +150,12 @@ def write_fetch(fetch_entries) :
         for entry in fetch_entries :
             f.write(entry)
             f.write("\n")
+
+def zip_all_files(mfd_input) :
+    # WARNING: VERY fragile; not tested on windows or macs whatsoever.
+    zipname = os.path.splitext(os.path.basename(mfd_input))[0]
+    dirname = os.path.dirname(mfd_input)
+    make_archive(dirname + "/" + zipname, "zip", bagit_settings.output_location)
 
 ## Models
 class BagIt(Entity) :
@@ -164,6 +181,7 @@ class BagIt(Entity) :
     @validator('File')
     @classmethod
     def check_singular_path_subdirectory(cls, values):
+        #TODO Need more validation, my brain is just too fried to think of it right now.
         for v in values:
             # TODO: Don't allow remote files, yet... Separate tag? RemoteFile?
             if len(v.Path) > 1 :
@@ -224,4 +242,4 @@ def runBagitMode(parameters, medford_input) :
     write_manifest(sha_entries)
     write_fetch(fetch_entries)
 
-    #zip_all_files()
+    zip_all_files(medford_input)

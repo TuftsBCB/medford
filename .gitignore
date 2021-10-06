@@ -3,3 +3,4 @@ TODO
 __pycache__/*
 .vscode/*
 .pylintrc
+*.zip
