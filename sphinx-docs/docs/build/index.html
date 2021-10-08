@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to MEDFORD’s documentation! &#8212; MEDFORD 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-medford_BagIt">
+<span id="welcome-to-medford-s-documentation"></span><h1>Welcome to MEDFORD’s documentation!<a class="headerlink" href="#module-medford_BagIt" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="medford_BagIt.copy_local_file">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">copy_local_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Primary</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Primary</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_location</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span> </span><span class="pre">copy.Error</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#medford_BagIt.copy_local_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a “local” file (file with a defined PATH), copies it from its original path to its bag-relative location.</p>
+<dl class="simple">
+<dt>INPUT: </dt><dd><p><strong>inp_file</strong> (required) : the pydantic model of the file’s information. Must have a Name and a Path.
+<strong>copy_location</strong> (required) : the location that was determined to be the bag-relative location this file should be copied to.</p>
+</dd>
+<dt>OUTPUT:</dt><dd><p>Tuple[bool, None | Error] - a tuple where the first bool represents whether or not the copy was successful. If the copy was unsuccessful (bool is False), the error message is stored in the second entry of the Tuple.</p>
+</dd>
+<dt>SIDE EFFECTS:</dt><dd><ul class="simple">
+<li><p>Copies the local file from Path to _output_path.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.create_bagit_loc">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">create_bagit_loc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Primary</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Primary</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Ref</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Ref</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#medford_BagIt.create_bagit_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a either a remote or local file, defines its new bag-relative location.</p>
+<dl class="simple">
+<dt>INPUT:</dt><dd><p>inp_file (r)    : the pydantic model of the file’s information. Must have a Name. Subdirectory may or may not be defined.</p>
+</dd>
+<dt>OUTPUT:</dt><dd><p>Tuple[str,str] - A tuple of two strings, the first being the full run-relative path to copy the given file to and the second being the new bag-relative location of the file after copy. Both of these are generated using the prefix and bag_location defined in bagit_settings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.manage_local_file">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">manage_local_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Primary</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Primary</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#medford_BagIt.manage_local_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a “local” file (file with a defined PATH), defines its new bag-relative location, copies it to that location, and adjusts its internal stored path to that new location. Then, returned the calculated SHA of the file.</p>
+<dl class="simple">
+<dt>INPUT:</dt><dd><p><strong>inp_file</strong> (required) : the pydantic model of the file’s information. Must have a Name and a non-empty Path. Subdirectory may or may not be defined.</p>
+</dd>
+<dt>OUTPUT:</dt><dd><p>Tuple[str, int] - the calculated sha of the copied file and the bag-relative file location.</p>
+</dd>
+<dt>SIDE EFFECTS:</dt><dd><ul class="simple">
+<li><p>changes inp_file’s path, deletes subdirectory if defined.</p></li>
+<li><p>creates a new file in the user’s system, under the BAG output location defined by bagit_settings.output_location</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.manage_remote_file">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">manage_remote_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Ref</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Ref</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#medford_BagIt.manage_remote_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the fetch.txt line for a file</p>
+<p>Given a “remote file”, generates the line to be entered into fetch.txt.</p>
+<dl class="simple">
+<dt>INPUT:</dt><dd><p>inp_file (r)    : the pydantic model of the file’s information. Must have a Name and a URI.</p>
+</dd>
+<dt>OUTPUT:</dt><dd><dl class="simple">
+<dt>str     - a string that fulfills all the requirements for fetchtxt, formatted as follows:</dt><dd><p>(inp_file URI)  -   (inp_file output location)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.mutate_local_file">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">mutate_local_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Primary</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Primary</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_location</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#medford_BagIt.mutate_local_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>[summary]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp_file</strong> (<em>LocalFile</em>) – the pydantic model of the file’s information. Must have a Name.</p></li>
+<li><p><strong>relative_location</strong> (<em>str</em>) – The new location of the copied file, relative to the root of the bag.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.perform_medford_munging">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">perform_medford_munging</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mfd_input</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">howto_write</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#medford_BagIt.perform_medford_munging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an entry for the current medford file, write the adjusted file into the bag.</p>
+<p>Given the current medford file location, creates an ArbitraryFile entry for the medford. Then, calculates what its location inside the bag should be and modifies the ArbitraryFile entry appropriately. Then uses the passed howto_write function to write the fully adjusted medford file to the correct location before finally returning all the information required for the manifest.</p>
+<dl class="simple">
+<dt>INPUT:</dt><dd><p>mfd_input (r)   : (str) The location of the .mfd file that MEDFORD is currently running on.
+howto_write (r) : (Callable[[ArbitraryFile, str], None] A function that given the medford pydantic model and an output location, writes the adjusted medford file in medford format to that location.</p>
+</dd>
+<dt>OUTPUT:</dt><dd><p>Tuple[str, int] : A tuple containing all of the information required for the manifest (bag-relative location and sha integer.))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">MEDFORD</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Polina Shpilker.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
