@@ -1,8 +1,6 @@
 from medford_detailparser import *
 from medford_detail import *
 from medford_models import BCODMO, Entity
-from functools import reduce 
-from helpers_file import swap_file_loc
 from medford_BagIt import runBagitMode, BagIt
 import json
 
@@ -62,9 +60,6 @@ def runMedford(filename, output_json, mode):
         p = BCODMO(**final_dict)
     elif mode == MFDMode.BAGIT:
         p = BagIt(**final_dict)
-        # Iterate through all Files and:
-        #   - create hash
-        #   - copy to new subdir & location in data/
         runBagitMode(p, filename)
     elif mode == MFDMode.OTHER:
         p = Entity(**final_dict)
@@ -77,5 +72,4 @@ def runMedford(filename, output_json, mode):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-
     runMedford(args.file, args.write_json, args.mode)
