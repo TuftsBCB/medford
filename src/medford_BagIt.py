@@ -95,6 +95,17 @@ def mutate_local_file(inp_file: LocalFile, relative_location: str) -> None :
     :param relative_location: The new location of the copied file, relative to the root of the bag.
     :type relative_location: str
     
+    :sideeffect
+    """
+    """
+    Given a local file and its relative location, adjusts its pydantic model to represent the new bag-relative location.
+
+    INPUT:
+        **inp_file** (required) : the pydantic model of the file's information. Must have a Name.
+        **relative_location** (required) : the new location of the copied file, relative to the root of the bag.
+    
+    SIDE EFFECTS:
+        - changes Path in input_file to point to relative_location + inp_file.Name[0], and deletes Subdirectory if defined.
     """
     inp_file.Path = [relative_location + inp_file.Name[0]]
     inp_file.Subdirectory = None
