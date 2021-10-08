@@ -1,5 +1,3 @@
-import os
-import shutil
 from medford_detailparser import *
 from medford_detail import *
 from medford_models import BCODMO, Entity
@@ -8,13 +6,40 @@ from helpers_file import swap_file_loc
 from medford_BagIt import runBagitMode, BagIt
 import json
 
-from enum import Enum
+import argparse
+
+from enum import Enum, auto
+
 
 class MFDMode(Enum) :
-    OTHER = 1
-    BCODMO = 2
-    BAGIT = 3
+    OTHER = 'OTHER'
+    BCODMO = 'BCODMO'
+    BAGIT = 'BAGIT'
+
+    def __str__(self):
+        return self.value
+
+class ParserMode(Enum) :
+    validate = 'validate'
+    compile = 'compile'
+
+    def __str__(self):
+        return self.value
     
+# Command Line Arguments
+# TODO: How can I make it require an MFDMode value, but lowercase is OK?
+#       Do I actually care?
+parser = argparse.ArgumentParser()
+parser.add_argument("-m", "--mode", type=MFDMode, choices=list(MFDMode), default=MFDMode.OTHER, required=True,
+    help="Which Output mode the MEDFORD parser should validate or compile for.")
+parser.add_argument("action", type=ParserMode, choices=list(ParserMode), 
+    help="Whether the MEDFORD parser is only validating or actually compiling (performing any necessary adjustments or actions for the appropriate format, such as creating a Bag for the BagIt mode.)")
+parser.add_argument("file", type=str, help="The input MEDFORD file to validate or compile.")
+parser.add_argument("--write_json", action="store_true", default=False,
+    help="Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
+parser.add_argument("--debug", "-d", "-v", action="store_true", default=False,
+    help="Enable verbose mode for MEDFORD, enabling various debug messages during runtime.")
+
 def runMedford(filename, output_json, mode):
     class FieldError(Exception):
         pass
@@ -51,11 +76,6 @@ def runMedford(filename, output_json, mode):
             json.dump(final_dict, f, indent=2)
 
 if __name__ == "__main__":
-    #filename = "samples/pdam_cunning.MFD"
-    #filename = "samples/made_up_BCODMO.MFD"
-    #filename = "samples/made_up_Freeform.MFD"
-    #filename = "samples/Shpilker_2021.mfd"
-    filename = "samples/bagit_example/made_up_BAGIT.MFD"
-    output_json = True
+    args = parser.parse_args()
 
-    runMedford(filename, output_json, MFDMode.BAGIT)
+    runMedford(args.file, args.write_json, args.mode)

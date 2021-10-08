@@ -76,7 +76,7 @@ class Expedition(StrDescModel):
     Synonyms: Optional[List[str]]
 
 class ArbitraryFile(StrDescModel):
-    Name: List[str]
+    Filename: List[str]
     Path: Optional[List[str]]
     Subdirectory: Optional[List[str]]
     URI: Optional[List[AnyUrl]]

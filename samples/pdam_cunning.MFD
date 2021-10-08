@@ -22,7 +22,8 @@
 #Contributors will be names, they can have subtypes of association, role, contact, etc.
 @Contributor Ross Cunning 
 @Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA. 
-@Contributor-Role First Author, Corresponding Author
+@Contributor-Role First Author
+@Contributor-Role Corresponding Author
 @Contributor-Email ross.cunning@gmail.com 
 
 @Contributor R.A. Bay
@@ -120,13 +121,13 @@
 @Code_Ref InterProScan 
 @Code_Ref-Type Assign GO terms to protein sequences 
 
-@Data_Ref P. damicornis annotation github repository 
-@Data_Ref-URI https://github.com/jrcunning/pdam-genome 
-@Data_Ref-Type Github
+#@Data_Ref P. damicornis annotation github repository 
+#@Data_Ref-URI https://github.com/jrcunning/pdam-genome 
+#@Data_Ref-Type Github
 
-@Data_Ref Reef Genomics Pocillopora damicornis 
-@Data_Ref-URI http://pdam.reefgenomics.org 
-@Data_Ref-Type Website 
+#@Data_Ref Reef Genomics Pocillopora damicornis 
+#@Data_Ref-URI http://pdam.reefgenomics.org 
+#@Data_Ref-Type Website 
 
-@Data_Ref NCBI Pocillopora damicornis 
-@Data_Ref-Type Database
+#@Data_Ref NCBI Pocillopora damicornis 
+#@Data_Ref-Type Database
