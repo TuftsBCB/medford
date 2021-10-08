@@ -30,8 +30,73 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-medford_BagIt">
-<span id="welcome-to-medford-s-documentation"></span><h1>Welcome to MEDFORD’s documentation!<a class="headerlink" href="#module-medford_BagIt" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-medford-s-documentation">
+<h1>Welcome to MEDFORD’s documentation!<a class="headerlink" href="#welcome-to-medford-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="bagit-as-reference">
+<h1>BagIt as Reference<a class="headerlink" href="#bagit-as-reference" title="Permalink to this headline">¶</a></h1>
+<p>BagIt, woohoo!
+Note to self, the code to re-compile is:</p>
+<dl class="simple">
+<dt>::</dt><dd><p>sphinx-build -b html sphinx-docs/docs/source sphinx-docs/docs/build</p>
+</dd>
+</dl>
+<p>Also, if restructuredText is breaking, use Ctrl + Shift + P to open keyboard shortcuts. Then, search for all keyboard shortcuts containins restructuredtext.editor.listEditing and delete them.</p>
+<span class="target" id="module-medford_BagIt"></span><dl class="py class">
+<dt id="medford_BagIt.BagIt">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">BagIt</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Paper</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Paper</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Journal</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Journal</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Date</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Contributor</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Contributor</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Funding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Funding</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Keyword</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Keyword</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Species</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Species</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Method</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Method</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Software</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Software</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Data</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">File</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Freeform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Freeform</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.BagIt" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="medford_BagIt.BagIt.Data">
+<code class="sig-name descname"><span class="pre">Data</span></code><em class="property"><span class="pre">:</span> <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.Data</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#medford_BagIt.BagIt.Data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="medford_BagIt.BagIt.check_singular_path_subdirectory">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">check_singular_path_subdirectory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.BagIt.check_singular_path_subdirectory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="medford_BagIt.bagit_settings">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">bagit_settings</span></code><a class="headerlink" href="#medford_BagIt.bagit_settings" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="medford_BagIt.bagit_settings.output_location">
+<code class="sig-name descname"><span class="pre">output_location</span></code><em class="property"> <span class="pre">=</span> <span class="pre">''</span></em><a class="headerlink" href="#medford_BagIt.bagit_settings.output_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="medford_BagIt.bagit_settings.prefix">
+<code class="sig-name descname"><span class="pre">prefix</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'data/'</span></em><a class="headerlink" href="#medford_BagIt.bagit_settings.prefix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="medford_BagIt.bagit_settings.regex">
+<code class="sig-name descname"><span class="pre">regex</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'^[^%\\s]+$'</span></em><a class="headerlink" href="#medford_BagIt.bagit_settings.regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.calculate_sha_256">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">calculate_sha_256</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.calculate_sha_256" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.calculate_sha_512">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">calculate_sha_512</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.calculate_sha_512" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt id="medford_BagIt.copy_local_file">
 <code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">copy_local_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">medford_models.ArbitraryFile</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.D_Primary</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Copy</span><span class="p"><span class="pre">,</span> </span><span class="pre">medford_models.S_Primary</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_location</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span> </span><span class="pre">copy.Error</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#medford_BagIt.copy_local_file" title="Permalink to this definition">¶</a></dt>
@@ -122,16 +187,26 @@ howto_write (r) : (Callable[[ArbitraryFile, str], None] A function that given th
 </dl>
 </dd></dl>
 
-<div class="toctree-wrapper compound">
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
+<dl class="py function">
+<dt id="medford_BagIt.runBagitMode">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">runBagitMode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medford_input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.runBagitMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.write_fetch">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">write_fetch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fetch_entries</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.write_fetch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.write_manifest">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">write_manifest</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sha_entries</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.write_manifest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="medford_BagIt.zip_all_files">
+<code class="sig-prename descclassname"><span class="pre">medford_BagIt.</span></code><code class="sig-name descname"><span class="pre">zip_all_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mfd_input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#medford_BagIt.zip_all_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
