@@ -26,6 +26,11 @@ class TestDetailMethods(unittest.TestCase) :
         self.assertListEqual(d.Major_Tokens, ["Freeform","Date"])
         self.assertEqual(d.Minor_Token, "Note")
         self.assertEqual(d.Data, "Samples Obtained")
+    
+    def test_recognizes_template(self) :
+        example_line = "@Date-Note [...]"
+        with self.assertRaises(ValueError) :
+            detail.FromLine(example_line, -1, None)
 
     # Tests for Macro functionality.
     def test_add_macro(self) :
