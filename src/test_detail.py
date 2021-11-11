@@ -32,6 +32,13 @@ class TestDetailMethods(unittest.TestCase) :
         with self.assertRaises(ValueError) :
             detail.FromLine(example_line, -1, None, None)
 
+    def test_detail_multiline(self) :
+        example_line_1 = "@Date-Note asdf "
+        example_line_2 = "More asdf"
+        _,_, d, _ = detail.FromLine(example_line_1, -1, None, None)
+        _,_, d, _ = detail.FromLine(example_line_2, -1, d, None)
+        self.assertEqual(d.Data, "asdf More asdf")
+
     # Tests for Macro functionality.
     def test_add_macro(self) :
         example_line = "`@macro_name macro body"
@@ -73,7 +80,7 @@ class TestDetailMethods(unittest.TestCase) :
         _, _, _, macro2 = detail.FromLine(example_line_2, -1, None, macro)
         self.assertEqual(macro, macro2)
         self.assertListEqual(list(detail.macro_dictionary.keys()), ["macro_name"])
-        self.assertEqual(detail.macro_dictionary[macro2], "macro_body\nmacro_body_2")
+        self.assertEqual(detail.macro_dictionary[macro2], "macro_body macro_body_2")
 
     def test_substitutes_multiline_macro(self) :
         macro_body_1 = "macro_body"
@@ -85,13 +92,13 @@ class TestDetailMethods(unittest.TestCase) :
         _,_,_, macro = detail.FromLine(example_line, -1, None, None)
         detail.FromLine(example_line_2, -1, None, macro)
         _,_, d, _ = detail.FromLine(example_line_3, -1, None, None)
-        self.assertEqual(d.Data, macro_body_1 + "\n" + macro_body_2)
+        self.assertEqual(d.Data, macro_body_1 + " " + macro_body_2)
 
     # Tests for Comment functionality
     def test_ignores_inline_in_macro(self) :
         example_line = "`@macro_name macro_body # this is a comment"
         _,_,_, macro = detail.FromLine(example_line, -1, None, None)
-        self.assertEqual(detail.macro_dictionary[macro], "macro_body ")
+        self.assertEqual(detail.macro_dictionary[macro], "macro_body")
 
 
 if __name__ == '__main__':

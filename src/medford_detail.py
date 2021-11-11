@@ -63,15 +63,20 @@ class detail() :
         """
         line = line.strip()
 
+        # Line contains a template marker, and isn't a comment
         if line[0] != detail.comment_head :
             if detail.template_flag in line :
                 raise ValueError("ERROR: Line " + str(lineno) + \
                     " contains the template marker [...]. Please substitute this with actual data!" + \
                     "\n\tLINE: " + line)
+
         # Line contains a comment
         if detail.comment_flag in line :
             comment_ind = line.find(detail.comment_flag) 
             line = line[:comment_ind]
+
+            # Make sure there's no trailing spaces after we remove the inline comment.
+            line = line.strip()
 
         # Line is a comment
         if(line[0] == detail.comment_head) :
@@ -122,7 +127,7 @@ class detail() :
         # Line is a run-over from a previous line.
         else :
             if prev_macro is not None:
-                detail.macro_dictionary[prev_macro] = detail.macro_dictionary[prev_macro] + "\n" + line
+                detail.addMacroData(prev_macro, line)
                 return(False, False, None, prev_macro)
             elif prev_detail is None:
                 raise ValueError("ERROR: Line " + str(lineno) + \
@@ -132,9 +137,14 @@ class detail() :
             return(True, False, prev_detail, None)
 
 
+    # TODO: add logic to check if next line leads with space or not.
     def addData(self, line) :
         self.Data = self.Data + " " + line
     
+    @classmethod
+    def addMacroData(cls, macro_name, line) :
+        detail.macro_dictionary[macro_name] = detail.macro_dictionary[macro_name] + " " + line
+
     def tabstring(self) :
         if self.Minor_Token != 'desc' :
             return('\t'*self.depth + self.Minor_Token + ': ' + self.Data)
