@@ -45,14 +45,14 @@ def runMedford(filename, output_json, mode):
     details = []
     with open(filename, 'r') as f:
         all_lines = f.readlines()
-        prev_detail = None
+        dr = None
         for i, line in enumerate(all_lines):
             if(line.strip() != "") :
-                noncomment, new_detail, returned_detail = detail.FromLine(line, i+1, prev_detail = prev_detail)
-                if noncomment and new_detail :
-                    details.append(returned_detail)
-                if noncomment:
-                    prev_detail = details[-1]
+                # TODO: move the details collection logic to detail? I don't like that we have to pull the typing here.
+                dr = detail.FromLine(line, i+1, dr)
+                if isinstance(dr, detail_return) :
+                    if dr.is_novel :
+                        details.append(dr.detail)
 
     parser = detailparser(details)
     final_dict = parser.export()
