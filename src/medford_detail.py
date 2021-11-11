@@ -68,14 +68,14 @@ class detail() :
                 raise ValueError("ERROR: Line " + str(lineno) + \
                     " contains the template marker [...]. Please substitute this with actual data!" + \
                     "\n\tLINE: " + line)
-        # Line is a comment
-        if(line[0] == detail.comment_head) :
-            return (False, False, None, None)
-
         # Line contains a comment
         if detail.comment_flag in line :
             comment_ind = line.find(detail.comment_flag) 
-            data = line[:comment_ind]
+            line = line[:comment_ind]
+
+        # Line is a comment
+        if(line[0] == detail.comment_head) :
+            return (False, False, None, None)
 
         # Line is defining a macro
         elif line[:2] == detail.macro_head :
@@ -119,7 +119,7 @@ class detail() :
 
             return (True, True, cls(major_tokens, minor_token, lineno, depth, data), None)
 
-        # The line is a run-over from a previous line.
+        # Line is a run-over from a previous line.
         else :
             if prev_macro is not None:
                 detail.macro_dictionary[prev_macro] = detail.macro_dictionary[prev_macro] + "\n" + line

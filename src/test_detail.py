@@ -87,6 +87,12 @@ class TestDetailMethods(unittest.TestCase) :
         _,_, d, _ = detail.FromLine(example_line_3, -1, None, None)
         self.assertEqual(d.Data, macro_body_1 + "\n" + macro_body_2)
 
+    # Tests for Comment functionality
+    def test_ignores_inline_in_macro(self) :
+        example_line = "`@macro_name macro_body # this is a comment"
+        _,_,_, macro = detail.FromLine(example_line, -1, None, None)
+        self.assertEqual(detail.macro_dictionary[macro], "macro_body ")
+
 
 if __name__ == '__main__':
     unittest.main()
