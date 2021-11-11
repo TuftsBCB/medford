@@ -72,6 +72,11 @@ class detail() :
         if(line[0] == detail.comment_head) :
             return (False, False, None, None)
 
+        # Line contains a comment
+        if detail.comment_flag in line :
+            comment_ind = line.find(detail.comment_flag) 
+            data = line[:comment_ind]
+
         # Line is defining a macro
         elif line[:2] == detail.macro_head :
             macro_name, macro_body = line[2:].split(" ",1)
@@ -111,9 +116,6 @@ class detail() :
                         " tries to use macro " + found_macro_name + ", but this macro has not previously been defined." + \
                         " Are you sure you did not mis-spell the macro name? Or that you actually defined it?")
 
-            if detail.comment_flag in data :
-                comment_ind = data.find(detail.comment_flag) 
-                data = data[:comment_ind]
 
             return (True, True, cls(major_tokens, minor_token, lineno, depth, data), None)
 
