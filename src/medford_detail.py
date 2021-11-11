@@ -9,7 +9,15 @@
 #   A Depth (the number of Major tokens in the instance)
 #   Data    (the data stored within the instance)
 
-from typing import Union, TypeVar
+from typing import Union
+
+class detail_return():
+    is_novel : bool = False
+    detail : 'detail' = None
+
+    def __init__(self, is_novel, detail):
+        self.is_novel = is_novel
+        self.detail = detail
 
 class detail() :
     #static
@@ -45,7 +53,7 @@ class detail() :
     #TODO : For the love of all that is good in this world, split this up into different cases...
     #           e.g. "handle_macro"?
     @classmethod
-    def FromLine(cls, line: str, lineno: int, prev_detail: Union[None, 'detail'], prev_macro: Union[None,str]) -> tuple[bool, bool, 'detail', str] :
+    def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return, str]) -> Union[None, detail_return, str] :
         """Generate a Detail object from a line, the line number, and the Detail generated directly previous.
 
         :param line: A string to parse into a detail, from a MFD file.
@@ -80,7 +88,7 @@ class detail() :
 
         # Line is a comment
         if(line[0] == detail.comment_head) :
-            return (False, False, None, None)
+            return None
 
         # Line is defining a macro
         elif line[:2] == detail.macro_head :
@@ -90,7 +98,7 @@ class detail() :
                     " tries to define macro " + macro_name + " to be '" + macro_body + "', but " + \
                     macro_name + " is already defined!")
             detail.macro_dictionary[macro_name] = macro_body
-            return (False, False, None, macro_name)
+            return macro_name
 
         # Line follows the standard major-minor format
         elif line[0] == "@" :
@@ -121,20 +129,20 @@ class detail() :
                         " tries to use macro " + found_macro_name + ", but this macro has not previously been defined." + \
                         " Are you sure you did not mis-spell the macro name? Or that you actually defined it?")
 
-
-            return (True, True, cls(major_tokens, minor_token, lineno, depth, data), None)
+            return detail_return(True, cls(major_tokens, minor_token, lineno, depth, data))
 
         # Line is a run-over from a previous line.
         else :
-            if prev_macro is not None:
-                detail.addMacroData(prev_macro, line)
-                return(False, False, None, prev_macro)
-            elif prev_detail is None:
+            if isinstance(previous_return, detail_return) :
+                previous_return.detail.addData(line)
+                return detail_return(False, previous_return.detail)
+            elif isinstance(previous_return, str) :
+                detail.addMacroData(str(previous_return), line)
+                return previous_return
+            else :
                 raise ValueError("ERROR: Line " + str(lineno) + \
                     " does not lead with a @ or a # (has neither a token nor is a comment.) " + \
                     "Did you forget to declare a token? Or did you mean to make this a comment?\n\tLINE: " + line)
-            prev_detail.addData(line)
-            return(True, False, prev_detail, None)
 
 
     # TODO: add logic to check if next line leads with space or not.
