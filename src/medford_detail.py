@@ -45,7 +45,7 @@ class detail() :
     #TODO : For the love of all that is good in this world, split this up into different cases...
     #           e.g. "handle_macro"?
     @classmethod
-    def FromLine(cls, line: str, lineno: int, prev_detail: Union[None, 'detail']) -> tuple[bool, bool, 'detail'] :
+    def FromLine(cls, line: str, lineno: int, prev_detail: Union[None, 'detail'], prev_macro: Union[None,str]) -> tuple[bool, bool, 'detail', str] :
         """Generate a Detail object from a line, the line number, and the Detail generated directly previous.
 
         :param line: A string to parse into a detail, from a MFD file.
@@ -58,7 +58,7 @@ class detail() :
         :raises ValueError: A Macro name that has already been used is detected.
         :raises ValueError: A Macro is referred to that has not yet been defined.
         :raises ValueError: A catch-all error when we have no idea how to process the line provided.
-        :return: A 3-tuple describing : Is this data, is this NOVEL data, and the Detail object. The 'novel' data flag was added to accomodate multi-line details.
+        :return: A 3-tuple describing : Is this detail data, is this NOVEL detail data, and the Detail object. The 'novel' data flag was added to accomodate multi-line details.
         :rtype: Tuple(Bool, Bool, Detail)
         """
         line = line.strip()
@@ -68,10 +68,11 @@ class detail() :
                 raise ValueError("ERROR: Line " + str(lineno) + \
                     " contains the template marker [...]. Please substitute this with actual data!" + \
                     "\n\tLINE: " + line)
-
+        # Line is a comment
         if(line[0] == detail.comment_head) :
-            return (False, False, None)
+            return (False, False, None, None)
 
+        # Line is defining a macro
         elif line[:2] == detail.macro_head :
             macro_name, macro_body = line[2:].split(" ",1)
             if macro_name in detail.macro_dictionary.keys() :
@@ -79,8 +80,9 @@ class detail() :
                     " tries to define macro " + macro_name + " to be '" + macro_body + "', but " + \
                     macro_name + " is already defined!")
             detail.macro_dictionary[macro_name] = macro_body
-            return (False, False, None)
+            return (False, False, None, macro_name)
 
+        # Line follows the standard major-minor format
         elif line[0] == "@" :
             tokens, body = str.split(line, " ", 1)
             tokens = str.replace(tokens, '@', "")
@@ -113,15 +115,19 @@ class detail() :
                 comment_ind = data.find(detail.comment_flag) 
                 data = data[:comment_ind]
 
-            return (True, True, cls(major_tokens, minor_token, lineno, depth, data))
+            return (True, True, cls(major_tokens, minor_token, lineno, depth, data), None)
 
+        # The line is a run-over from a previous line.
         else :
-            if prev_detail is None:
+            if prev_macro is not None:
+                detail.macro_dictionary[prev_macro] = detail.macro_dictionary[prev_macro] + "\n" + line
+                return(False, False, None, prev_macro)
+            elif prev_detail is None:
                 raise ValueError("ERROR: Line " + str(lineno) + \
                     " does not lead with a @ or a # (has neither a token nor is a comment.) " + \
                     "Did you forget to declare a token? Or did you mean to make this a comment?\n\tLINE: " + line)
             prev_detail.addData(line)
-            return(True, False, prev_detail)
+            return(True, False, prev_detail, None)
 
 
     def addData(self, line) :
