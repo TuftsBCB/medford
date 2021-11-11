@@ -41,8 +41,8 @@ class TestDetailMethods(unittest.TestCase) :
     def test_add_multiple_macros(self) :
         example_line = "`@macro_name macro body"
         example_line_2 = "`@macro_name_2 macro body"
-        _, _, _ = detail.FromLine(example_line, -1, None)
-        _, _, _ = detail.FromLine(example_line_2, -1, None)
+        detail.FromLine(example_line, -1, None)
+        detail.FromLine(example_line_2, -1, None)
         self.assertListEqual(list(detail.macro_dictionary.keys()), ["macro_name", "macro_name_2"])
 
     def test_add_same_macro_name(self) :
@@ -56,14 +56,14 @@ class TestDetailMethods(unittest.TestCase) :
         example_line = "`@macro_name macro body"
         example_line_2 = "@major-minor text `@macro_name"
         detail.FromLine(example_line, -1, None)
-        is_detail, is_new, d = detail.FromLine(example_line_2, -1, None)
+        _, _, d = detail.FromLine(example_line_2, -1, None)
         self.assertEqual(d.Data, "text macro body")
 
     def test_correctly_substitutes_macro_with_stuff_after(self) :
         example_line = "`@macro_name macro body"
         example_line_2 = "@major-minor text `@macro_name asdf asdf asdf"
         detail.FromLine(example_line, -1, None)
-        is_detail, is_new, d = detail.FromLine(example_line_2, -1, None)
+        _, _, d = detail.FromLine(example_line_2, -1, None)
         self.assertEqual(d.Data, "text macro body asdf asdf asdf")
 
 if __name__ == '__main__':
