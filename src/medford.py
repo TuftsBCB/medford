@@ -74,22 +74,6 @@ def runMedford(filename, output_json, mode):
         with open(filename + ".JSON", 'w') as f:
             json.dump(final_dict, f, indent=2)
 
-def handle_errors(err, final_dict) :
-    errors = err.errors()
-    ### TODO:
-    # 1. collapse all errors that happen at the same location
-    # 2. figure out what the type was supposed to be, and human-ify-it
-    # 2.5 figure out the specific combination of tokens that got us here -- technically can achieve this by crunching apart the error json. 
-    #       May be worth moving this logic to the detailparser, since this will change with detailparser updates.
-    # 3. save this as a new error message, accessing the info's loc to get the location in the file
-    t_err = final_dict
-    for key in errors[0]['loc'][:-1]:
-        print(key)
-        t_err = t_err[key]
-    new_err = TypeError("ERROR: Provided @major-minor in line " + t_err[0] + " is of the wrong format. It needs to be TYPE, but instead is TYPE.")
-    #errors[0]['loc']
-    raise NotImplementedError()
-
 if __name__ == "__main__":
     args = parser.parse_args()
     runMedford(args.file, args.write_json, args.mode)

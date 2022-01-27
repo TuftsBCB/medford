@@ -34,7 +34,6 @@ class IncompleteDataError(ValueError):
 class StrDescModel(BaseModel):
     desc: ListT[str] #TODO: Find a way to make an exception?
     Note: OptListT[str]
-#    Note: Optional[List[str]]
 
 ################################
 # Field Models                 #
@@ -88,6 +87,16 @@ class Expedition(StrDescModel):
     MooringID: OptListT[str]
     DiveNumber: OptListT[int]
     Synonyms: OptListT[str]
+
+    #def check_at_least_one_identifier(cls, v) :
+    #    values = {key:value for key, value in v[0].__dict__.items() if not key.startswith('__') and not callable(key)}
+    #    has_shipname = values['ShipName'] is not None and values['CruiseID'] is not None
+    #    has_mooring = values['MooringID'] is not None 
+    #    has_divenumber = values['DiveNumber'] is not None 
+    #    if not any([has_shipname, has_mooring, has_divenumber]) :
+    #        raise ValueError('BCO-DMO requires at least one cruise identifier. Your choices are: \n' +
+    #                            '     ShipName and CruiseID, MooringID, or DiveNumber.')
+    #    return v
 
 class ArbitraryFile(StrDescModel):
     #todo: change to filename
@@ -183,34 +192,8 @@ class Entity(BaseModel):
     Freeform: OptListT[Freeform]
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
-# NOTE: Broken AF right now, will NOT work because of refactoring to include line #s.
 class BCODMO(BaseModel):
     Data: List[Data]
-
-    # TODO: FIX
-    #@validator('Data')
-    #@classmethod
-    #def check_at_least_one_recorded(cls, v) :
-    #    if not len(v['Primary']) > 0:
-    #        raise ValueError('There must be at least 1 data field flagged as "recorded" for the BCO-DMO format,' +
-    #                            ' to mark the new data being submitted.')
-    #    return v
-
     Contributor: List[Contributor]
     Project: List[Project]
     Expedition: List[Expedition]
-
-    # https://github.com/samuelcolvin/pydantic/issues/506
-    # Check for at least one acceptable form of cruise identifier.
-    @validator('Expedition')
-    @classmethod
-    def check_at_least_one_identifier(cls, v) :
-        values = {key:value for key, value in v[0].__dict__.items() if not key.startswith('__') and not callable(key)}
-        has_shipname = values['ShipName'] is not None and values['CruiseID'] is not None
-        has_mooring = values['MooringID'] is not None 
-        has_divenumber = values['DiveNumber'] is not None 
-        if not any([has_shipname, has_mooring, has_divenumber]) :
-            raise ValueError('BCO-DMO requires at least one cruise identifier. Your choices are: \n' +
-                                '     ShipName and CruiseID, MooringID, or DiveNumber.')
-        return v
-    
