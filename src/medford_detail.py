@@ -86,6 +86,9 @@ class detail() :
             # Make sure there's no trailing spaces after we remove the inline comment.
             line = line.strip()
 
+        if(len(line) == 0) :
+            return None
+        
         # Line is a comment
         if(line[0] == detail.comment_head) :
             return None

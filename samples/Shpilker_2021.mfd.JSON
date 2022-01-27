@@ -1,150 +1,306 @@
 {
   "Paper": [
-    {
-      "Primary": [
-        {
-          "desc": [
-            "MEDFORD: A human and machine readable markup language to facilitate FAIR coral metadata"
-          ],
-          "Note": [
-            "A paper describing the implementation of the MEDFORD file format, which has a parser that can take a provided MEDFORD file and additional arbitrary files and put them into a bag. A MEDFORD file can also be translated into other formats, such as the BCODMO submission format."
+    [
+      5,
+      {
+        "Primary": [
+          [
+            5,
+            {
+              "desc": [
+                [
+                  5,
+                  "MEDFORD: A human and machine readable markup language to facilitate FAIR coral metadata"
+                ]
+              ],
+              "Note": [
+                [
+                  6,
+                  "A paper describing the implementation of the MEDFORD file format, which has a parser that can take a provided MEDFORD file and additional arbitrary files and put them into a bag. A MEDFORD file can also be translated into other formats, such as the BCODMO submission format."
+                ]
+              ]
+            }
           ]
-        }
-      ]
-    }
+        ]
+      }
+    ]
   ],
   "Contributor": [
-    {
-      "desc": [
-        "Polina Shpilker"
-      ],
-      "Association": [
-        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-      ],
-      "Role": [
-        "First Author",
-        "Corresponding Author"
-      ],
-      "Email": [
-        "polina.shpilker@tufts.edu"
-      ]
-    },
-    {
-      "desc": [
-        "John Freeman"
-      ],
-      "Association": [
-        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Hailey McKelvie"
-      ],
-      "Association": [
-        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Jill Ashey"
-      ],
-      "Association": [
-        "Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Jay-Miguel Fonticella"
-      ],
-      "Association": [
-        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Hollie Putnam"
-      ],
-      "Association": [
-        "Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Jane Greenberg"
-      ],
-      "Association": [
-        "Department if Information Science, Drexel University, Street, Postcode, PA, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Lenore Cowen"
-      ],
-      "Association": [
-        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Alva Couch"
-      ],
-      "Association": [
-        "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "desc": [
-        "Noah Daniels"
-      ],
-      "Association": [
-        "Department of Computer Science and Statistics, University of Rhode Island, Street, Postcode, RI, USA"
-      ],
-      "Role": [
-        "Last Author",
-        "Corresponding Author"
-      ],
-      "Email": [
-        "noah_daniels@uri.edu"
-      ]
-    }
+    [
+      10,
+      {
+        "desc": [
+          [
+            10,
+            "Polina Shpilker"
+          ]
+        ],
+        "Association": [
+          [
+            11,
+            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            12,
+            "First Author"
+          ],
+          [
+            13,
+            "Corresponding Author"
+          ]
+        ],
+        "Email": [
+          [
+            14,
+            "polina.shpilker@tufts.edu"
+          ]
+        ]
+      }
+    ],
+    [
+      16,
+      {
+        "desc": [
+          [
+            16,
+            "John Freeman"
+          ]
+        ],
+        "Association": [
+          [
+            17,
+            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            18,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      20,
+      {
+        "desc": [
+          [
+            20,
+            "Hailey McKelvie"
+          ]
+        ],
+        "Association": [
+          [
+            21,
+            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            22,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      24,
+      {
+        "desc": [
+          [
+            24,
+            "Jill Ashey"
+          ]
+        ],
+        "Association": [
+          [
+            25,
+            "Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA"
+          ]
+        ],
+        "Role": [
+          [
+            26,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      28,
+      {
+        "desc": [
+          [
+            28,
+            "Jay-Miguel Fonticella"
+          ]
+        ],
+        "Association": [
+          [
+            29,
+            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            30,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      32,
+      {
+        "desc": [
+          [
+            32,
+            "Hollie Putnam"
+          ]
+        ],
+        "Association": [
+          [
+            33,
+            "Department of Biological Sciences, University of Rhode Island, Street, Postcode, RI, USA"
+          ]
+        ],
+        "Role": [
+          [
+            34,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      36,
+      {
+        "desc": [
+          [
+            36,
+            "Jane Greenberg"
+          ]
+        ],
+        "Association": [
+          [
+            37,
+            "Department if Information Science, Drexel University, Street, Postcode, PA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            38,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      40,
+      {
+        "desc": [
+          [
+            40,
+            "Lenore Cowen"
+          ]
+        ],
+        "Association": [
+          [
+            41,
+            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            42,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      44,
+      {
+        "desc": [
+          [
+            44,
+            "Alva Couch"
+          ]
+        ],
+        "Association": [
+          [
+            45,
+            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
+          ]
+        ],
+        "Role": [
+          [
+            46,
+            "Author"
+          ]
+        ]
+      }
+    ],
+    [
+      48,
+      {
+        "desc": [
+          [
+            48,
+            "Noah Daniels"
+          ]
+        ],
+        "Association": [
+          [
+            49,
+            "Department of Computer Science and Statistics, University of Rhode Island, Street, Postcode, RI, USA"
+          ]
+        ],
+        "Role": [
+          [
+            50,
+            "Last Author"
+          ],
+          [
+            51,
+            "Corresponding Author"
+          ]
+        ],
+        "Email": [
+          [
+            52,
+            "noah_daniels@uri.edu"
+          ]
+        ]
+      }
+    ]
   ],
   "Code": [
-    {
-      "Copy": [
-        {
-          "desc": [
-            "MEDFORD Parser Source Code"
-          ],
-          "URI": [
-            "https://github.com/infispiel/MEDFORD"
+    [
+      54,
+      {
+        "Copy": [
+          [
+            54,
+            {
+              "desc": [
+                [
+                  54,
+                  "MEDFORD Parser Source Code"
+                ]
+              ],
+              "URI": [
+                [
+                  55,
+                  "https://github.com/infispiel/MEDFORD"
+                ]
+              ]
+            }
           ]
-        }
-      ]
-    }
+        ]
+      }
+    ]
   ]
 }

@@ -1,5 +1,6 @@
+from re import L
 from pydantic import BaseModel, AnyUrl, validator, root_validator
-from typing import List, Optional, Union, Iterable
+from typing import List, Optional, Union, TypeVar, Generic
 import datetime
 from enum import Enum
 from helpers_file import *
@@ -17,70 +18,83 @@ from helpers_file import *
 #       Return which ones *can* submit to & which *cannot*
 #       Can then re-run on specific mode to see specific errors
 
+T = TypeVar('T')
+OptListT = Optional[List[tuple[int,T]]]
+ListT = List[tuple[int,T]]
 
 class Config:
     extra = 'allow'
     
+class IncompleteDataError(ValueError):
+    code = "incomplete_data_error"
+
 ################################
 # Helper Models                #
 ################################
 class StrDescModel(BaseModel):
-    desc: List[str] #TODO: Find a way to make an exception?
-    Note: Optional[List[str]]
+    desc: ListT[str] #TODO: Find a way to make an exception?
+    Note: OptListT[str]
+#    Note: Optional[List[str]]
 
 ################################
 # Field Models                 #
 ################################
 
 class Journal(StrDescModel):
-    Volume: List[int]
-    Issue: List[int]
-    Pages: Optional[List[str]] #TODO: Validation?
+    Volume: ListT[int]
+    Issue: ListT[int]
+    Pages: OptListT[str] #TODO: Validation?
 
 class Date(BaseModel):
-    desc: Union[List[datetime.date], List[datetime.datetime]]
-    Note: List[str]
+    desc: Union[ListT[datetime.date], ListT[datetime.datetime]]
+    Note: ListT[str]
     #changed type to note because type is a reserved keyword
 
 class Contributor(StrDescModel) :
-    ORCID: Optional[List[int]]
-    Assocation: Optional[List[str]]
-    Role: Optional[List[str]]
-    Email: Optional[List[str]] #TODO: Email validation
+    ORCID: OptListT[int]
+    Assocation: OptListT[str]
+    Role: OptListT[str]
+    Email: OptListT[str] #TODO: Email validation
+
+    @root_validator
+    def check_corresponding_has_contact(cls, v) :
+        roles = [r[1] for r in v['Role']]
+        if "Corresponding Author" in roles and v["Email"] is None :
+            raise IncompleteDataError("Corresponding Authors must have a provided validated email")
 
 class Funding(StrDescModel) :
-    ID: Optional[List[str]] #TODO: Funding ID validation?
+    ID: OptListT[str] #TODO: Funding ID validation?
 
 class Keyword(StrDescModel):
     pass
 
 class Species(StrDescModel):
-    Loc: List[str]
-    ReefCollection: List[str] # TODO: Change to date with note?
-    Cultured: List[str]
-    CultureCollection: List[str]
+    Loc: ListT[str]
+    ReefCollection: ListT[str] # TODO: Change to date with note?
+    Cultured: ListT[str]
+    CultureCollection: ListT[str]
 
 class Method(StrDescModel):
-    Type: List[str]
-    Company: Optional[List[str]]
-    Sample: Optional[List[str]]
+    Type: ListT[str]
+    Company: OptListT[str]
+    Sample: OptListT[str]
 
 class Project(StrDescModel):
     pass
 
 class Expedition(StrDescModel):
-    ShipName: Optional[List[str]]
-    CruiseID: Optional[List[str]]
-    MooringID: Optional[List[str]]
-    DiveNumber: Optional[List[int]]
-    Synonyms: Optional[List[str]]
+    ShipName: OptListT[str]
+    CruiseID: OptListT[str]
+    MooringID: OptListT[str]
+    DiveNumber: OptListT[int]
+    Synonyms: OptListT[str]
 
 class ArbitraryFile(StrDescModel):
     #todo: change to filename
-    Name: List[str]
-    Path: Optional[List[str]]
-    Subdirectory: Optional[List[str]]
-    URI: Optional[List[AnyUrl]]
+    Name: ListT[str]
+    Path: OptListT[str]
+    Subdirectory: OptListT[str]
+    URI: OptListT[AnyUrl]
     output_path: Optional[str]
 
 class Freeform(BaseModel):
@@ -90,93 +104,86 @@ class Freeform(BaseModel):
 
 ## Multi-Typed tags (data, code, paper)
 class LocalBase(StrDescModel):
-    Name: List[str]
-    Path: Optional[List[str]]
-    Subdirectory: Optional[List[str]]
+    Name: ListT[str]
+    Path: OptListT[str]
+    Subdirectory: OptListT[str]
     output_path: Optional[str]
 
 class D_Ref(LocalBase) :
-    Type: Optional[List[str]]
-    URI: Optional[List[AnyUrl]]
+    Type: OptListT[str]
+    URI: OptListT[AnyUrl]
 
 class D_Copy(LocalBase) :
-    Type: Optional[List[str]]
+    Type: OptListT[str]
 
 class D_Primary(LocalBase) :
-    Type: Optional[List[str]]
+    Type: OptListT[str]
 
 class Data(BaseModel) :
-    Ref: Optional[List[D_Ref]]
-    Copy: Optional[List[D_Copy]]
-    Primary: Optional[List[D_Primary]]
+    Ref: OptListT[D_Ref]
+    Copy: OptListT[D_Copy]
+    Primary: OptListT[D_Primary]
 
 class P_Ref(LocalBase) :
-    Link: Optional[List[AnyUrl]]
-    PMID: Optional[List[int]]
+    Link: OptListT[AnyUrl]
+    PMID: OptListT[int]
     #Add a validator for PMID?
-    DOI: Optional[List[datetime.date]]
+    DOI: OptListT[datetime.date]
 
 class P_Copy(StrDescModel) :
-    Link: Optional[List[AnyUrl]]
-    PMID: Optional[List[int]]
+    Link: OptListT[AnyUrl]
+    PMID: OptListT[int]
     #Add a validator for PMID?
-    DOI: Optional[List[datetime.date]]
+    DOI: OptListT[datetime.date]
 
 class P_Primary(StrDescModel) :
-    Link: Optional[List[AnyUrl]]
-    PMID: Optional[List[int]]
+    Link: OptListT[AnyUrl]
+    PMID: OptListT[int]
     #Add a validator for PMID?
-    DOI: Optional[List[datetime.date]]
+    DOI: OptListT[datetime.date]
 
 class Paper(BaseModel) :
-    Ref: Optional[List[P_Ref]]
-    Copy: Optional[List[P_Copy]]
-    Primary: Optional[List[P_Primary]]
+    Ref: OptListT[P_Ref]
+    Copy: OptListT[P_Copy]
+    Primary: OptListT[P_Primary]
 
 class S_Ref(StrDescModel):
-    Type: List[str]
-    Version: Optional[List[str]]
+    Type: ListT[str]
+    Version: OptListT[str]
     
 class S_Copy(LocalBase):
-    Type: List[str]
-    Version: Optional[List[str]]
+    Type: ListT[str]
+    Version: OptListT[str]
 
 class S_Primary(LocalBase):
-    Type: List[str]
-    Version: Optional[List[str]]
+    Type: ListT[str]
+    Version: OptListT[str]
 
 class Software(BaseModel): 
-    Ref: Optional[List[S_Ref]]
-    Copy: Optional[List[S_Copy]]
-    Primary: Optional[List[S_Primary]]
+    Ref: OptListT[S_Ref]
+    Copy: OptListT[S_Copy]
+    Primary: OptListT[S_Primary]
+
 ################################
 # Overarching Model            #
 ################################
 # Meant to store every single possible tag that we have defined
 class Entity(BaseModel):
-    Paper: Optional[List[Paper]]
-    Journal: Optional[List[Journal]]
-    Date: Optional[List[Date]]
-    Contributor: Optional[List[Contributor]]
-
-    @validator('Contributor')
-    @classmethod
-    def ensure_corresponding_have_email(cls, v) :
-        for contributor in v:
-            roles = [str.lower(x).strip() for x in contributor.Role]
-            if 'corresponding author' in roles and contributor.Email is None:
-                raise ValueError("ERROR: Contributor " + contributor.desc[0] + " is marked as a corresponding author, but has no provided email.")
-                
-    Funding: Optional[List[Funding]]
-    Keyword: Optional[List[Keyword]]
-    Species: Optional[List[Species]]
-    Method: Optional[List[Method]]
-    Software: Optional[List[Software]]
-    Data: Optional[List[Data]]
-    File: Optional[List[ArbitraryFile]]
-    Freeform: Optional[List[Freeform]]
+    Paper: OptListT[Paper]
+    Journal: OptListT[Journal]
+    Date: OptListT[Date]
+    Contributor: OptListT[Contributor]
+    Funding: OptListT[Funding]
+    Keyword: OptListT[Keyword]
+    Species: OptListT[Species]
+    Method: OptListT[Method]
+    Software: OptListT[Software]
+    Data: OptListT[Data]
+    File: OptListT[ArbitraryFile]
+    Freeform: OptListT[Freeform]
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
+# NOTE: Broken AF right now, will NOT work because of refactoring to include line #s.
 class BCODMO(BaseModel):
     Data: List[Data]
 
