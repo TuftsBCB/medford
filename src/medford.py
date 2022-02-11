@@ -3,6 +3,7 @@ from medford_detailparser import *
 from medford_detail import *
 from medford_models import BCODMO, Entity
 from medford_BagIt import runBagitMode, BagIt
+from medford_error_mngr import *
 import json
 
 import argparse
@@ -24,22 +25,42 @@ class ParserMode(Enum) :
 
     def __str__(self):
         return self.value
-    
+
+class ErrorMode(Enum) :
+    first = 'FIRST'
+    all = 'ALL'
+
+    def __str__(self) :
+        return self.value
+
+class ErrorOrder(Enum) :
+    type = 'TYPE'
+    tokens = 'TOKENS'
+    line = 'LINE'
+
+    def __str__(self):
+        return self.value
+
+
 # Command Line Arguments
 # TODO: How can I make it require an MFDMode value, but lowercase is OK?
 #       Do I actually care?
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--mode", type=MFDMode, choices=list(MFDMode), default=MFDMode.OTHER, required=True,
     help="Which Output mode the MEDFORD parser should validate or compile for.")
-parser.add_argument("action", type=ParserMode, choices=list(ParserMode), 
+parser.add_argument("action", type=ParserMode, choices=list(ParserMode),
     help="Whether the MEDFORD parser is only validating or actually compiling (performing any necessary adjustments or actions for the appropriate format, such as creating a Bag for the BagIt mode.)")
 parser.add_argument("file", type=str, help="The input MEDFORD file to validate or compile.")
 parser.add_argument("--write_json", action="store_true", default=False,
     help="Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
 parser.add_argument("--debug", "-d", "-v", action="store_true", default=False,
     help="Enable verbose mode for MEDFORD, enabling various debug messages during runtime.")
+parser.add_argument("--error_mode", "-e", type=ErrorMode, choices=list(ErrorMode), default=ErrorMode.all,
+    help="(ALL | FIRST) Whether to compile all errors or stop on the first error encountered.")
+parser.add_argument("--error_sort", "-s", type=ErrorOrder, choices=list(ErrorOrder), default=ErrorOrder.tokens,
+    help="(TYPE|TOKENS|LINE) How to sort the errors, if compiling all errors.")
 
-def runMedford(filename, output_json, mode):
+def runMedford(filename, output_json, mode, error_mode, error_sort):
     class FieldError(Exception):
         pass
 
@@ -55,7 +76,8 @@ def runMedford(filename, output_json, mode):
                     if dr.is_novel :
                         details.append(dr.detail)
 
-    parser = detailparser(details)
+    err_mngr = error_mngr(str(error_mode), str(error_sort))
+    parser = detailparser(details, err_mngr)
     final_dict = parser.export()
     try:
         if mode == MFDMode.BCODMO:
@@ -76,4 +98,4 @@ def runMedford(filename, output_json, mode):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    runMedford(args.file, args.write_json, args.mode)
+    runMedford(args.file, args.write_json, args.mode, args.error_mode, args.error_sort)

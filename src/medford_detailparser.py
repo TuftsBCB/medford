@@ -8,10 +8,10 @@ from medford_error_mngr import *
 
 class detailparser :
 
-    def __init__(self, details) :
+    def __init__(self, details, err_mngr) :
         self.data = {}
         self.parse_details(details)
-        self.err_mngr = error_mngr()
+        self.err_mngr = err_mngr
 
     def parse_details(self, details) :
         prev_minor = "-1"
@@ -159,15 +159,6 @@ class detailparser :
 
             error_obj = mfd_err(error_line_number, error_type, tokens, error_loc[-1], error_msg)
             self.err_mngr.add_error(error_obj)
-            ##### PRINT PRETTY ERROR #####
-            """if error_type == "missing_field" :
-                missing_field = error_loc[-1]
-                print(f"The {token_string} block starting at line {error_line_number} is missing the field {missing_field}.")
-            elif error_type == "incomplete_data" :
-                print(f"The {token_string} block starting at line {error_line_number} has incomplete information: {error_msg}.")
-            else :
-                print(f"The {token_string} line starting on line {error_line_number} is of the wrong type: {error_msg}.")
-                """
         self.err_mngr.print_errors()
 
 

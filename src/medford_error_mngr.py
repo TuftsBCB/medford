@@ -25,12 +25,19 @@ class mfd_err:
             return f"Line {self.line: <10} : {self.token_string} is of the wrong type: {self.msg}."
 
 class error_mngr:
-    def __init__(self, mode="ALL", order="LINE"):
+    # mode : ("ALL", "FIRST")
+    # order: ("TYPE", "TOKENS", "LINE")
+    def __init__(self, mode, order):
         self._error_collection = {}
         self.mode = mode
         self.order = order
 
     def add_error(self, error_obj: mfd_err):
+        if self.mode == "FIRST" :
+            print("Stopping on first error: ")
+            print("\t" + str(error_obj))
+            raise SystemExit(0)
+
         if self.order == "TYPE" :
             keyval = error_obj.errtype
         elif self.order == "TOKENS" :
