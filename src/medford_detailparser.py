@@ -4,12 +4,14 @@ import functools
 
 from sqlalchemy import all_
 from medford_detail import *
+from medford_error_mngr import *
 
 class detailparser :
 
     def __init__(self, details) :
         self.data = {}
         self.parse_details(details)
+        self.err_mngr = error_mngr()
 
     def parse_details(self, details) :
         prev_minor = "-1"
@@ -42,12 +44,12 @@ class detailparser :
                 if append == True and n == len(major_list) - 1:
                     cur_dict[major].append((lineno, {}))
                 cur_dict = cur_dict[major][-1][1]
-        
+
         if minor not in cur_dict.keys() :
             cur_dict[minor] = [(lineno, data)]
         else :
             cur_dict[minor].append((lineno, data))
-                
+
     def export(self) :
         return deepcopy(self.data)
 
@@ -66,11 +68,11 @@ class detailparser :
                         f.write("@" + keystring + "-" + tag + " " + dat + "\n")
                     if(idx == len(curdict.keys()) - 1) :
                         f.write("\n")
-                        
+
     def write(self, location) :
         with open(location, 'w') as f:
             self.recursive_write(f, "", self.data)
-            
+
     def recursive_write_from_dict(f, keystring, curdict, newline = False) :
         for idx, tag in enumerate(curdict.keys()) :
             if curdict[tag] is not None :
@@ -107,7 +109,6 @@ class detailparser :
                 error_locations[e['loc']] = [e]
             else :
                 error_locations[e['loc']].append(e)
-        print(len(error_locations.keys()))
 
         for error_loc in error_locations.keys() :
             error_type = None
@@ -128,8 +129,10 @@ class detailparser :
                     error_type = "incomplete_data"
                 elif "value_error" in current_errors[0]['type'] :
                     error_type = "value_error"
+                elif "type_error" in current_errors[0]['type'] :
+                    error_type = "value_error" # hurts to type, but...
                 error_msg = current_errors[0]['msg']
-            
+
             # Below this, we assume that we only care about the first error.
 
             ##### LINE NUMBER #####
@@ -154,14 +157,19 @@ class detailparser :
                     token_string = token_string + "_" + token
                 token_string = token_string + "-" + tokens[-1]
 
+            error_obj = mfd_err(error_line_number, error_type, tokens, error_loc[-1], error_msg)
+            self.err_mngr.add_error(error_obj)
             ##### PRINT PRETTY ERROR #####
-            if error_type == "missing_field" :
+            """if error_type == "missing_field" :
                 missing_field = error_loc[-1]
                 print(f"The {token_string} block starting at line {error_line_number} is missing the field {missing_field}.")
             elif error_type == "incomplete_data" :
                 print(f"The {token_string} block starting at line {error_line_number} has incomplete information: {error_msg}.")
             else :
                 print(f"The {token_string} line starting on line {error_line_number} is of the wrong type: {error_msg}.")
+                """
+        self.err_mngr.print_errors()
+
 
     def write_from_dict(d, location):
         with open(location, 'w') as f:

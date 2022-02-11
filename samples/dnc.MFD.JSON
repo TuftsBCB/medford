@@ -26,42 +26,15 @@
           ]
         ]
       }
-    ],
+    ]
+  ],
+  "Date": [
     [
       7,
       {
         "desc": [
           [
             7,
-            "John Freeman"
-          ]
-        ],
-        "Association": [
-          [
-            8,
-            "Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA"
-          ]
-        ],
-        "Role": [
-          [
-            9,
-            "Author"
-          ],
-          [
-            10,
-            "Corresponding Author"
-          ]
-        ]
-      }
-    ]
-  ],
-  "Date": [
-    [
-      12,
-      {
-        "desc": [
-          [
-            12,
             "asdf"
           ]
         ]
@@ -70,23 +43,23 @@
   ],
   "Journal": [
     [
-      14,
+      9,
       {
         "desc": [
           [
-            14,
+            9,
             "asdfk"
           ]
         ],
         "Issue": [
           [
-            15,
+            10,
             "five"
           ]
         ],
         "Pages": [
           [
-            16,
+            11,
             "sixteen to 17"
           ]
         ]
