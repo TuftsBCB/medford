@@ -1,6 +1,6 @@
 from re import L
 from pydantic import BaseModel, AnyUrl, validator, root_validator
-from typing import List, Optional, Union, TypeVar, Generic
+from typing import List, Optional, Union, TypeVar, Generic, Tuple
 import datetime
 from enum import Enum
 from helpers_file import *
@@ -19,8 +19,8 @@ from helpers_file import *
 #       Can then re-run on specific mode to see specific errors
 
 T = TypeVar('T')
-OptListT = Optional[List[tuple[int,T]]]
-ListT = List[tuple[int,T]]
+OptListT = Optional[List[Tuple[int,T]]]
+ListT = List[Tuple[int,T]]
 
 class Config:
     extra = 'allow'
@@ -60,6 +60,7 @@ class Contributor(StrDescModel) :
         roles = [r[1] for r in v['Role']]
         if "Corresponding Author" in roles and v["Email"] is None :
             raise IncompleteDataError("Corresponding Authors must have a provided validated email")
+        return v
 
 class Funding(StrDescModel) :
     ID: OptListT[str] #TODO: Funding ID validation?

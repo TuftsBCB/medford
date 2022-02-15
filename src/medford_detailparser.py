@@ -1,8 +1,8 @@
 # Take 3!
 from copy import deepcopy
 import functools
+import math
 
-from sqlalchemy import all_
 from medford_detail import *
 from medford_error_mngr import *
 
@@ -137,7 +137,7 @@ class detailparser :
 
             ##### LINE NUMBER #####
             # Get the index in pydantic's 'loc' n-ple that corresponds to the line number of the most specific relevant block.
-            n_3ples = float.__floor__(len(error_loc)/3.0)
+            n_3ples = math.floor(len(error_loc)/3.0)
             start_last3 = (n_3ples-1)*3
             end_last3 = (n_3ples)*3
             location_hint_slice = error_loc[:(end_last3-1)]

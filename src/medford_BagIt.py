@@ -184,9 +184,9 @@ class BagIt(Entity) :
         #TODO Need more validation, my brain is just too fried to think of it right now.
         for v in values:
             # TODO: Don't allow remote files, yet... Separate tag? RemoteFile?
-            if len(v.Path) > 1 :
+            if len(v[1].Path) > 1 :
                 raise ValueError("Please create a separate @File tag for each recorded file.")
-            if len(v.Subdirectory) > 1:
+            if len(v[1].Subdirectory) > 1:
                 raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
                                 "Please use a separate @File tag for each output file.")
             #v = create_new_bagit_loc(v, "local")
