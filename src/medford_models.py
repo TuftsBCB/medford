@@ -57,9 +57,10 @@ class Contributor(StrDescModel) :
 
     @root_validator
     def check_corresponding_has_contact(cls, v) :
-        roles = [r[1] for r in v['Role']]
-        if "Corresponding Author" in roles and v["Email"] is None :
-            raise IncompleteDataError("Corresponding Authors must have a provided validated email")
+        if v['Role'] is not None:
+            roles = [r[1] for r in v['Role']]
+            if "Corresponding Author" in roles and v["Email"] is None :
+                raise IncompleteDataError("Corresponding Authors must have a provided validated email")
         return v
 
 class Funding(StrDescModel) :

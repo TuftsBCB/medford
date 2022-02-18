@@ -91,6 +91,8 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
             raise Exception("Medford is running in an unsupported mode.")
     except ValidationError as e:
         parser.parse_pydantic_errors(e, final_dict)
+    else:
+        print("No errors found.")
 
     if(output_json) :
         with open(filename + ".JSON", 'w') as f:
