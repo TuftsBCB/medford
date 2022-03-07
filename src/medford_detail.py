@@ -93,8 +93,11 @@ class detail() :
         if(line[0] == detail.comment_head) :
             return None
 
+        # TODO: Check that they aren't trying to use '@ to define/use a macro.
+        
         # Line is defining a macro
         elif line[:2] == detail.macro_head :
+            # TODO: Check that they haven't put an extra space between `@ and the macro name
             macro_name, macro_body = line[2:].split(" ",1)
             if macro_name in detail.macro_dictionary.keys() :
                 raise ValueError("ERROR: Line " + str(lineno) + \
@@ -118,12 +121,18 @@ class detail() :
             data = body
 
             if detail.macro_flag in data :
+                # TODO: adjust so I don't need so many magic integers
                 first_ind = data.find(detail.macro_flag)
-                whitespace_after = data.find(" ", first_ind)
-                if whitespace_after == -1 :
-                    whitespace_after = len(data)
+                is_curled = (data[first_ind+2] == "{")
+                if is_curled :
+                    whitespace_after = first_ind + data[first_ind:].find("}") +1
+                    found_macro_name = data[first_ind+3:whitespace_after-1]
+                else :
+                    whitespace_after = data.find(" ", first_ind)
+                    if whitespace_after == -1 :
+                        whitespace_after = len(data)
 
-                found_macro_name = data[first_ind+2:whitespace_after]
+                    found_macro_name = data[first_ind+2:whitespace_after]
 
                 if found_macro_name in detail.macro_dictionary.keys() :
                     data = data[:first_ind] + detail.macro_dictionary[found_macro_name] + data[whitespace_after:]

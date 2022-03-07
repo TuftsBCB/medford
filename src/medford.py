@@ -57,7 +57,7 @@ parser.add_argument("--debug", "-d", "-v", action="store_true", default=False,
     help="Enable verbose mode for MEDFORD, enabling various debug messages during runtime.")
 parser.add_argument("--error_mode", "-e", type=ErrorMode, choices=list(ErrorMode), default=ErrorMode.all,
     help="(ALL | FIRST) Whether to compile all errors or stop on the first error encountered.")
-parser.add_argument("--error_sort", "-s", type=ErrorOrder, choices=list(ErrorOrder), default=ErrorOrder.tokens,
+parser.add_argument("--error_sort", "-s", type=ErrorOrder, choices=list(ErrorOrder), default=ErrorOrder.line,
     help="(TYPE|TOKENS|LINE) How to sort the errors, if compiling all errors.")
 
 def runMedford(filename, output_json, mode, error_mode, error_sort):
@@ -65,6 +65,8 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
         pass
 
     details = []
+    # TODO: add error catching for mis-formatting in here...
+    # to test, change line 12 of pshpil_rnaseq.mfd to have a typo in the macro name.
     with open(filename, 'r') as f:
         all_lines = f.readlines()
         dr = None
