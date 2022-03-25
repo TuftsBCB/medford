@@ -78,6 +78,7 @@ class detailparser :
             if curdict[tag] is not None :
                 if isinstance(curdict[tag], list) :
                     for dat in curdict[tag] :
+                        dat = dat[1]
                         if isinstance(dat, dict):
                             if keystring == "" :
                                 detailparser.recursive_write_from_dict(f, tag, dat)

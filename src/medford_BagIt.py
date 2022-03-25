@@ -73,7 +73,7 @@ def add_outpath(inp_file: Union[LocalFile, RemoteFile], type:str) -> Union[Local
         else :
             inp_file.outpath = [(-1, datadir + os.path.basename(inp_file.Path[0][1]))]
     elif type == "remote":
-        inp_file.outpath = [(inp_file.Filename[0][0], datadir + inp_file.Filename[0][1])]
+        inp_file.outpath = [(inp_file.Filename[0][0], "data/" + inp_file.Filename[0][1])]
     
     return inp_file
 
@@ -113,7 +113,17 @@ def mutate_local_file(inp_file: LocalFile) -> None :
     inp_file.Path = inp_file.outpath
     inp_file.outpath = None
     inp_file.Destination = None
+    if 'type' in inp_file.__dict__.keys() :
+        del inp_file.type
     return inp_file
+
+def mutate_remote_file(inp_file: RemoteFile) -> None:
+    inp_file.Filename = inp_file.outpath
+    inp_file.outpath = None
+    if 'type' in inp_file.__dict__.keys() :
+        del inp_file.type
+    return inp_file
+
 
 def manage_remote_file(inp_file: RemoteFile) -> str:
     """Creates the fetch.txt line for a file
@@ -128,10 +138,8 @@ def manage_remote_file(inp_file: RemoteFile) -> str:
             (inp_file URI)  -   (inp_file output location)
     """
     outpath = inp_file.outpath[0][1]
-    bagdir = bagit_settings.get_bagdir()
-    short_outpath = outpath.replace(bagdir, "")
 
-    fetchstring = inp_file.URI[0][1] + "\t-\t" + short_outpath
+    fetchstring = inp_file.URI[0][1] + "\t-\t" + outpath
     return fetchstring
 
 def perform_medford_munging(mfd_input: str, howto_write: Callable[[ArbitraryFile, str],None]) -> Tuple[str, int] :
@@ -279,10 +287,11 @@ def runBagitMode(parameters, medford_input) :
         rf = add_outpath(rf, 'remote')
 
         rf_fetch = manage_remote_file(rf)
+        rf = mutate_remote_file(rf)
         fetch_lines.append(rf_fetch)
 
     def write_medford_file(mfd_model, final_location) :
-        _parameters.File.append(mfd_model)
+        _parameters.File.append((-1,mfd_model))
         #TODO: fix detailparser's write_from_dict
         detailparser.write_from_dict(_parameters.dict(), final_location)
 
