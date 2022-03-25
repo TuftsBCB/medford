@@ -3,6 +3,8 @@ from copy import deepcopy
 import functools
 import math
 
+from pydantic import BaseModel
+
 from medford_detail import *
 from medford_error_mngr import *
 
@@ -73,33 +75,33 @@ class detailparser :
         with open(location, 'w') as f:
             self.recursive_write(f, "", self.data)
 
-    def recursive_write_from_dict(f, keystring, curdict, newline = False) :
-        for idx, tag in enumerate(curdict.keys()) :
-            if curdict[tag] is not None :
-                if isinstance(curdict[tag], list) :
-                    for dat in curdict[tag] :
-                        dat = dat[1]
-                        if isinstance(dat, dict):
-                            if keystring == "" :
-                                detailparser.recursive_write_from_dict(f, tag, dat)
-                            else :
-                                detailparser.recursive_write_from_dict(f, keystring + "_" + tag, dat)
-                        else :
-                            if keystring == "" :
-                                f.write("@" + tag + " " + str(dat) + "\n")
-                            else :
-                                if tag != "desc" :
-                                    f.write("@" + keystring + "-" + tag + " " + str(dat) + "\n")
-                                else :
-                                    f.write("@" + keystring + " " + str(dat) + "\n")
-                else :
-                    dat = curdict[tag]
-                    if tag != "desc" :
-                        f.write("@" + keystring + "-" + tag + " " + str(dat) + "\n")
+    def travel_major_tokens(curdat:BaseModel, current_majors: List[str]) -> List[str] :
+        set_attributes = curdat.__fields_set__
+        all_keys = list(curdat.__fields__.keys())
+        collapsed_majors = '_'.join(current_majors)
+        output_strings = []
+        
+        for attr in set_attributes :
+            if attr not in all_keys :
+                all_keys.append(attr)
+
+        for attr in all_keys :
+            if curdat.__getattribute__(attr) != None :
+                for val in curdat.__getattribute__(attr) :
+                    val = val[1]
+                    if issubclass(type(val), BaseModel) :
+                        # this is a major token again, so we need to recurse
+                        res = detailparser.travel_major_tokens(val, current_majors + [attr])
+                        output_strings.extend(res)
                     else :
-                        f.write("@" + keystring + " " + str(dat) + "\n")
-                if newline :
-                    f.write("\n")
+                        if attr != "desc" :
+                                output_strings.append(f'@{collapsed_majors}-{attr} {val}\n')
+                        else :
+                            output_strings.append(f'@{collapsed_majors} {val}\n')
+        
+        if output_strings[-1] != "\n" :
+            output_strings.append("\n")
+        return output_strings
 
     def parse_pydantic_errors(self, errs, dict) :
         errors = errs.errors()
@@ -163,6 +165,11 @@ class detailparser :
         self.err_mngr.print_errors()
 
 
-    def write_from_dict(d, location):
+    def write_from_model(model:BaseModel, location:str) -> None:
         with open(location, 'w') as f:
-            detailparser.recursive_write_from_dict(f, "", d, newline = True)
+            lines = detailparser.travel_major_tokens(model, [])
+            if lines[-1] == "\n" :
+                lines = lines[:-1]
+                lines[-1] = lines[-1][:-1]
+            for line in lines :
+                f.write(line)

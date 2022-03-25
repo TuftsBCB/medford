@@ -292,8 +292,7 @@ def runBagitMode(parameters, medford_input) :
 
     def write_medford_file(mfd_model, final_location) :
         _parameters.File.append((-1,mfd_model))
-        #TODO: fix detailparser's write_from_dict
-        detailparser.write_from_dict(_parameters.dict(), final_location)
+        detailparser.write_from_model(_parameters, final_location)
 
     mfd_path, mfd_sha = perform_medford_munging(medford_input, write_medford_file)
     sha_lines.append("%s %s" % (mfd_path, mfd_sha))

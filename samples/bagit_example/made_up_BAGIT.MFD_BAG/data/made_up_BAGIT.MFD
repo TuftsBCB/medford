@@ -1,4 +1,5 @@
 @Paper_Primary Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution
+@Paper_Primary-URI https://www.nature.com/articles/s41598-018-34459-8
 
 @Journal Nature Scientific Reports
 @Journal-Volume 8
@@ -7,6 +8,7 @@
 
 @Date 2018-05-09
 @Date-Note Received
+@Date-Note slkdjfklsjdfklsjdf
 
 @Data_Ref A random Data
 @Data_Ref-URI https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it
@@ -14,6 +16,6 @@
 
 @File A random File
 @File-Path samples/bagit_example/made_up_BAGIT.MFD_BAG/data/licensing/LICENSE
+
 @File Medford File
 @File-Path samples/bagit_example/made_up_BAGIT.MFD_BAG/data/made_up_BAGIT.MFD
-

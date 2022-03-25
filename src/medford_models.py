@@ -1,6 +1,7 @@
 from typing import List, Optional, Union, TypeVar, Tuple
 import datetime
-from pydantic import BaseModel, AnyUrl, root_validator
+from pydantic import BaseModel as PydanticBaseModel
+from pydantic import AnyUrl, root_validator
 from helpers_file import *
 
 # bcodmo? + bag
@@ -20,8 +21,9 @@ T = TypeVar('T')
 OptListT = Optional[List[Tuple[int, T]]]
 ListT = List[Tuple[int, T]]
 
-class Config:
-    extra = 'allow'
+class BaseModel(PydanticBaseModel) :
+    class Config:
+        extra = 'allow'
 
 class IncompleteDataError(ValueError):
     code = "incomplete_data_error"

@@ -1,7 +1,7 @@
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 from medford_detailparser import *
 from medford_detail import *
-from medford_models import BCODMO, Entity
+from medford_models import BCODMO, Entity, StrDescModel
 from medford_BagIt import runBagitMode, BagIt
 from medford_error_mngr import *
 import json
