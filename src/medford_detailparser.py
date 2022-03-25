@@ -94,11 +94,21 @@ class detailparser :
                         res = detailparser.travel_major_tokens(val, current_majors + [attr])
                         output_strings.extend(res)
                     else :
+                        # we're in a minor token, so start writing coach
                         if attr != "desc" :
                                 output_strings.append(f'@{collapsed_majors}-{attr} {val}\n')
                         else :
                             output_strings.append(f'@{collapsed_majors} {val}\n')
         
+        # if we haven't already had a newline, add a newline
+        # ( double-newline happens if we're in a multi-major-token that is not followed by a sister major token,
+        #   e.g. :
+        #   Data-Primary asdf
+        #   Software-Primary fdsa
+        # 
+        #   instead of:
+        #   Data-Primary asdf
+        #   Data-Ref fdsa)
         if output_strings[-1] != "\n" :
             output_strings.append("\n")
         return output_strings
@@ -168,8 +178,12 @@ class detailparser :
     def write_from_model(model:BaseModel, location:str) -> None:
         with open(location, 'w') as f:
             lines = detailparser.travel_major_tokens(model, [])
+            # Because I wrote it, I know lines is going to end up with an extra newline.
+            # Remove it for cleanliness.
             if lines[-1] == "\n" :
                 lines = lines[:-1]
+                # Again, because I wrote it, I know that every line ends with a newline.
+                # Remove the newline from the last line so we don't have a trailing newline.
                 lines[-1] = lines[-1][:-1]
             for line in lines :
                 f.write(line)
