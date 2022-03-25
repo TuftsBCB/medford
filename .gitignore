@@ -4,3 +4,4 @@ __pycache__/*
 .vscode/*
 .pylintrc
 *.zip
+samples/pshpil_rnaseq_example/pshpil_rnaseq.mfd

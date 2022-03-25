@@ -65,6 +65,8 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
         pass
 
     details = []
+    err_mngr = error_mngr(str(error_mode), str(error_sort))
+
     # TODO: add error catching for mis-formatting in here...
     # to test, change line 12 of pshpil_rnaseq.mfd to have a typo in the macro name.
     with open(filename, 'r') as f:
@@ -73,20 +75,24 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
         for i, line in enumerate(all_lines):
             if(line.strip() != "") :
                 # TODO: move the details collection logic to detail? I don't like that we have to pull the typing here.
-                dr = detail.FromLine(line, i+1, dr)
+                dr = detail.FromLine(line, i+1, dr, err_mngr)
                 if isinstance(dr, detail_return) :
                     if dr.is_novel :
                         details.append(dr.detail)
+    
+    if err_mngr.has_major_parsing :
+        err_mngr.print_errors()
+        raise SystemExit(0)
 
-    err_mngr = error_mngr(str(error_mode), str(error_sort))
     parser = detailparser(details, err_mngr)
     final_dict = parser.export()
+    p = {}
+    # nom
     try:
         if mode == MFDMode.BCODMO:
             p = BCODMO(**final_dict)
         elif mode == MFDMode.BAGIT:
             p = BagIt(**final_dict)
-            runBagitMode(p, filename)
         elif mode == MFDMode.OTHER:
             p = Entity(**final_dict)
         else :
@@ -95,6 +101,9 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
         parser.parse_pydantic_errors(e, final_dict)
     else:
         print("No errors found.")
+
+    if mode == MFDMode.BAGIT:
+        runBagitMode(p, filename)
 
     if(output_json) :
         with open(filename + ".JSON", 'w') as f:

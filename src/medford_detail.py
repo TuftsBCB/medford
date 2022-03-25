@@ -11,6 +11,8 @@
 
 from typing import Union
 
+from medford_error_mngr import error_mngr
+
 class detail_return():
     is_novel : bool = False
     detail : 'detail' = None
@@ -53,7 +55,7 @@ class detail() :
     #TODO : For the love of all that is good in this world, split this up into different cases...
     #           e.g. "handle_macro"?
     @classmethod
-    def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return, str]) -> Union[None, detail_return, str] :
+    def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return, str], err_mngr: error_mngr) -> Union[None, detail_return, str] :
         """Generate a Detail object from a line, the line number, and the Detail generated directly previous.
 
         :param line: A string to parse into a detail, from a MFD file.
@@ -63,8 +65,8 @@ class detail() :
         :param prev_detail: The previous detail generated from this MEDFORD file, if applicable.
         :type prev_detail: Detail|None
         :raises ValueError: A Template marker ("[...]") is observed in the provided line.
-        :raises ValueError: A Macro name that has already been used is detected.
-        :raises ValueError: A Macro is referred to that has not yet been defined.
+        :raises MedfordFormatException: A Macro name that has already been used is detected.
+        :raises MedfordFormatException: A Macro is referred to that has not yet been defined.
         :raises ValueError: A catch-all error when we have no idea how to process the line provided.
         :return: A 3-tuple describing : Is this detail data, is this NOVEL detail data, and the Detail object. The 'novel' data flag was added to accomodate multi-line details.
         :rtype: Tuple(Bool, Bool, Detail)
@@ -74,7 +76,8 @@ class detail() :
         # Line contains a template marker, and isn't a comment
         if line[0] != detail.comment_head :
             if detail.template_flag in line :
-                raise ValueError("ERROR: Line " + str(lineno) + \
+                #TODO: Not actually major. Make this throw later.
+                err_mngr.add_major_parsing_error("ERROR: Line " + str(lineno) + \
                     " contains the template marker [...]. Please substitute this with actual data!" + \
                     "\n\tLINE: " + line)
 
@@ -89,7 +92,7 @@ class detail() :
         if(len(line) == 0) :
             return None
         
-        # Line is a comment
+        # Line IS a comment
         if(line[0] == detail.comment_head) :
             return None
 
@@ -100,9 +103,8 @@ class detail() :
             # TODO: Check that they haven't put an extra space between `@ and the macro name
             macro_name, macro_body = line[2:].split(" ",1)
             if macro_name in detail.macro_dictionary.keys() :
-                raise ValueError("ERROR: Line " + str(lineno) + \
-                    " tries to define macro " + macro_name + " to be '" + macro_body + "', but " + \
-                    macro_name + " is already defined!")
+                err_mngr.add_major_parsing_error(lineno, "macro_misuse", f"Line " + str(lineno) + " tries to define macro " + macro_name + " to be '" + 
+                    macro_body + "', but " + macro_name + " is already defined!")
             detail.macro_dictionary[macro_name] = macro_body
             return macro_name
 
@@ -137,9 +139,8 @@ class detail() :
                 if found_macro_name in detail.macro_dictionary.keys() :
                     data = data[:first_ind] + detail.macro_dictionary[found_macro_name] + data[whitespace_after:]
                 else :
-                    raise ValueError("ERROR: Line " + str(lineno) + \
-                        " tries to use macro " + found_macro_name + ", but this macro has not previously been defined." + \
-                        " Are you sure you did not mis-spell the macro name? Or that you actually defined it?")
+                    err_mngr.add_major_parsing_error(lineno, "macro_misuse", f"Line " + str(lineno) + " tries to use macro " + found_macro_name + 
+                        ", but this macro has not previously been defined. Are you sure you did not misspell the intended macro name?")
 
             return detail_return(True, cls(major_tokens, minor_token, lineno, depth, data))
 
@@ -152,9 +153,9 @@ class detail() :
                 detail.addMacroData(str(previous_return), line)
                 return previous_return
             else :
-                raise ValueError("ERROR: Line " + str(lineno) + \
+                err_mngr.add_major_parsing_error(lineno, "formatting", f"Line " + str(lineno) + \
                     " does not lead with a @ or a # (has neither a token nor is a comment.) " + \
-                    "Did you forget to declare a token? Or did you mean to make this a comment?\n\tLINE: " + line)
+                    "Did you forget to declare a token? Or did you mean to make this a comment?")
 
 
     # TODO: add logic to check if next line leads with space or not.

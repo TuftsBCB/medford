@@ -1,22 +1,13 @@
-@Paper_Primary Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution
-@Paper_Primary-Link https://www.nature.com/articles/s41598-018-34459-8
+@Paper (1, {'Ref': None, 'Copy': None, 'Primary': [(1, {'desc': [(1, 'Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution')], 'Note': None, 'Link': None, 'PMID': None, 'DOI': None})]})
 
-@Journal Nature Scientific Reports
-@Journal-Volume 8
-@Journal-Issue 1
-@Journal-Pages 1-10
+@Journal (4, {'desc': [(4, 'Nature Scientific Reports')], 'Note': None, 'Volume': [(5, 8)], 'Issue': [(6, 1)], 'Pages': [(7, '1-10')]})
 
-@Date 2018-05-09
-@Date-Note Received
+@Date (9, {'desc': [(9, datetime.date(2018, 5, 9))], 'Note': [(10, 'Received')]})
 
-@Data_Ref A random Data
-@Data_Ref-Name file
-@Data_Ref-URI https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it
+@Data (16, {'Ref': [(16, {'desc': [(16, 'A random Data')], 'Note': None, 'URI': [(18, AnyUrl('https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it', scheme='https', host='stackoverflow.com', tld='com', host_type='domain', path='/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it'))], 'Filename': [(17, 'file')], 'outpath': [(17, 'samples/bagit_example/made_up_BAGIT.MFD_BAG/data/file')], 'Type': None})], 'Copy': None, 'Primary': None})
 
-@File A random File
-@File-Name LICENSE
-@File-Path data/licensing/LICENSE
-@File Medford File
-@File-Name made_up_BAGIT.MFD
-@File-Path data/made_up_BAGIT.MFD
+@File (12, {'desc': [(12, 'A random File')], 'Note': None, 'Path': [(14, 'samples/bagit_example/made_up_BAGIT.MFD_BAG/data/licensing/LICENSE')], 'Destination': None, 'URI': None, 'outpath': None, 'type': 'local'})
+@File (-1, 'Medford File')
+@File-Path (-1, 'samples/bagit_example/made_up_BAGIT.MFD_BAG/data/made_up_BAGIT.MFD')
+@File-type local
 

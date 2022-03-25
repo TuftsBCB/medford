@@ -1,8 +1,6 @@
-from re import L
-from pydantic import BaseModel, AnyUrl, validator, root_validator
-from typing import List, Optional, Union, TypeVar, Generic, Tuple
+from typing import List, Optional, Union, TypeVar, Tuple
 import datetime
-from enum import Enum
+from pydantic import BaseModel, AnyUrl, root_validator
 from helpers_file import *
 
 # bcodmo? + bag
@@ -19,12 +17,12 @@ from helpers_file import *
 #       Can then re-run on specific mode to see specific errors
 
 T = TypeVar('T')
-OptListT = Optional[List[Tuple[int,T]]]
-ListT = List[Tuple[int,T]]
+OptListT = Optional[List[Tuple[int, T]]]
+ListT = List[Tuple[int, T]]
 
 class Config:
     extra = 'allow'
-    
+
 class IncompleteDataError(ValueError):
     code = "incomplete_data_error"
 
@@ -102,11 +100,30 @@ class Expedition(StrDescModel):
 
 class ArbitraryFile(StrDescModel):
     #todo: change to filename
-    Name: ListT[str]
     Path: OptListT[str]
-    Subdirectory: OptListT[str]
+    Destination: OptListT[str]
     URI: OptListT[AnyUrl]
-    output_path: Optional[str]
+    outpath: str = ""
+    @root_validator
+    def check_singular_path_subdirectory(cls, values):
+        # TODO: Don't allow remote files, yet... Separate tag? RemoteFile?
+        if (values['Path'] != None and len(values['Path']) > 1) :
+            raise ValueError("Please create a separate @File tag for each recorded file.")
+        if (values['Destination'] != None and len(values['Destination']) > 1):
+            raise ValueError("MEDFORD does not currently support copying a file multiple times through one tag. " + 
+                            "Please use a separate @File tag for each output file.")
+        #v = create_new_bagit_loc(v, "local")
+        return values
+    
+    @root_validator
+    def check_path_or_uri(cls, values) :
+        if (values['Path'] == None or len(values['Path']) == 0) and (values['URI'] == None or len(values['URI']) == 0) :
+            raise ValueError("Please provide a path or URI for the file.")
+        if (values['Path'] != None and len(values['Path']) != 0) :
+            values['type'] = 'local'
+        else :
+            values['type'] = 'remote'
+        return values
 
 class Freeform(BaseModel):
     class Config:
@@ -115,14 +132,17 @@ class Freeform(BaseModel):
 
 ## Multi-Typed tags (data, code, paper)
 class LocalBase(StrDescModel):
-    Name: ListT[str]
-    Path: OptListT[str]
-    Subdirectory: OptListT[str]
-    output_path: Optional[str]
+    Path: ListT[str]
+    Destination: OptListT[str]
+    outpath: str =  ""
 
-class D_Ref(LocalBase) :
+class RemoteBase(StrDescModel):
+    URI: ListT[AnyUrl]
+    Filename: ListT[str]
+    outpath: str = ""
+
+class D_Ref(RemoteBase) :
     Type: OptListT[str]
-    URI: OptListT[AnyUrl]
 
 class D_Copy(LocalBase) :
     Type: OptListT[str]
@@ -135,7 +155,7 @@ class Data(BaseModel) :
     Copy: OptListT[D_Copy]
     Primary: OptListT[D_Primary]
 
-class P_Ref(LocalBase) :
+class P_Ref(RemoteBase) :
     Link: OptListT[AnyUrl]
     PMID: OptListT[int]
     #Add a validator for PMID?
@@ -158,7 +178,7 @@ class Paper(BaseModel) :
     Copy: OptListT[P_Copy]
     Primary: OptListT[P_Primary]
 
-class S_Ref(StrDescModel):
+class S_Ref(RemoteBase):
     Type: ListT[str]
     Version: OptListT[str]
     
