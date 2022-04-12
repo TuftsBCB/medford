@@ -81,7 +81,7 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
                         details.append(dr.detail)
     
     if err_mngr.has_major_parsing :
-        err_mngr.print_errors()
+        err_mngr.print_syntax_errors()
         raise SystemExit(0)
 
     parser = detailparser(details, err_mngr)

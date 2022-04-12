@@ -2,7 +2,6 @@ from typing import List, Optional, Union, TypeVar, Tuple
 import datetime
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import AnyUrl, root_validator
-from helpers_file import *
 
 # bcodmo? + bag
 # export to rtf?

@@ -9,21 +9,32 @@
 #   A Depth (the number of Major tokens in the instance)
 #   Data    (the data stored within the instance)
 
-from typing import Union
+import re
+from typing import Tuple, Union
 
-from medford_error_mngr import error_mngr
+from jinja2 import UndefinedError
+
+from medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc
 
 class detail_return():
+    type: str
     is_novel : bool = False
     detail : 'detail' = None
+    macro : Tuple[str, Tuple[int, str]] = None
 
-    def __init__(self, is_novel, detail):
-        self.is_novel = is_novel
-        self.detail = detail
+    def __init__(self, type, is_novel, detail, macro):
+        self.type = type
+        if type == "detail_return" :
+            self.is_novel = is_novel
+            self.detail = detail
+        elif type == "macro_return" :
+            self.macro = macro
+        else : 
+            raise Exception("Unexpected behavior in detail.FromLine. Attempted to create detail_return with type '{}'".format(type))
 
 class detail() :
     #static
-    template_flag = "[...]"
+    template_flag = "[..]"
     macro_head = "`@"
     macro_flag = "`@"
     comment_head = "#"
@@ -52,10 +63,65 @@ class detail() :
     def _clear_cache(cls) :
         detail.macro_dictionary = {}
 
+    @classmethod
+    def _validate_comment(cls, **params) :
+        pass
+
+    @classmethod
+    def _remove_inline_comment(cls, line:str) :
+        if detail.comment_flag in line:
+            return line.split(detail.comment_flag)[0].strip()
+
+    @classmethod
+    def _validate_noncomment(cls, line:str, lineno:int, previous_return: Union[None, detail_return, str], err_mngr:error_mngr) :
+        if detail.template_flag in line:
+            err_mngr.add_syntax_err(mfd_remaining_template(lineno))
+
+    @classmethod
+    def _handle_macro_definition(cls, line:str, lineno:int, err_mngr:error_mngr) :
+        # TODO: Check that they haven't put an extra space between `@ and the macro name
+        macro_name, macro_body = line.split(detail.macro_flag,1)[1].split(" ",1)
+        
+        if macro_name in detail.macro_dictionary.keys() :
+            old_lineno = detail.macro_dictionary[macro_name][0]
+            err_mngr.add_syntax_err(mfd_duplicated_macro(lineno, old_lineno, macro_name))
+        
+        # If this is duplicated, we're not going to finish parsing anyways. 
+        # Just set the macro value to be the new value for now.
+        macro_data = (lineno, macro_body)
+        detail.macro_dictionary[macro_name] = macro_data
+        return detail_return('macro_return', None, None, (macro_name, macro_data))
+
+    @classmethod
+    def _substitute_macro(cls, data:str, lineno:int, err_mngr:error_mngr) :
+        curled_macro_regex = "{}\{{[a-zA-Z0-9_]+\}}".format(detail.macro_flag)
+        if re.search(curled_macro_regex, data) :
+            # we've found a macro that's curled
+            macro_loc = re.search(curled_macro_regex, data).span()
+            macro_fullname = data[macro_loc[0]:macro_loc[1]] # includes macro head and curly brackets
+
+            macro_name_start = macro_loc[0] + len(detail.macro_flag) + 1 # +1 because of curly bracket
+            macro_name_end = macro_loc[1] - 1 # -1 because of curly bracket
+            found_macro_name = data[macro_name_start:macro_name_end]
+        else :
+            # we've found a macro that's not curled
+            macro_loc = re.search("{}[a-zA-Z0-9_]\w+".format(detail.macro_flag), data).span() # TODO : check that this works too :clown:
+            macro_fullname = data[macro_loc[0]:macro_loc[1]] # includes macro head
+
+            macro_name_start = macro_loc[0] + len(detail.macro_head) # has to move head pointer b/c of macro
+            macro_name_end = macro_loc[1]
+            found_macro_name = data[macro_name_start:macro_name_end]
+            
+        if found_macro_name in detail.macro_dictionary.keys() :
+            data = data.replace(macro_fullname, detail.macro_dictionary[found_macro_name][1])
+        else :
+            err_mngr.add_syntax_err(mfd_unexpected_macro(lineno, found_macro_name))
+        return data
+
     #TODO : For the love of all that is good in this world, split this up into different cases...
     #           e.g. "handle_macro"?
     @classmethod
-    def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return, str], err_mngr: error_mngr) -> Union[None, detail_return, str] :
+    def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return], err_mngr: error_mngr) -> Union[None, detail_return] :
         """Generate a Detail object from a line, the line number, and the Detail generated directly previous.
 
         :param line: A string to parse into a detail, from a MFD file.
@@ -72,90 +138,73 @@ class detail() :
         :rtype: Tuple(Bool, Bool, Detail)
         """
         line = line.strip()
-
-        # Line contains a template marker, and isn't a comment
-        if line[0] != detail.comment_head :
-            if detail.template_flag in line :
-                #TODO: Not actually major. Make this throw later.
-                err_mngr.add_major_parsing_error("ERROR: Line " + str(lineno) + \
-                    " contains the template marker [...]. Please substitute this with actual data!" + \
-                    "\n\tLINE: " + line)
-
+        
         # Line contains a comment
         if detail.comment_flag in line :
-            comment_ind = line.find(detail.comment_flag) 
-            line = line[:comment_ind]
+            line = detail._remove_inline_comment(line)
 
-            # Make sure there's no trailing spaces after we remove the inline comment.
-            line = line.strip()
-
+        # Line is empty
         if(len(line) == 0) :
-            return None
+            return previous_return
         
         # Line IS a comment
-        if(line[0] == detail.comment_head) :
-            return None
+        if(line[:len(detail.comment_head)] == detail.comment_head) :
+            return previous_return
 
         # TODO: Check that they aren't trying to use '@ to define/use a macro.
         
+        # Generic validation for anything that isn't a comment; raises if something is wrong
+        # but otherwise continues.
+        #   (e.g. a template marker is still present)
+        detail._validate_noncomment(line, lineno, previous_return, err_mngr)
+
         # Line is defining a macro
-        elif line[:2] == detail.macro_head :
-            # TODO: Check that they haven't put an extra space between `@ and the macro name
-            macro_name, macro_body = line[2:].split(" ",1)
-            if macro_name in detail.macro_dictionary.keys() :
-                err_mngr.add_major_parsing_error(lineno, "macro_misuse", f"Line " + str(lineno) + " tries to define macro " + macro_name + " to be '" + 
-                    macro_body + "', but " + macro_name + " is already defined!")
-            detail.macro_dictionary[macro_name] = macro_body
-            return macro_name
+        if line[:len(detail.macro_head)] == detail.macro_head :
+            return detail._handle_macro_definition(line, lineno, err_mngr)
 
         # Line follows the standard major-minor format
         elif line[0] == "@" :
             tokens, body = str.split(line, " ", 1)
             tokens = str.replace(tokens, '@', "")
             tokens_list = tokens.split("-")
+            major_tokens = tokens_list[0].split("_")
 
             if len(tokens_list) == 1 :
                 minor_token = "desc"
             else :
+                if not previous_return.type == "detail_return" :
+                    err_mngr.add_syntax_err(mfd_no_desc(lineno, tokens))
+                else :
+                    if not previous_return.detail.Major_Tokens == major_tokens :
+                        err_mngr.add_syntax_err(mfd_no_desc(lineno, tokens))
                 minor_token = tokens_list[1]
             depth = len(tokens_list)
-            major_tokens = tokens_list[0].split("_")
             data = body
 
             if detail.macro_flag in data :
-                # TODO: adjust so I don't need so many magic integers
-                first_ind = data.find(detail.macro_flag)
-                is_curled = (data[first_ind+2] == "{")
-                if is_curled :
-                    whitespace_after = first_ind + data[first_ind:].find("}") +1
-                    found_macro_name = data[first_ind+3:whitespace_after-1]
-                else :
-                    whitespace_after = data.find(" ", first_ind)
-                    if whitespace_after == -1 :
-                        whitespace_after = len(data)
+                data = detail._substitute_macro(data, lineno, err_mngr)
 
-                    found_macro_name = data[first_ind+2:whitespace_after]
-
-                if found_macro_name in detail.macro_dictionary.keys() :
-                    data = data[:first_ind] + detail.macro_dictionary[found_macro_name] + data[whitespace_after:]
-                else :
-                    err_mngr.add_major_parsing_error(lineno, "macro_misuse", f"Line " + str(lineno) + " tries to use macro " + found_macro_name + 
-                        ", but this macro has not previously been defined. Are you sure you did not misspell the intended macro name?")
-
-            return detail_return(True, cls(major_tokens, minor_token, lineno, depth, data))
+            return detail_return("detail_return", True, cls(major_tokens, minor_token, lineno, depth, data), None)
 
         # Line is a run-over from a previous line.
         else :
-            if isinstance(previous_return, detail_return) :
+            if previous_return.type == "detail_return" :
                 previous_return.detail.addData(line)
-                return detail_return(False, previous_return.detail)
-            elif isinstance(previous_return, str) :
+                return detail_return("detail_return", False, previous_return.detail, None)
+
+            elif previous_return.type == "macro_return" :
                 detail.addMacroData(str(previous_return), line)
-                return previous_return
+                # Not technically necessary -- can just return previous return.
+                #   changing it though to make it match the detail_return case for legibility
+                return detail_return("macro_return", None, None, previous_return.macro)
+
             else :
-                err_mngr.add_major_parsing_error(lineno, "formatting", f"Line " + str(lineno) + \
-                    " does not lead with a @ or a # (has neither a token nor is a comment.) " + \
-                    "Did you forget to declare a token? Or did you mean to make this a comment?")
+                # I think this will only occur if someone basically just starts typing in an empty file, with no
+                #   macro or major-minor tokens?
+                raise Exception("Unhandled previous_return type: " + str(previous_return.type) + " in detail.FromLine")
+                #err_mngr.add_major_parsing_error(lineno, "formatting", f"Line " + str(lineno) + \
+                #    " does not lead with a @ or a # (has neither a token nor is a comment.) " + \
+                #    "Did you forget to declare a token? Or did you mean to make this a comment?")
 
 
     # TODO: add logic to check if next line leads with space or not.

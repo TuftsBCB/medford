@@ -4,6 +4,7 @@ from typing import Callable, List, Optional, Tuple, Union, Iterable
 from medford_detailparser import detailparser
 import hashlib
 import itertools
+import os
 from copy import Error, deepcopy
 
 ## Helper Functions

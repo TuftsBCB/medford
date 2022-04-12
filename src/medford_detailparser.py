@@ -16,15 +16,16 @@ class detailparser :
         self.err_mngr = err_mngr
 
     def parse_details(self, details) :
-        prev_minor = "-1"
         prev_major = "-1"
         for detail in details :
             cur_minor = detail.Minor_Token
             cur_major = detail.Combined_Major_Token
             if not cur_major == prev_major:
                 if not detail.Minor_Token == "desc" :
-                    raise ValueError("Error: Tried to describe new data without starting with a description line on line " + str(detail.Line_Number) + \
-                            "\nBefore this line, there should be a line like this: @"+ detail.Combined_Major_Token + " [A DESCRIPTION HERE]")
+                    error_mngr.add_syntax_err(mfd_no_desc(detail.Line_Number, cur_major))
+                    # Add a dummy desc so we can keep running for now.
+                    self.add_to_dict(detail.Major_Tokens, "desc", "NO DESC PROVIDED", detail.Line_Number, False)
+                    self.add_to_dict(detail.Major_Tokens, detail.Minor_Token, detail.Data, detail.Line_Number, False)
                 else :
                     self.add_to_dict(detail.Major_Tokens, detail.Minor_Token, detail.Data, detail.Line_Number, True)
 
@@ -33,7 +34,6 @@ class detailparser :
 
             else :
                 self.add_to_dict(detail.Major_Tokens, detail.Minor_Token, detail.Data, detail.Line_Number, False)
-            prev_minor = cur_minor
             prev_major = cur_major
 
     def add_to_dict(self, major_list, minor, data, lineno, append=False):

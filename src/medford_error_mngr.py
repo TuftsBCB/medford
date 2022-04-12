@@ -9,6 +9,47 @@ from typing import List
 #   !(duplicated macro name)
 #   throws off rest of parsing
 #   !(easy enough to proceed parsing)
+#       The problem is, when can it actually be "easy enough to proceed parsing"? Especially when there's type checking involved.
+#       What if the expected value is an integer, and there's an unspecified/duplicated macro, then Pydantic is going to throw an error
+#       that the user shouldn't be worried about, so I don't really want to allow the parser to get that far.
+
+class mfd_syntax_err(SyntaxError):
+    lineno:int
+    errtype:str
+    inst_terminal:bool
+    late_terminal:bool
+
+    # adding the late_terminal flag to mark whether or not the parser should stop before reaching pydantic.
+    # this may be not necessary, but it will be easier to refactor to remove it later than to refactor to add it.
+    def __init__(self, message:str, lineno:int, errtype:str, inst_terminal:bool, late_terminal:bool):
+        super().__init__(message)
+        self.lineno = lineno
+        self.errtype = errtype
+        self.inst_terminal = inst_terminal
+        self.late_terminal = late_terminal
+
+    def __str__(self):
+        return f"{self.errtype} on line {self.lineno}: {self.args[0]}"
+
+class mfd_unexpected_macro(mfd_syntax_err):
+    def __init__(self, lineno:int, macro_name:str) :
+        message = f"Unexpected macro '{macro_name}' on line {lineno}."
+        super().__init__(message, lineno, "unexpected_macro", False, True)
+
+class mfd_duplicated_macro(mfd_syntax_err):
+    def __init__(self, instance_1:int, instance_2:int, macro_name:str) :
+        message = f"Duplicated macro '{macro_name}' on lines {instance_1} and {instance_2}."
+        super().__init__(message, instance_2, "duplicated_macro", False, True)
+
+class mfd_remaining_template(mfd_syntax_err):
+    def __init__(self, lineno:int):
+        message = f"Remaining template marker on line {lineno}."
+        super().__init__(message, lineno, "remaining_template", False, True)
+
+class mfd_no_desc(mfd_syntax_err):
+    def __init__(self, lineno:int, major_token:str):
+        message = f"Novel token @{major_token} started without a description on line {lineno}."
+        super().__init__(message, lineno, "no_desc", False, True)
 
 class mfd_err:
     def __init__(self, line: int, errtype: str, token_context: List[str],
@@ -47,9 +88,28 @@ class error_mngr:
     # mode : ("ALL", "FIRST")
     # order: ("TYPE", "TOKENS", "LINE")
     def __init__(self, mode, order):
+        self._syntax_err_coll = {}
         self._error_collection = {}
+        self.has_major_parsing = False
         self.mode = mode
         self.order = order
+
+    def add_syntax_err(self, err_obj:mfd_syntax_err):
+        if err_obj.late_terminal :
+            self.has_major_parsing = True
+        if err_obj.inst_terminal :
+            raise err_obj
+        # TODO: Add ordering functionality, for now I'm just assuming lineno ordering
+        if err_obj.lineno not in self._syntax_err_coll.keys() :
+            self._syntax_err_coll[err_obj.lineno] = [err_obj]
+        else :
+            self._syntax_err_coll[err_obj.lineno].append(err_obj)
+
+    def print_syntax_errors(self):
+        print("\nSyntax errors:")
+        for line in sorted(self._syntax_err_coll.keys()) :
+            for err in self._syntax_err_coll[line] :
+                print("\t" + str(err))
 
     def add_error(self, error_obj: mfd_err):
         if self.mode == "FIRST" :
@@ -82,8 +142,3 @@ class error_mngr:
                 print(title + str(keyval) + ": ")
             for err in self._error_collection[keyval] :
                 print("\t" + str(err))
-
-
-    def add_major_parsing_error(self, lineno, type, msg) :
-        self.has_major_parsing = True
-        self.add_error(mfd_err(lineno, type, None, None, msg))
