@@ -3,16 +3,6 @@ from typing import List
 
 #TODO: Check how much everything breaks if I try to sort by token on pre-processing errors.
 
-# fatal problem on line ?? - instant termination
-#   !([..])
-#   !(unspecified macro)
-#   !(duplicated macro name)
-#   throws off rest of parsing
-#   !(easy enough to proceed parsing)
-#       The problem is, when can it actually be "easy enough to proceed parsing"? Especially when there's type checking involved.
-#       What if the expected value is an integer, and there's an unspecified/duplicated macro, then Pydantic is going to throw an error
-#       that the user shouldn't be worried about, so I don't really want to allow the parser to get that far.
-
 class mfd_syntax_err(SyntaxError):
     lineno:int
     errtype:str
@@ -50,6 +40,11 @@ class mfd_no_desc(mfd_syntax_err):
     def __init__(self, lineno:int, major_token:str):
         message = f"Novel token @{major_token} started without a description on line {lineno}."
         super().__init__(message, lineno, "no_desc", False, True)
+
+class mfd_wrong_macro_token(mfd_syntax_err) :
+    def __init__(self, lineno:int) :
+        message = f"Wrong token used to define a macro on line {lineno}. Please use `@, not '@, when defining a macro."
+        super().__init__(message, lineno, "wrong_macro_token", False, True)
 
 class mfd_err:
     def __init__(self, line: int, errtype: str, token_context: List[str],

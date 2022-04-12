@@ -1,20 +1,7 @@
-# Attempting a different structure for tokens that is more straightforward.
-# Key parts:
-#   A list of all Major tokens (A major token being defined as not a minor token)
-#       There must be at LEAST 1 Major token.
-#   A Minor token (A minor token being defined as the final token in the list
-#                   of tokens for an instance)
-#       There must be EXACTLY 1 Minor token.
-#   A Line Number (the original line the instance was created from)
-#   A Depth (the number of Major tokens in the instance)
-#   Data    (the data stored within the instance)
-
 import re
 from typing import Tuple, Union
 
-from jinja2 import UndefinedError
-
-from medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc
+from medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc, mfd_wrong_macro_token
 
 class detail_return():
     type: str
@@ -79,7 +66,7 @@ class detail() :
 
     @classmethod
     def _handle_macro_definition(cls, line:str, lineno:int, err_mngr:error_mngr) :
-        # TODO: Check that they haven't put an extra space between `@ and the macro name
+        # TODO: Check that they haven't put an extra space between `@ and the macro name?
         macro_name, macro_body = line.split(detail.macro_flag,1)[1].split(" ",1)
         
         if macro_name in detail.macro_dictionary.keys() :
@@ -118,8 +105,6 @@ class detail() :
             err_mngr.add_syntax_err(mfd_unexpected_macro(lineno, found_macro_name))
         return data
 
-    #TODO : For the love of all that is good in this world, split this up into different cases...
-    #           e.g. "handle_macro"?
     @classmethod
     def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return], err_mngr: error_mngr) -> Union[None, detail_return] :
         """Generate a Detail object from a line, the line number, and the Detail generated directly previous.
@@ -151,8 +136,6 @@ class detail() :
         if(line[:len(detail.comment_head)] == detail.comment_head) :
             return previous_return
 
-        # TODO: Check that they aren't trying to use '@ to define/use a macro.
-        
         # Generic validation for anything that isn't a comment; raises if something is wrong
         # but otherwise continues.
         #   (e.g. a template marker is still present)
@@ -161,6 +144,11 @@ class detail() :
         # Line is defining a macro
         if line[:len(detail.macro_head)] == detail.macro_head :
             return detail._handle_macro_definition(line, lineno, err_mngr)
+
+        elif line[:len(detail.macro_head)] == "'@" :
+            err_mngr.add_syntax_err(mfd_wrong_macro_token(lineno)) 
+            # If they tried & failed to define a macro, should reset previous return.
+            return None
 
         # Line follows the standard major-minor format
         elif line[0] == "@" :
