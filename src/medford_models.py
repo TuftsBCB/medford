@@ -27,6 +27,7 @@ class BaseModel(PydanticBaseModel) :
 class IncompleteDataError(ValueError):
     code = "incomplete_data_error"
 
+all_versions = ["1.0"]
 ################################
 # Helper Models                #
 ################################
@@ -37,7 +38,20 @@ class StrDescModel(BaseModel):
 ################################
 # Field Models                 #
 ################################
+class MEDFORDmodel(BaseModel) :
+    desc: OptListT[str]
+    Version: ListT[str]
+    @root_validator
+    def check_version(cls, values) :
+        if values['Version'] == [] :
+            raise IncompleteDataError()
 
+        actual_value = values['Version'][0][1]
+        if actual_value not in all_versions :
+            raise ValueError(f"Version {actual_value} is not a valid version")
+        
+        return values
+    
 class Journal(StrDescModel):
     Volume: ListT[int]
     Issue: ListT[int]
@@ -201,6 +215,7 @@ class Software(BaseModel):
 ################################
 # Meant to store every single possible tag that we have defined
 class Entity(BaseModel):
+    MEDFORD: ListT[MEDFORDmodel]
     Paper: OptListT[Paper]
     Journal: OptListT[Journal]
     Date: OptListT[Date]

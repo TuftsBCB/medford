@@ -1,21 +1,40 @@
 {
-  "Paper": [
+  "MEDFORD": [
     [
       1,
       {
-        "Primary": [
+        "desc": [
           [
             1,
+            "description"
+          ]
+        ],
+        "Version": [
+          [
+            2,
+            "1.0"
+          ]
+        ]
+      }
+    ]
+  ],
+  "Paper": [
+    [
+      4,
+      {
+        "Primary": [
+          [
+            4,
             {
               "desc": [
                 [
-                  1,
+                  4,
                   "Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution"
                 ]
               ],
               "URI": [
                 [
-                  2,
+                  5,
                   "https://www.nature.com/articles/s41598-018-34459-8"
                 ]
               ]
@@ -27,29 +46,29 @@
   ],
   "Journal": [
     [
-      4,
+      7,
       {
         "desc": [
           [
-            4,
+            7,
             "Nature Scientific Reports"
           ]
         ],
         "Volume": [
           [
-            5,
+            8,
             "8"
           ]
         ],
         "Issue": [
           [
-            6,
+            9,
             "1"
           ]
         ],
         "Pages": [
           [
-            7,
+            10,
             "1-10"
           ]
         ]
@@ -58,21 +77,21 @@
   ],
   "Date": [
     [
-      9,
+      12,
       {
         "desc": [
           [
-            9,
+            12,
             "2018-05-09"
           ]
         ],
         "Note": [
           [
-            10,
+            13,
             "Received"
           ],
           [
-            11,
+            14,
             "slkdjfklsjdfklsjdf"
           ]
         ]
@@ -81,23 +100,23 @@
   ],
   "File": [
     [
-      13,
+      16,
       {
         "desc": [
           [
-            13,
+            16,
             "A random File"
           ]
         ],
         "Path": [
           [
-            14,
+            17,
             "samples/bagit_example/LICENSE"
           ]
         ],
         "Destination": [
           [
-            15,
+            18,
             "licensing/LICENSE"
           ]
         ]
@@ -106,27 +125,27 @@
   ],
   "Data": [
     [
-      17,
+      20,
       {
         "Ref": [
           [
-            17,
+            20,
             {
               "desc": [
                 [
-                  17,
+                  20,
                   "A random Data"
                 ]
               ],
               "Filename": [
                 [
-                  18,
+                  21,
                   "file"
                 ]
               ],
               "URI": [
                 [
-                  19,
+                  22,
                   "https://stackoverflow.com/questions/18727347/how-to-extract-a-filename-from-a-url-append-a-word-to-it"
                 ]
               ]

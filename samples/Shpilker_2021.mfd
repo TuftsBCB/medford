@@ -7,6 +7,9 @@
 can take a provided MEDFORD file and additional arbitrary files and put them into a bag. A MEDFORD file can also
 be translated into other formats, such as the BCODMO submission format.
 
+@MEDFORD description
+@MEDFORD-Version 1.0
+
 @Contributor Polina Shpilker
 @Contributor-Association Department of Computer Science, Tufts University, 1XX College Ave, 02155, MA, USA
 @Contributor-Role First Author
