@@ -60,7 +60,7 @@ parser.add_argument("--error_mode", "-e", type=ErrorMode, choices=list(ErrorMode
 parser.add_argument("--error_sort", "-s", type=ErrorOrder, choices=list(ErrorOrder), default=ErrorOrder.line,
     help="(TYPE|TOKENS|LINE) How to sort the errors, if compiling all errors.")
 
-def runMedford(filename, output_json, mode, error_mode, error_sort):
+def runMedford(filename, output_json, mode, error_mode, error_sort, action):
     class FieldError(Exception):
         pass
 
@@ -102,7 +102,7 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
     else:
         print("No errors found.")
 
-    if mode == MFDMode.BAGIT:
+    if mode == MFDMode.BAGIT and action == ParserMode.compile:
         runBagitMode(p, filename)
 
     if(output_json) :
@@ -111,4 +111,4 @@ def runMedford(filename, output_json, mode, error_mode, error_sort):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    runMedford(args.file, args.write_json, args.mode, args.error_mode, args.error_sort)
+    runMedford(args.file, args.write_json, args.mode, args.error_mode, args.error_sort, args.action)
