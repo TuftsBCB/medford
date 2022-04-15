@@ -139,10 +139,16 @@ class detailparser :
             t_err = dict
             for location_hint in location_hint_slice :
                 t_err = t_err[location_hint]
-            error_line_number = t_err[0]
+            if len(location_hint_slice) == 0 :
+                error_line_number = -1
+            else:
+                error_line_number = t_err[0]
 
             ##### RELATED TOKENS #####
-            token_indices = list(range(0, (n_3ples)*3,3))
+            if n_3ples > 0:
+                token_indices = list(range(0, (n_3ples)*3,3))
+            else :
+                token_indices = [0]
             tokens = [error_loc[i] for i in token_indices]
             token_string = "@" + tokens[0]
             if len(tokens) > 1:
