@@ -189,7 +189,7 @@ def zip_all_files(mfd_input) :
 
 ## Models
 class BagIt(Entity) :
-    Data: OptListT[Data]
+    Data: OptDataT[Data]
 
 ## Runners
 def runBagitMode(parameters, medford_input) :

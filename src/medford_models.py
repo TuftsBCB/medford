@@ -17,8 +17,9 @@ from pydantic import AnyUrl, root_validator
 #       Can then re-run on specific mode to see specific errors
 
 T = TypeVar('T')
-OptListT = Optional[List[Tuple[int, T]]]
-ListT = List[Tuple[int, T]]
+DatumT = Tuple[int, T]
+DataT = List[DatumT[T]]
+OptDataT = Optional[DataT[T]]
 
 class BaseModel(PydanticBaseModel) :
     class Config:
@@ -32,15 +33,15 @@ all_versions = ["1.0"]
 # Helper Models                #
 ################################
 class StrDescModel(BaseModel):
-    desc: ListT[str] #TODO: Find a way to make an exception?
-    Note: OptListT[str]
+    desc: DataT[str] #TODO: Find a way to make an exception?
+    Note: OptDataT[str]
 
 ################################
 # Field Models                 #
 ################################
 class MEDFORDmodel(BaseModel) :
-    desc: OptListT[str]
-    Version: ListT[str]
+    desc: OptDataT[str]
+    Version: DataT[str]
     @root_validator
     def check_version(cls, values) :
         if values['Version'] == [] :
@@ -48,25 +49,25 @@ class MEDFORDmodel(BaseModel) :
 
         actual_value = values['Version'][0][1]
         if actual_value not in all_versions :
-            raise ValueError(f"Version {actual_value} is not a valid version")
+            raise ValueError(f"Version {actual_value} is not a valid version.")
         
         return values
     
 class Journal(StrDescModel):
-    Volume: ListT[int]
-    Issue: ListT[int]
-    Pages: OptListT[str] #TODO: Validation?
+    Volume: DataT[int]
+    Issue: DataT[int]
+    Pages: OptDataT[str] #TODO: Validation?
 
 class Date(BaseModel):
-    desc: Union[ListT[datetime.date], ListT[datetime.datetime]]
-    Note: ListT[str]
+    desc: Union[DataT[datetime.date], DataT[datetime.datetime]]
+    Note: DataT[str]
     #changed type to note because type is a reserved keyword
 
 class Contributor(StrDescModel) :
-    ORCID: OptListT[int]
-    Assocation: OptListT[str]
-    Role: OptListT[str]
-    Email: OptListT[str] #TODO: Email validation
+    ORCID: OptDataT[int]
+    Assocation: OptDataT[str]
+    Role: OptDataT[str]
+    Email: OptDataT[str] #TODO: Email validation
 
     @root_validator
     def check_corresponding_has_contact(cls, v) :
@@ -77,31 +78,31 @@ class Contributor(StrDescModel) :
         return v
 
 class Funding(StrDescModel) :
-    ID: OptListT[str] #TODO: Funding ID validation?
+    ID: OptDataT[str] #TODO: Funding ID validation?
 
 class Keyword(StrDescModel):
     pass
 
 class Species(StrDescModel):
-    Loc: ListT[str]
-    ReefCollection: ListT[str] # TODO: Change to date with note?
-    Cultured: ListT[str]
-    CultureCollection: ListT[str]
+    Loc: DataT[str]
+    ReefCollection: DataT[str] # TODO: Change to date with note?
+    Cultured: DataT[str]
+    CultureCollection: DataT[str]
 
 class Method(StrDescModel):
-    Type: ListT[str]
-    Company: OptListT[str]
-    Sample: OptListT[str]
+    Type: DataT[str]
+    Company: OptDataT[str]
+    Sample: OptDataT[str]
 
 class Project(StrDescModel):
     pass
 
 class Expedition(StrDescModel):
-    ShipName: OptListT[str]
-    CruiseID: OptListT[str]
-    MooringID: OptListT[str]
-    DiveNumber: OptListT[int]
-    Synonyms: OptListT[str]
+    ShipName: OptDataT[str]
+    CruiseID: OptDataT[str]
+    MooringID: OptDataT[str]
+    DiveNumber: OptDataT[int]
+    Synonyms: OptDataT[str]
 
     #def check_at_least_one_identifier(cls, v) :
     #    values = {key:value for key, value in v[0].__dict__.items() if not key.startswith('__') and not callable(key)}
@@ -115,9 +116,9 @@ class Expedition(StrDescModel):
 
 class ArbitraryFile(StrDescModel):
     #todo: change to filename
-    Path: OptListT[str]
-    Destination: OptListT[str]
-    URI: OptListT[AnyUrl]
+    Path: OptDataT[str]
+    Destination: OptDataT[str]
+    URI: OptDataT[AnyUrl]
     outpath: str = ""
     @root_validator
     def check_singular_path_subdirectory(cls, values):
@@ -147,87 +148,87 @@ class Freeform(BaseModel):
 
 ## Multi-Typed tags (data, code, paper)
 class LocalBase(StrDescModel):
-    Path: ListT[str]
-    Destination: OptListT[str]
+    Path: DataT[str]
+    Destination: OptDataT[str]
     outpath: str =  ""
 
 class RemoteBase(StrDescModel):
-    URI: ListT[AnyUrl]
-    Filename: ListT[str]
+    URI: DataT[AnyUrl]
+    Filename: DataT[str]
     outpath: str = ""
 
 class D_Ref(RemoteBase) :
-    Type: OptListT[str]
+    Type: OptDataT[str]
 
 class D_Copy(LocalBase) :
-    Type: OptListT[str]
+    Type: OptDataT[str]
 
 class D_Primary(LocalBase) :
-    Type: OptListT[str]
+    Type: OptDataT[str]
 
 class Data(BaseModel) :
-    Ref: OptListT[D_Ref]
-    Copy: OptListT[D_Copy]
-    Primary: OptListT[D_Primary]
+    Ref: OptDataT[D_Ref]
+    Copy: OptDataT[D_Copy]
+    Primary: OptDataT[D_Primary]
 
 class P_Ref(RemoteBase) :
-    Link: OptListT[AnyUrl]
-    PMID: OptListT[int]
+    Link: OptDataT[AnyUrl]
+    PMID: OptDataT[int]
     #Add a validator for PMID?
-    DOI: OptListT[datetime.date]
+    DOI: OptDataT[datetime.date]
 
 class P_Copy(StrDescModel) :
-    Link: OptListT[AnyUrl]
-    PMID: OptListT[int]
+    Link: OptDataT[AnyUrl]
+    PMID: OptDataT[int]
     #Add a validator for PMID?
-    DOI: OptListT[datetime.date]
+    DOI: OptDataT[datetime.date]
 
 class P_Primary(StrDescModel) :
-    Link: OptListT[AnyUrl]
-    PMID: OptListT[int]
+    Link: OptDataT[AnyUrl]
+    PMID: OptDataT[int]
     #Add a validator for PMID?
-    DOI: OptListT[datetime.date]
+    DOI: OptDataT[datetime.date]
 
 class Paper(BaseModel) :
-    Ref: OptListT[P_Ref]
-    Copy: OptListT[P_Copy]
-    Primary: OptListT[P_Primary]
+    Ref: OptDataT[P_Ref]
+    Copy: OptDataT[P_Copy]
+    Primary: OptDataT[P_Primary]
 
 class S_Ref(RemoteBase):
-    Type: ListT[str]
-    Version: OptListT[str]
+    Type: DataT[str]
+    Version: OptDataT[str]
     
 class S_Copy(LocalBase):
-    Type: ListT[str]
-    Version: OptListT[str]
+    Type: DataT[str]
+    Version: OptDataT[str]
 
 class S_Primary(LocalBase):
-    Type: ListT[str]
-    Version: OptListT[str]
+    Type: DataT[str]
+    Version: OptDataT[str]
 
 class Software(BaseModel): 
-    Ref: OptListT[S_Ref]
-    Copy: OptListT[S_Copy]
-    Primary: OptListT[S_Primary]
+    Ref: OptDataT[S_Ref]
+    Copy: OptDataT[S_Copy]
+    Primary: OptDataT[S_Primary]
 
 ################################
 # Overarching Model            #
 ################################
 # Meant to store every single possible tag that we have defined
 class Entity(BaseModel):
-    MEDFORD: ListT[MEDFORDmodel]
-    Paper: OptListT[Paper]
-    Journal: OptListT[Journal]
-    Date: OptListT[Date]
-    Contributor: OptListT[Contributor]
-    Funding: OptListT[Funding]
-    Keyword: OptListT[Keyword]
-    Species: OptListT[Species]
-    Method: OptListT[Method]
-    Software: OptListT[Software]
-    Data: OptListT[Data]
-    File: OptListT[ArbitraryFile]
-    Freeform: OptListT[Freeform]
+    MEDFORD: DataT[MEDFORDmodel]
+    Paper: OptDataT[Paper]
+    Journal: OptDataT[Journal]
+    Date: OptDataT[Date]
+    Contributor: OptDataT[Contributor]
+    Funding: OptDataT[Funding]
+    Keyword: OptDataT[Keyword]
+    Species: OptDataT[Species]
+    Method: OptDataT[Method]
+    Software: OptDataT[Software]
+    Data: OptDataT[Data]
+    File: OptDataT[ArbitraryFile]
+    Freeform: OptDataT[Freeform]
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
 class BCODMO(BaseModel):
