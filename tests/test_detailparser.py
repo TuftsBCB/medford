@@ -1,7 +1,7 @@
 import unittest
 
-from medford_detail import *
-from medford_detailparser import *
+from MEDFORD.medford_detail import *
+from MEDFORD.medford_detailparser import *
 
 class TestDetailMethods(unittest.TestCase) :
     def test_single_line(self) :

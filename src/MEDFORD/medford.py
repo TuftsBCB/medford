@@ -1,9 +1,9 @@
 from pydantic import BaseModel, ValidationError
-from medford_detailparser import *
-from medford_detail import *
-from medford_models import BCODMO, Entity, StrDescModel
-from medford_BagIt import runBagitMode, BagIt
-from medford_error_mngr import *
+from MEDFORD.medford_detailparser import *
+from MEDFORD.medford_detail import *
+from MEDFORD.medford_models import BCODMO, Entity, StrDescModel
+from MEDFORD.medford_BagIt import runBagitMode, BagIt
+from MEDFORD.medford_error_mngr import *
 import json
 
 import argparse
@@ -109,6 +109,9 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
         with open(filename + ".JSON", 'w') as f:
             json.dump(final_dict, f, indent=2)
 
-if __name__ == "__main__":
+def parse_args_and_go() :
     args = parser.parse_args()
     runMedford(args.file, args.write_json, args.mode, args.error_mode, args.error_sort, args.action)
+
+if __name__ == "__main__":
+    parse_args_and_go()

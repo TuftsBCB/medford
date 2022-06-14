@@ -1,7 +1,7 @@
 import re
 from typing import Tuple, Union
 
-from medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc, mfd_wrong_macro_token
+from MEDFORD.medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc, mfd_wrong_macro_token
 
 class detail_return():
     type: str

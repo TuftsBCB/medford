@@ -5,3 +5,7 @@ __pycache__/*
 .pylintrc
 *.zip
 samples/pshpil_rnaseq_example/pshpil_rnaseq.mfd
+dist/*
+src/*.egg-info
+pyproject.toml
+setup.cfg

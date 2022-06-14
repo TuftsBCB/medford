@@ -1,6 +1,6 @@
 import unittest
 
-from medford import *
+from MEDFORD.medford import *
 
 class TestModelMethods(unittest.TestCase) :
     def test_pdam_cunning(self) :

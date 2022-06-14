@@ -1,7 +1,7 @@
-from medford_models import *
+from MEDFORD.medford_models import *
 from shutil import copyfile, make_archive
 from typing import Callable, List, Optional, Tuple, Union, Iterable
-from medford_detailparser import detailparser
+from MEDFORD.medford_detailparser import detailparser
 import hashlib
 import itertools
 import os

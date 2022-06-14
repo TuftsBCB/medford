@@ -1,6 +1,6 @@
 import unittest
 
-from medford_detail import *
+from MEDFORD.medford_detail import *
 
 class TestDetailMethods(unittest.TestCase) :
     def setUp(self) :

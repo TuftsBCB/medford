@@ -1,6 +1,6 @@
 import unittest
 
-from medford_models import *
+from MEDFORD.medford_models import *
 
 class TestModelMethods(unittest.TestCase) :
     def test_freeform_simple(self) :

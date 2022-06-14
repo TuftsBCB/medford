@@ -5,8 +5,8 @@ import math
 
 from pydantic import BaseModel
 
-from medford_detail import *
-from medford_error_mngr import *
+from MEDFORD.medford_detail import *
+from MEDFORD.medford_error_mngr import *
 
 class detailparser :
 
