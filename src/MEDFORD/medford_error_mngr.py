@@ -31,6 +31,7 @@ class mfd_unexpected_macro(mfd_syntax_err):
 class mfd_duplicated_macro(mfd_syntax_err):
     def __init__(self, instance_1:int, instance_2:int, macro_name:str) :
         self.substr = macro_name
+        self.earlier_lineno = instance_1
         message = f"Duplicated macro '{macro_name}' on lines {instance_1} and {instance_2}."
         super().__init__(message, instance_2, "duplicated_macro", False, True)
 
@@ -41,6 +42,7 @@ class mfd_remaining_template(mfd_syntax_err):
 
 class mfd_no_desc(mfd_syntax_err):
     def __init__(self, lineno:int, major_token:str):
+        self.substr = major_token
         message = f"Novel token @{major_token} started without a description on line {lineno}."
         super().__init__(message, lineno, "no_desc", False, True)
 
