@@ -111,6 +111,14 @@ class error_mngr:
             for err in self._syntax_err_coll[line] :
                 print("\t" + str(err))
 
+    def get_syntax_errors_list(self) -> List[mfd_syntax_err]:
+        errors = []
+
+        for line in sorted(self._syntax_err_coll.keys()) :
+            errors.extend(self._syntax_err_coll[line])
+        
+        return errors
+
     def add_error(self, error_obj: mfd_err):
         if self.mode == "FIRST" :
             print("Stopping on first error: ")
