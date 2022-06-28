@@ -176,7 +176,13 @@ class detail() :
 
         # Line is a run-over from a previous line.
         else :
+            if previous_return is None :
+                raise Exception("Unhandled previous_return type: NoneType in detail.FromLine. %d %s" % (lineno, line))
+
             if previous_return.type == "detail_return" :
+                if detail.macro_flag in line :
+                    line = detail._substitute_macro(line, lineno, err_mngr)
+                    
                 previous_return.detail.addData(line)
                 return detail_return("detail_return", False, previous_return.detail, None)
 

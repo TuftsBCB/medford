@@ -55,7 +55,9 @@ class MEDFORDmodel(BaseModel) :
     
 class Journal(StrDescModel):
     Volume: DataT[int]
-    Issue: DataT[int]
+    Issue: DataT[str]
+    # Issue types seen so far:
+    # [month] [year] (connelly 2020)
     Pages: OptDataT[str] #TODO: Validation?
 
 class Date(BaseModel):
@@ -84,6 +86,15 @@ class Keyword(StrDescModel):
     pass
 
 class Species(StrDescModel):
+    # Should it be Loc or Reef?
+    # Consider following use case:
+    # @Species-Reef Houwan
+    # @Species-ReefCollection [..]
+    # @Species-Reef Wanglitung 
+    # @Species-ReefCollection [..]
+    # Makes more sense than having two Locs and two ReefCollections. (Maybe also Reef should have the sub-token ReefCollection instead of having it be two separate minor tokens?)
+    # Right now it doesn't validate that each reef has its own reefcollection.
+    # Or maybe it should be listed as two separate species, then?
     Loc: DataT[str]
     ReefCollection: DataT[str] # TODO: Change to date with note?
     Cultured: DataT[str]
@@ -158,6 +169,9 @@ class RemoteBase(StrDescModel):
     outpath: str = ""
 
 class D_Ref(RemoteBase) :
+    # Should add conditional parsing based on certain types.
+    # e.g. 'sra accession' should have some level of understanding of what that is, and what that means for the field 'filename',
+    #       and expect minor token 'accession'
     Type: OptDataT[str]
 
 class D_Copy(LocalBase) :

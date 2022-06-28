@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 
 
@@ -23,11 +24,13 @@ class mfd_syntax_err(SyntaxError):
 
 class mfd_unexpected_macro(mfd_syntax_err):
     def __init__(self, lineno:int, macro_name:str) :
+        self.substr = macro_name
         message = f"Unexpected macro '{macro_name}' on line {lineno}."
         super().__init__(message, lineno, "unexpected_macro", False, True)
 
 class mfd_duplicated_macro(mfd_syntax_err):
     def __init__(self, instance_1:int, instance_2:int, macro_name:str) :
+        self.substr = macro_name
         message = f"Duplicated macro '{macro_name}' on lines {instance_1} and {instance_2}."
         super().__init__(message, instance_2, "duplicated_macro", False, True)
 
@@ -123,6 +126,12 @@ class error_mngr:
             self._error_collection[keyval] = [error_obj]
         else :
             self._error_collection[keyval].append(error_obj)
+
+    def return_errors(self): 
+        return deepcopy(self._error_collection)
+
+    def return_syntax_errors(self) :
+        return deepcopy(self._syntax_err_coll)
 
     def print_errors(self):
         if self.order == "TYPE" :
