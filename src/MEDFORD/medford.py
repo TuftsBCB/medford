@@ -65,6 +65,7 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
         pass
 
     details = []
+    detail._clear_cache()
     err_mngr = error_mngr(str(error_mode), str(error_sort))
 
     # TODO: add error catching for mis-formatting in here...
