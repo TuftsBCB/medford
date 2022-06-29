@@ -187,7 +187,7 @@ class detail() :
                 return detail_return("detail_return", False, previous_return.detail, None)
 
             elif previous_return.type == "macro_return" :
-                detail.addMacroData(str(previous_return), line)
+                detail.addMacroData(previous_return, line)
                 # Not technically necessary -- can just return previous return.
                 #   changing it though to make it match the detail_return case for legibility
                 return detail_return("macro_return", None, None, previous_return.macro)
@@ -206,8 +206,10 @@ class detail() :
         self.Data = self.Data + " " + line
     
     @classmethod
-    def addMacroData(cls, macro_name, line) :
-        detail.macro_dictionary[macro_name] = detail.macro_dictionary[macro_name] + " " + line
+    def addMacroData(cls, macro_return, line) :
+        macro_name = macro_return.macro[0]
+        old_entry = detail.macro_dictionary[macro_name]
+        detail.macro_dictionary[macro_name] = (old_entry[0], old_entry[1] + " " + line)
 
     def tabstring(self) :
         if self.Minor_Token != 'desc' :
