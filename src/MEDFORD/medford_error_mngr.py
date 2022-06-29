@@ -22,6 +22,14 @@ class mfd_syntax_err(SyntaxError):
     def __str__(self):
         return f"{self.errtype} on line {self.lineno}: {self.args[0]}"
 
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
 class mfd_unexpected_macro(mfd_syntax_err):
     def __init__(self, lineno:int, macro_name:str) :
         self.substr = macro_name
