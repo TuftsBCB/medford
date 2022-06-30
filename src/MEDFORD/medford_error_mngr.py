@@ -22,40 +22,49 @@ class mfd_syntax_err(SyntaxError):
     def __str__(self):
         return f"{self.errtype} on line {self.lineno}: {self.args[0]}"
 
-    def __deepcopy__(self, memo):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo))
-        return result
-
 class mfd_unexpected_macro(mfd_syntax_err):
     def __init__(self, lineno:int, macro_name:str) :
         self.substr = macro_name
         message = f"Unexpected macro '{macro_name}' on line {lineno}."
         super().__init__(message, lineno, "unexpected_macro", False, True)
 
+    def duplicate(self) :
+        return mfd_unexpected_macro(self.lineno, self.substr)
+
 class mfd_duplicated_macro(mfd_syntax_err):
     def __init__(self, instance_1:int, instance_2:int, macro_name:str) :
         self.substr = macro_name
+        self.earlier_lineno = instance_1
         message = f"Duplicated macro '{macro_name}' on lines {instance_1} and {instance_2}."
         super().__init__(message, instance_2, "duplicated_macro", False, True)
+    
+    def duplicate(self) :
+        return mfd_duplicated_macro(self.earlier_lineno, self.lineno, self.substr)
 
 class mfd_remaining_template(mfd_syntax_err):
     def __init__(self, lineno:int):
         message = f"Remaining template marker on line {lineno}."
         super().__init__(message, lineno, "remaining_template", False, True)
 
+    def duplicate(self) :
+        return mfd_remaining_template(self.lineno)
+
 class mfd_no_desc(mfd_syntax_err):
     def __init__(self, lineno:int, major_token:str):
+        self.substr = major_token
         message = f"Novel token @{major_token} started without a description on line {lineno}."
         super().__init__(message, lineno, "no_desc", False, True)
+    
+    def duplicate(self) :
+        return mfd_no_desc(self.lineno, self.substr)
 
 class mfd_wrong_macro_token(mfd_syntax_err) :
     def __init__(self, lineno:int) :
         message = f"Wrong token used to define a macro on line {lineno}. Please use `@, not '@, when defining a macro."
         super().__init__(message, lineno, "wrong_macro_token", False, True)
+
+    def duplicate(self) :
+        return mfd_wrong_macro_token(self.lineno)
 
 class mfd_err:
     def __init__(self, line: int, errtype: str, token_context: List[str],
@@ -139,7 +148,11 @@ class error_mngr:
         return deepcopy(self._error_collection)
 
     def return_syntax_errors(self) :
-        return deepcopy(self._syntax_err_coll)
+        output_dict = {}
+        for key in self._syntax_err_coll :
+            output_dict[key] = list(map(lambda err: err.duplicate(), self._syntax_err_coll[key]))
+
+        return output_dict
 
     def print_errors(self):
         if self.order == "TYPE" :
