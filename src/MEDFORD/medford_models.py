@@ -67,7 +67,7 @@ class Date(BaseModel):
 
 class Contributor(StrDescModel) :
     ORCID: OptDataT[int]
-    Assocation: OptDataT[str]
+    Association: OptDataT[str]
     Role: OptDataT[str]
     Email: OptDataT[str] #TODO: Email validation
 
