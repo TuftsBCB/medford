@@ -130,10 +130,12 @@ class detail() :
 
         # Line is empty
         if(len(line) == 0) :
+            previous_return.is_novel = False
             return previous_return
         
         # Line IS a comment
         if(line[:len(detail.comment_head)] == detail.comment_head) :
+            previous_return.is_novel = False
             return previous_return
 
         # Generic validation for anything that isn't a comment; raises if something is wrong

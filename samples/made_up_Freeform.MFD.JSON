@@ -1,110 +1,234 @@
 {
-  "Data": [
-    {
-      "Ref": [
-        {
-          "desc": [
-            "Reef Genomics Pocillopora damicornis"
-          ],
-          "URI": [
-            "http://pdam.reefgenomics.org"
-          ],
-          "Type": [
-            "Website"
+  "MEDFORD": [
+    [
+      1,
+      {
+        "desc": [
+          [
+            1,
+            "description"
           ]
-        }
-      ]
-    }
+        ],
+        "Version": [
+          [
+            2,
+            "1.0"
+          ]
+        ]
+      }
+    ]
+  ],
+  "Data": [
+    [
+      4,
+      {
+        "Ref": [
+          [
+            4,
+            {
+              "desc": [
+                [
+                  4,
+                  "Reef Genomics Pocillopora damicornis"
+                ]
+              ],
+              "URI": [
+                [
+                  5,
+                  "http://pdam.reefgenomics.org"
+                ]
+              ],
+              "Type": [
+                [
+                  6,
+                  "Website"
+                ]
+              ]
+            }
+          ]
+        ]
+      }
+    ]
   ],
   "Contributor": [
-    {
-      "desc": [
-        "Ross Cunning"
-      ],
-      "Association": [
-        "Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA."
-      ],
-      "Role": [
-        "First Author, Corresponding Author"
-      ],
-      "Email": [
-        "ross.cunning@gmail.com"
-      ]
-    }
+    [
+      8,
+      {
+        "desc": [
+          [
+            8,
+            "Ross Cunning"
+          ]
+        ],
+        "Association": [
+          [
+            9,
+            "Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA."
+          ]
+        ],
+        "Role": [
+          [
+            10,
+            "First Author, Corresponding Author"
+          ]
+        ],
+        "Email": [
+          [
+            11,
+            "ross.cunning@gmail.com"
+          ]
+        ]
+      }
+    ]
   ],
   "Project": [
-    {
-      "desc": [
-        "Some Project Here"
-      ]
-    }
+    [
+      13,
+      {
+        "desc": [
+          [
+            13,
+            "Some Project Here"
+          ]
+        ]
+      }
+    ]
   ],
   "Expedition": [
-    {
-      "desc": [
-        "Coral cruise"
-      ],
-      "ShipName": [
-        "Ship"
-      ],
-      "CruiseID": [
-        "39849"
-      ]
-    }
+    [
+      15,
+      {
+        "desc": [
+          [
+            15,
+            "Coral cruise"
+          ]
+        ],
+        "ShipName": [
+          [
+            16,
+            "Ship"
+          ]
+        ],
+        "CruiseID": [
+          [
+            17,
+            "39849"
+          ]
+        ]
+      }
+    ]
   ],
   "Freeform": [
-    {
-      "Date": [
-        {
-          "desc": [
-            "05-22"
+    [
+      19,
+      {
+        "Date": [
+          [
+            19,
+            {
+              "desc": [
+                [
+                  19,
+                  "05-22"
+                ]
+              ],
+              "Note": [
+                [
+                  20,
+                  "Hello Workd"
+                ]
+              ]
+            }
           ],
-          "Note": [
-            "Hello Workd"
+          [
+            22,
+            {
+              "desc": [
+                [
+                  22,
+                  "05-24"
+                ]
+              ],
+              "Note": [
+                [
+                  23,
+                  "Hello Workd"
+                ]
+              ]
+            }
           ]
-        },
-        {
-          "desc": [
-            "05-24"
-          ],
-          "Note": [
-            "Hello Workd"
-          ]
-        }
-      ]
-    }
+        ]
+      }
+    ]
   ],
   "Code": [
-    {
-      "Primary": [
-        {
-          "desc": [
-            "1"
-          ]
-        },
-        {
-          "desc": [
-            "2"
+    [
+      25,
+      {
+        "Primary": [
+          [
+            25,
+            {
+              "desc": [
+                [
+                  25,
+                  "1"
+                ]
+              ]
+            }
           ],
-          "note": [
-            "ADFG",
-            "KDJFI"
-          ]
-        },
-        {
-          "desc": [
-            "3"
-          ]
-        },
-        {
-          "desc": [
-            "4"
+          [
+            26,
+            {
+              "desc": [
+                [
+                  26,
+                  "2"
+                ]
+              ],
+              "note": [
+                [
+                  27,
+                  "ADFG"
+                ],
+                [
+                  28,
+                  "KDJFI"
+                ]
+              ]
+            }
           ],
-          "URL": [
-            "/some/other/code/Here"
+          [
+            30,
+            {
+              "desc": [
+                [
+                  30,
+                  "3"
+                ]
+              ]
+            }
+          ],
+          [
+            32,
+            {
+              "desc": [
+                [
+                  32,
+                  "4"
+                ]
+              ],
+              "URL": [
+                [
+                  33,
+                  "/some/other/code/Here"
+                ]
+              ]
+            }
           ]
-        }
-      ]
-    }
+        ]
+      }
+    ]
   ]
 }

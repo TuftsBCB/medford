@@ -246,7 +246,7 @@ class Entity(BaseModel):
 
 # Temporarily set to BaseModel instead of Entity for testing purposes.
 class BCODMO(BaseModel):
-    Data: List[Data]
-    Contributor: List[Contributor]
-    Project: List[Project]
-    Expedition: List[Expedition]
+    Data: DataT[Data]
+    Contributor: DataT[Contributor]
+    Project: DataT[Project]
+    Expedition: DataT[Expedition]

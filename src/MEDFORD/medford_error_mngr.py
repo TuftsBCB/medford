@@ -89,14 +89,15 @@ class mfd_err:
         self.msg = msg
 
     def __str__(self) :
+        self.lineno = self.line
         if self.errtype == "missing_field" :
-            return f"Line {self.line: <10} : {self.token_string} is missing the field {self.token_name}."
+            return f"Line {self.lineno: <10} : {self.token_string} is missing the field {self.token_name}."
         elif self.errtype == "incomplete_data" :
-            return f"Line {self.line: <10} : {self.token_string} has incomplete information: {self.msg}."
+            return f"Line {self.lineno: <10} : {self.token_string} has incomplete information: {self.msg}."
         elif self.errtype == "macro_misuse" :
-            return f"Line {self.line: <10} : {self.msg}"
+            return f"Line {self.lineno: <10} : {self.msg}"
         else:
-            return f"Line {self.line: <10} : {self.token_string} is of the wrong type: {self.msg}."
+            return f"Line {self.lineno: <10} : {self.token_string} is of the wrong type: {self.msg}."
 
 class error_mngr:
     has_major_parsing = False

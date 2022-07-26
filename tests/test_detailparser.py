@@ -1,48 +1,80 @@
-import unittest
+import pytest
 
 from MEDFORD.medford_detail import *
 from MEDFORD.medford_detailparser import *
 
-class TestDetailMethods(unittest.TestCase) :
-    def test_single_line(self) :
-        line = "@Date 02/24"
-        d = detail.FromLine(line, -1)
-        p = detailparser([d])
-        out_dict = p.export()
-        self.assertListEqual(list(out_dict.keys()), ["Date"])
-        self.assertEqual(len(out_dict["Date"]), 1) # There should only be one full Date object
+@pytest.fixture
+def general_context() :
+    emngr = error_mngr("ALL","LINE")
+    detail._clear_cache()
+    return [emngr]
 
-        self.assertListEqual(list(out_dict["Date"][0].keys()), ["desc"])
-        self.assertEqual(len(out_dict["Date"][0]["desc"]), 1) # Only should be 1 desc line
+def test_single_line(general_context) :
+    emngr = general_context[0]
 
-        self.assertEqual(out_dict["Date"][0]["desc"][0], "02/24")
+    line = "@Date 02/24"
+    
+    d = detail.FromLine(line, -1, None, emngr)
+    p = detailparser([d.detail], emngr)
+    out_dict = p.export()
+    
+    assert list(out_dict.keys()) == ["Date"]
+    assert len(out_dict["Date"]) == 1
 
-    def test_multiple_details_one_instance(self):
-        lines = "@Date 02/24\n@Date-note Hello World"
-        ds = [detail.FromLine(line, -1) for line in lines.split("\n")]
-        p = detailparser(ds)
-        out_dict = p.export()
-        self.assertListEqual(list(out_dict.keys()), ["Date"])
-        self.assertEqual(len(out_dict["Date"]), 1) # There should only be one full Date object
+    assert list(out_dict["Date"][0][1].keys()) == ["desc"]
+    assert len(out_dict["Date"][0][1]["desc"]) == 1
 
-        self.assertListEqual(list(out_dict["Date"][0].keys()), ["desc","note"])
-        self.assertEqual(len(out_dict["Date"][0]["desc"]), 1) # Only should be 1 desc line
-        self.assertEqual(len(out_dict["Date"][0]["note"]), 1) # Only should be 1 note line
+    assert out_dict["Date"][0][1]["desc"][0][1] == "02/24"
 
-        self.assertEqual(out_dict["Date"][0]["desc"][0], "02/24")
-        self.assertEqual(out_dict["Date"][0]["note"][0], "Hello World")
+    assert len(emngr.return_syntax_errors()) == 0
 
-    def test_multiple_notes_one_instance(self):
-        lines = "@Date 02/24\n@Date-note Hello World\n@Date-note 42"
-        ds = [detail.FromLine(line, -1) for line in lines.split("\n")]
-        p = detailparser(ds)
-        out_dict = p.export()
-        self.assertListEqual(list(out_dict["Date"][0].keys()), ["desc","note"])
-        self.assertEqual(len(out_dict["Date"][0]["note"]), 2) # Should be 2 note lines
+def test_multiple_details_one_instance(general_context):
+    emngr = general_context[0]
 
-        self.assertEqual(out_dict["Date"][0]["desc"][0], "02/24")
-        self.assertEqual(out_dict["Date"][0]["note"][0], "Hello World")
-        self.assertEqual(out_dict["Date"][0]["note"][1], "42")
+    line = "@Date 02/24"
+    line2 = "@Date-note Hello World"
 
-if __name__ == '__main__':
-    unittest.main()
+    ds = []
+    dr = detail.FromLine(line, -1, None, emngr)
+    ds.append(dr.detail)
+    ds.append(detail.FromLine(line2, -1, dr, emngr).detail)
+    p = detailparser(ds, emngr)
+    out_dict = p.export()
+
+    assert list(out_dict.keys()) == ["Date"]
+    assert len(out_dict["Date"]) == 1
+
+    assert list(out_dict["Date"][0][1].keys()) == ["desc","note"]
+    assert len(out_dict["Date"][0][1]["desc"]) == 1
+    assert len(out_dict["Date"][0][1]["note"]) == 1
+
+    assert out_dict["Date"][0][1]["desc"][0][1] == "02/24"
+    assert out_dict["Date"][0][1]["note"][0][1] == "Hello World"
+
+    assert len(emngr.return_syntax_errors()) == 0
+
+def test_multiple_notes_one_instance(general_context):
+    emngr = general_context[0]
+    line1 = "@Date 02/24"
+    line2 = "@Date-note Hello World"
+    line3 = "@Date-note 42"
+
+    ds = []
+    dr = detail.FromLine(line1, -1, None, emngr)
+    ds.append(dr.detail)
+    dr = detail.FromLine(line2, -1, dr, emngr)
+    ds.append(dr.detail)
+    dr = detail.FromLine(line3, -1, dr, emngr)
+    ds.append(dr.detail)
+
+    p = detailparser(ds, emngr)
+    out_dict = p.export()
+
+    assert list(out_dict["Date"][0][1].keys()) == ["desc","note"]
+    assert len(out_dict["Date"][0][1]["note"]) == 2
+
+    assert out_dict["Date"][0][1]["desc"][0][1] == "02/24"
+    assert out_dict["Date"][0][1]["note"][0][1] == "Hello World"
+    assert out_dict["Date"][0][1]["note"][1][1] == "42"
+
+    assert len(emngr.return_syntax_errors()) == 0

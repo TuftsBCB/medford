@@ -1,3 +1,4 @@
+from pathlib import PurePath
 from pydantic import BaseModel, ValidationError
 from MEDFORD.medford_detailparser import *
 from MEDFORD.medford_detail import *
@@ -60,16 +61,8 @@ parser.add_argument("--error_mode", "-e", type=ErrorMode, choices=list(ErrorMode
 parser.add_argument("--error_sort", "-s", type=ErrorOrder, choices=list(ErrorOrder), default=ErrorOrder.line,
     help="(TYPE|TOKENS|LINE) How to sort the errors, if compiling all errors.")
 
-def runMedford(filename, output_json, mode, error_mode, error_sort, action):
-    class FieldError(Exception):
-        pass
-
+def read_details(filename, err_mngr) :
     details = []
-    detail._clear_cache()
-    err_mngr = error_mngr(str(error_mode), str(error_sort))
-
-    # TODO: add error catching for mis-formatting in here...
-    # to test, change line 12 of pshpil_rnaseq.mfd to have a typo in the macro name.
     with open(filename, 'r') as f:
         all_lines = f.readlines()
         dr = None
@@ -84,6 +77,19 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
     if err_mngr.has_major_parsing :
         err_mngr.print_syntax_errors()
         raise SystemExit(0)
+
+    return details
+
+def runMedford(filename, output_json, mode, error_mode, error_sort, action):
+    class FieldError(Exception):
+        pass
+
+    detail._clear_cache()
+    err_mngr = error_mngr(str(error_mode), str(error_sort))
+
+    # TODO: add error catching for mis-formatting in here...
+    # to test, change line 12 of pshpil_rnaseq.mfd to have a typo in the macro name.
+    details = read_details(filename, err_mngr)
 
     parser = detailparser(details, err_mngr)
     final_dict = parser.export()
@@ -107,12 +113,12 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
         runBagitMode(p, filename)
 
     if(output_json) :
-        with open(filename + ".JSON", 'w') as f:
+        with open(filename.parent / (filename.name + ".JSON"), 'w') as f:
             json.dump(final_dict, f, indent=2)
 
 def parse_args_and_go() :
     args = parser.parse_args()
-    runMedford(args.file, args.write_json, args.mode, args.error_mode, args.error_sort, args.action)
+    runMedford(PurePath(args.file), args.write_json, args.mode, args.error_mode, args.error_sort, args.action)
 
 if __name__ == "__main__":
     parse_args_and_go()
