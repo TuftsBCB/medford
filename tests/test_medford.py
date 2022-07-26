@@ -3,19 +3,19 @@ import pytest
 from MEDFORD.medford import *
 
 def test_pdam_cunning() :
-    runMedford("samples/pdam_cunning.MFD", True, MFDMode.OTHER, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
+    runMedford(PurePath("samples/pdam_cunning.MFD"), True, MFDMode.OTHER, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
     assert True
 
 def test_freeform() :
-    runMedford("samples/made_up_Freeform.MFD", True, MFDMode.OTHER, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
+    runMedford(PurePath("samples/made_up_Freeform.MFD"), True, MFDMode.OTHER, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
     assert True
 
 def test_bcodmo() :
-    runMedford("samples/made_up_BCODMO.MFD", True, MFDMode.BCODMO, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
+    runMedford(PurePath("samples/made_up_BCODMO.MFD"), True, MFDMode.BCODMO, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
     assert True
 
 def test_bagit() :
-    runMedford("samples/bagit_example/made_up_BAGIT.MFD", True, MFDMode.BAGIT, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
+    runMedford(PurePath("samples/bagit_example/made_up_BAGIT.MFD"), True, MFDMode.BAGIT, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
     assert True
 
 # TODO: Test to make sure that comments are NOT causing unexpected behavior

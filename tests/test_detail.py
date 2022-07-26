@@ -174,3 +174,11 @@ def test_ignores_inline_in_macro(general_context) :
     dr = detail.FromLine(example_line, -1, None, err_mngr)
 
     assert detail.macro_dictionary[dr.macro[0]] == (-1, "macro_body")
+
+
+def test_removes_whitespaces_before_comment(general_context) :
+    err_mngr = general_context[0]
+    example_line = "@Major body # comment"
+
+    dr = detail.FromLine(example_line, -1, None, err_mngr)
+    assert dr.detail.Data == "body"
