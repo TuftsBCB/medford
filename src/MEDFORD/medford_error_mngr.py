@@ -66,6 +66,17 @@ class mfd_wrong_macro_token(mfd_syntax_err) :
     def duplicate(self) :
         return mfd_wrong_macro_token(self.lineno)
 
+class mfd_empty_line(mfd_syntax_err) :
+    def __init__(self, lineno:int, has_comment, rest_of_line) :
+        self.has_comment = has_comment
+        self.substr = rest_of_line
+        message = f"No content provided on line {lineno}, only tokens: {self.substr}."
+        if has_comment :
+            message = message + " An inline comment was found on this line -- did you mean to make it a comment?"
+        super().__init__(message, lineno, "empty_line", False, True)
+
+    def duplicate(self) :
+        return mfd_empty_line(self.lineno, self.has_comment, self.substr)
 class mfd_err:
     def __init__(self, line: int, errtype: str, token_context: List[str],
                 token_name: str, msg: str) :

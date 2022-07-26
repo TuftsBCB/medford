@@ -1,7 +1,7 @@
 import re
 from typing import Tuple, Union
 
-from MEDFORD.medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc, mfd_wrong_macro_token
+from MEDFORD.medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc, mfd_wrong_macro_token, mfd_empty_line
 
 class detail_return():
     type: str
@@ -130,12 +130,14 @@ class detail() :
 
         # Line is empty
         if(len(line) == 0) :
-            previous_return.is_novel = False
+            if previous_return is not None :
+                previous_return.is_novel = False
             return previous_return
         
         # Line IS a comment
         if(line[:len(detail.comment_head)] == detail.comment_head) :
-            previous_return.is_novel = False
+            if previous_return is not None :
+                previous_return.is_novel = False
             return previous_return
 
         # Generic validation for anything that isn't a comment; raises if something is wrong
@@ -154,6 +156,9 @@ class detail() :
 
         # Line follows the standard major-minor format
         elif line[0] == "@" :
+            if len(str.split(line, " ")) == 1 :
+                err_mngr.add_syntax_err(mfd_empty_line(lineno, True, str.split(line, " ")[0]))
+                return previous_return
             tokens, body = str.split(line, " ", 1)
             tokens = str.replace(tokens, '@', "")
             tokens_list = tokens.split("-")

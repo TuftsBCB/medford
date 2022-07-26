@@ -1,5 +1,6 @@
 import pytest
 
+from pathlib import PurePath
 from MEDFORD.medford import *
 
 def test_pdam_cunning() :
@@ -65,3 +66,22 @@ def test_no_crash_on_first_line_missing_desc(tmp_path) :
         assert True # system exit is fine, means we caught it appropriately
     except Exception as e:
         assert 0 # any other exception is bad
+
+# Ensure that a comment-only line is appropriately seen as an empty line by pydantic and caught as an error by the medford parser.
+def test_comment_only_is_considered_empty(tmp_path) :
+
+    err_mngr = error_mngr("ALL", "LINE")
+    detail._clear_cache()
+
+    sample_txt = ["@MEDFORD testing",
+                    "@MEDFORD-Version # I think the verison is 1.0?"]
+    
+    f = tmp_path / "sample.mfd"
+    f.write_text("\n".join(sample_txt))
+
+    try :
+        details = read_details(f, err_mngr)
+    except SystemExit as e:
+        assert True
+    except Exception as e:
+        assert 0
