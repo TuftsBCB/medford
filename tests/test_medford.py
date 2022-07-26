@@ -49,3 +49,19 @@ def test_comments_not_duplicating(tmp_path) :
         assert 'Note' in res_json['Date'][0][1]
         assert len(res_json['Date'][0][1]['desc']) == 1
         assert len(res_json['Date'][0][1]['Note']) == 1
+
+# The MEDFORD parser has checks for missing 'desc' lines. However, these checks fail if the very first line
+#   is a missing desc line. Check to make sure that this fix hasn't been broken.
+def test_no_crash_on_first_line_missing_desc(tmp_path) :
+    sample_txt = ["",
+                "@MEDFORD-Version 1.0"]
+
+    f = tmp_path / "sample.mfd"
+    f.write_text("\n".join(sample_txt))
+
+    try :
+        runMedford(tmp_path / "sample.mfd", True, MFDMode.OTHER, ErrorMode.all, ErrorOrder.line, ParserMode.validate)
+    except SystemExit as e:
+        assert True # system exit is fine, means we caught it appropriately
+    except Exception as e:
+        assert 0 # any other exception is bad

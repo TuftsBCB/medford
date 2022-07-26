@@ -162,7 +162,7 @@ class detail() :
             if len(tokens_list) == 1 :
                 minor_token = "desc"
             else :
-                if not previous_return.type == "detail_return" :
+                if previous_return is None or not previous_return.type == "detail_return" :
                     err_mngr.add_syntax_err(mfd_no_desc(lineno, tokens))
                 else :
                     if not previous_return.detail.Major_Tokens == major_tokens :
