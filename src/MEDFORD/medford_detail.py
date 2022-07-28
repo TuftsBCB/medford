@@ -123,10 +123,12 @@ class detail() :
         :rtype: Tuple(Bool, Bool, Detail)
         """
         line = line.strip()
+        comment_removed = False
         
         # Line contains a comment
         if detail.comment_flag in line :
             line = detail._remove_inline_comment(line)
+            comment_removed = True
 
         # Line is empty
         if(len(line) == 0) :
@@ -157,7 +159,7 @@ class detail() :
         # Line follows the standard major-minor format
         elif line[0] == "@" :
             if len(str.split(line, " ")) == 1 :
-                err_mngr.add_syntax_err(mfd_empty_line(lineno, True, str.split(line, " ")[0]))
+                err_mngr.add_syntax_err(mfd_empty_line(lineno, comment_removed, str.split(line, " ")[0]))
                 return previous_return
             tokens, body = str.split(line, " ", 1)
             tokens = str.replace(tokens, '@', "")
