@@ -1,6 +1,6 @@
 from typing import List, Optional, Union, TypeVar, Tuple
 import datetime
-from pydantic import BaseModel as PydanticBaseModel
+from pydantic import BaseModel as PydanticBaseModel, validator
 from pydantic import AnyUrl, root_validator
 
 # bcodmo? + bag
@@ -49,7 +49,7 @@ class MEDFORDmodel(BaseModel) :
 
         actual_value = values['Version'][0][1]
         if actual_value not in all_versions :
-            raise ValueError(f"Version {actual_value} is not a valid version.")
+            raise ValueError(f"Version {actual_value} is not a valid version")
         
         return values
     
@@ -231,6 +231,12 @@ class Software(BaseModel):
 # Meant to store every single possible tag that we have defined
 class Entity(BaseModel):
     MEDFORD: DataT[MEDFORDmodel]
+    @validator('MEDFORD', pre=True)
+    def only_one_MEDFORD_block(cls, values) :
+        if len(values) > 0 :
+            raise ValueError("There can only be exactly one MEDFORD block in a file")
+        return values
+
     Paper: OptDataT[Paper]
     Journal: OptDataT[Journal]
     Date: OptDataT[Date]
