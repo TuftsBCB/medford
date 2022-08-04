@@ -233,7 +233,7 @@ class Entity(BaseModel):
     MEDFORD: DataT[MEDFORDmodel]
     @validator('MEDFORD', pre=True)
     def only_one_MEDFORD_block(cls, values) :
-        if len(values) > 0 :
+        if len(values) > 1 :
             raise ValueError("There can only be exactly one MEDFORD block in a file")
         return values
 
