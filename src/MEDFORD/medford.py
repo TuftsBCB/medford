@@ -75,10 +75,9 @@ def read_details(filename, err_mngr) :
                         details.append(dr.detail)
     
     if err_mngr.has_major_parsing :
-        err_mngr.print_syntax_errors()
-        raise SystemExit(0)
+        return (True, details, err_mngr.return_syntax_errors())
 
-    return details
+    return (False, details, None)
 
 def runMedford(filename, output_json, mode, error_mode, error_sort, action):
     class FieldError(Exception):
@@ -89,7 +88,10 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
 
     # TODO: add error catching for mis-formatting in here...
     # to test, change line 12 of pshpil_rnaseq.mfd to have a typo in the macro name.
-    details = read_details(filename, err_mngr)
+    (has_err, details, errs) = read_details(filename, err_mngr)
+    if has_err :
+        err_mngr.print_syntax_errors()
+        raise SystemExit(0)
 
     parser = detailparser(details, err_mngr)
     final_dict = parser.export()
