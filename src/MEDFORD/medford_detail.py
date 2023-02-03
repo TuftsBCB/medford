@@ -1,5 +1,6 @@
+from os import major
 import re
-from typing import Tuple, Union
+from typing import List, Tuple, Union
 
 from MEDFORD.medford_error_mngr import error_mngr, mfd_duplicated_macro, mfd_remaining_template, mfd_unexpected_macro, mfd_no_desc, mfd_wrong_macro_token, mfd_empty_line
 
@@ -24,11 +25,14 @@ class detail() :
     template_flag = "[..]"
     macro_head = "`@"
     macro_flag = "`@"
+    macro_regex = "({}\{{[a-zA-Z0-9_]+\}}|{}[a-zA-Z0-9]+\s)".format(macro_flag, macro_flag)
+
     comment_head = "#"
     comment_flag = "# "
     detail_head = "@"
 
     macro_dictionary = {}
+    named_dictionary = {} # collection of named major tokens
 
     #instance
     Major_Tokens = []
@@ -66,9 +70,13 @@ class detail() :
 
     @classmethod
     def _handle_macro_definition(cls, line:str, lineno:int, err_mngr:error_mngr) :
-        # TODO: Check that they haven't put an extra space between `@ and the macro name?
-        macro_name, macro_body = line.split(detail.macro_flag,1)[1].split(" ",1)
+        head = line[0:len(detail.macro_flag)]
+        if head[0] == " " or head[0] == "\t" :
+            # raise a warning to the user telling them to not put spaces directly after macro head.
+            pass # for now
         
+        macro_name, macro_body = line.split(" ",1)
+    
         if macro_name in detail.macro_dictionary.keys() :
             old_lineno = detail.macro_dictionary[macro_name][0]
             err_mngr.add_syntax_err(mfd_duplicated_macro(lineno, old_lineno, macro_name))
@@ -106,7 +114,41 @@ class detail() :
         return data
 
     @classmethod
+    def _bool_defines_macro(cls, line:str) -> bool:
+        if line[0:2] == detail.macro_head :
+            return True
+        else :
+            return False
+
+    @classmethod
+    def _bool_contains_macro(cls, line:str) -> bool:
+        if re.search(detail.macro_regex, line):
+            return True
+        else :
+            return False
+        
+    @classmethod
+    def _get_Major_Minor_Body(cls, line:str) -> Tuple[List[str], str, int, str]:
+        tokens, body = str.split(line, " ", 1)
+
+        # remove leading @
+        tokens = tokens[1:]
+        tokens_list = tokens.split("-")
+        major_tokens = tokens_list[0].split("_")
+
+        # if there are no minor tokens, tokens_list is [majors]
+        if len(tokens_list) == 1 :
+            minor_token = "desc"
+        else :
+            minor_token = tokens_list[1]
+        
+        depth = len(tokens_list)
+
+        return(major_tokens, minor_token, depth, body)
+    
+    @classmethod
     def FromLine(cls, line: str, lineno: int, previous_return: Union[None, detail_return], err_mngr: error_mngr) -> Union[None, detail_return] :
+        # TODO: breaking this up into smaller pieces.
         """Generate a Detail object from a line, the line number, and the Detail generated directly previous.
 
         :param line: A string to parse into a detail, from a MFD file.
@@ -115,7 +157,7 @@ class detail() :
         :type lineno: int
         :param prev_detail: The previous detail generated from this MEDFORD file, if applicable.
         :type prev_detail: Detail|None
-        :raises ValueError: A Template marker ("[...]") is observed in the provided line.
+        :raises ValueError: A Template marker ("[..]") is observed in the provided line.
         :raises MedfordFormatException: A Macro name that has already been used is detected.
         :raises MedfordFormatException: A Macro is referred to that has not yet been defined.
         :raises ValueError: A catch-all error when we have no idea how to process the line provided.
@@ -161,27 +203,19 @@ class detail() :
             if len(str.split(line, " ")) == 1 :
                 err_mngr.add_syntax_err(mfd_empty_line(lineno, comment_removed, str.split(line, " ")[0]))
                 return previous_return
-            tokens, body = str.split(line, " ", 1)
-            tokens = str.replace(tokens, '@', "")
-            tokens_list = tokens.split("-")
-            major_tokens = tokens_list[0].split("_")
+            
+            major_tokens, minor_token, depth, body = cls._get_Major_Minor_Body(line)
 
-            if len(tokens_list) == 1 :
-                minor_token = "desc"
-            else :
+            if minor_token != "desc":
                 if previous_return is None or not previous_return.type == "detail_return" :
-                    err_mngr.add_syntax_err(mfd_no_desc(lineno, tokens))
-                else :
-                    if not previous_return.detail.Major_Tokens == major_tokens :
-                        err_mngr.add_syntax_err(mfd_no_desc(lineno, tokens))
-                minor_token = tokens_list[1]
-            depth = len(tokens_list)
-            data = body
+                    err_mngr.add_syntax_err(mfd_no_desc(lineno, major_tokens + [minor_token]))
+                elif not previous_return.detail.Major_Tokens == major_tokens :
+                    err_mngr.add_syntax_err(mfd_no_desc(lineno, major_tokens + [minor_token]))
 
-            if detail.macro_flag in data :
-                data = detail._substitute_macro(data, lineno, err_mngr)
+            if detail.macro_flag in body :
+                body = detail._substitute_macro(body, lineno, err_mngr)
 
-            return detail_return("detail_return", True, cls(major_tokens, minor_token, lineno, depth, data), None)
+            return detail_return("detail_return", True, cls(major_tokens, minor_token, lineno, depth, body), None)
 
         # Line is a run-over from a previous line.
         else :
@@ -219,6 +253,47 @@ class detail() :
         macro_name = macro_return.macro[0]
         old_entry = detail.macro_dictionary[macro_name]
         detail.macro_dictionary[macro_name] = (old_entry[0], old_entry[1] + " " + line)
+
+    @classmethod
+    def _find_named(cls, line) -> Tuple[bool, Union[str, None], Union[str, None]] :
+        if '@' in line :
+            major_tokens, minor_token, _, body = cls._get_Major_Minor_Body(line)
+            # !!WARNING!! Will not work if there is a macro in the body!!
+            # SPEC UPDATE NEEDED: Should this behave well with a macro?
+            #                       (personally, I think yes, b/c what if 50+ samples, can re-use prefix as macro)
+            if minor_token == "desc" :
+                return (True, "-".join(major_tokens), body)
+            else :
+                return(False, None, None)
+        return (False, None, None)
+
+    @classmethod
+    def readDetails(cls, filename, err_mngr) :
+        details = []
+        all_lines = []
+        with open(filename, 'r') as f:
+            all_lines = f.readlines()
+        
+        for i, line in enumerate(all_lines) :
+            has_named, major, name = cls._find_named(line)
+            if has_named :
+                if major not in cls.named_dictionary.keys() :
+                    cls.named_dictionary[major] = [name]
+                else :
+                    cls.named_dictionary[major].append(name)
+
+        dr = None
+        for i, line in enumerate(all_lines):
+            if(line.strip() != "") :
+                dr = detail.FromLine(line, i+1, dr, err_mngr)
+                if isinstance(dr, detail_return) :
+                    if dr.is_novel :
+                        details.append(dr.detail)
+    
+        if err_mngr.has_major_parsing :
+            return (True, details, err_mngr.return_syntax_errors())
+
+        return (False, details, None)
 
     def tabstring(self) :
         if self.Minor_Token != 'desc' :

@@ -61,24 +61,6 @@ parser.add_argument("--error_mode", "-e", type=ErrorMode, choices=list(ErrorMode
 parser.add_argument("--error_sort", "-s", type=ErrorOrder, choices=list(ErrorOrder), default=ErrorOrder.line,
     help="(TYPE|TOKENS|LINE) How to sort the errors, if compiling all errors.")
 
-def read_details(filename, err_mngr) :
-    details = []
-    with open(filename, 'r') as f:
-        all_lines = f.readlines()
-        dr = None
-        for i, line in enumerate(all_lines):
-            if(line.strip() != "") :
-                # TODO: move the details collection logic to detail? I don't like that we have to pull the typing here.
-                dr = detail.FromLine(line, i+1, dr, err_mngr)
-                if isinstance(dr, detail_return) :
-                    if dr.is_novel :
-                        details.append(dr.detail)
-    
-    if err_mngr.has_major_parsing :
-        return (True, details, err_mngr.return_syntax_errors())
-
-    return (False, details, None)
-
 def runMedford(filename, output_json, mode, error_mode, error_sort, action):
     class FieldError(Exception):
         pass
@@ -88,7 +70,7 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
 
     # TODO: add error catching for mis-formatting in here...
     # to test, change line 12 of pshpil_rnaseq.mfd to have a typo in the macro name.
-    (has_err, details, errs) = read_details(filename, err_mngr)
+    (has_err, details, errs) = detail.readDetails(filename, err_mngr)
     if has_err :
         err_mngr.print_syntax_errors()
         raise SystemExit(0)
