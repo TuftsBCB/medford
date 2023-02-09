@@ -189,3 +189,35 @@ def test_categorize_line(general_context) :
             for line_no in range(1,example_counts[key]+1 ) :
                 lr = linereader.categorize_line(example_lines[key + "_" + str(line_no)], -1)
                 assert lr.linetype == LineReturn.LineType.CONT
+
+def test_separate_tex_comment() :
+    ex = [("@Major-minor $$block 1$$ and $$ block 2 $$ and # a comment", (True, [(13,24), (29,42)], True, 47)),
+        ("@Major-minor $$block 1$$ and $$ block # 2 $$ and # a comment", (True, [(13,24), (29,44)], True, 49)),
+        ("@Major-minor $$block 1$$ and $$ block # 2 $$ and no comment", (True, [(13, 24), (29,44)], False, -1)),
+
+        ("@Major-minor $$block 1$$ and # a comment $$ block 2 $$", (True, [(13, 24)], True, 29)),
+        ("@Major-minor $$block 1$$ and # a comment $$ block 2 $$ # and a second comment", (True, [(13, 24)], True, 29)),
+
+        ("@Major-minor $$block # comment 1$$ and $$ block 2 $$", (True, [(13, 34), (39, 52)], False, -1)),
+        ("@Major-minor $$block # comment 1$$ and # a comment and $$ block 2 $$", (True, [(13, 34)], True, 39)),
+        
+        ("@Major-minor # a commented $$block 1$$ and $$ block 2 $$", (False, [], True, 13))]
+
+    for i in range(0, len(ex)) :
+        ex_str = ex[i][0]
+        ex_sol = ex[i][1]
+        assert linereader.contains_latex_use(ex_str)
+        assert linereader.contains_inline_comment(ex_str)
+
+        poss_comments = linereader.find_possible_inline_comments(ex_str)
+        assert len(poss_comments) > 0
+
+        poss_latex = linereader.find_possible_latex(ex_str)
+        assert len(poss_latex) == 2
+
+        has_tex, tex, has_comm, comm = linereader.determine_macro_latex_overlap(ex[i], poss_latex, poss_comments)
+        assert has_tex == ex_sol[0]
+        assert tex == ex_sol[1]
+        assert has_comm == ex_sol[2]
+        assert comm == ex_sol[3]
+        

@@ -189,6 +189,71 @@ class linereader() :
         return lr
     
     @staticmethod
+    def determine_macro_latex_overlap(line:str, poss_tex:List[Tuple[int,int]], poss_com:List[int]) -> Tuple[bool, List[Tuple[int,int]], bool, int] :
+        """
+        Determines which latex regions and which comment actually exist in a line.
+
+        TODO: Maybe make this recursive? Also find a better way to type it -- the return type is horrifying..
+
+        Parameters
+        ----------
+        line        str
+            The line to analyze for tex, comment overlap.
+        poss_tex    List[Tuple[int,int]]
+            Locations of possible tex blocks within line; len(poss_com) > 0
+        poss_com    List[int]
+            Locations of possible inline comments within line; len(poss_com) > 0
+
+        Returns
+        -------
+        Tuple[ bool, List[Tuple[int,int]], bool, int ]
+        Tuple containing : whether there are valid tex blocks, the index ranges of those tex blocks, 
+        whether there is a valid inline comment, and the location of that comment.
+        """
+        
+        # check what the overlap is; make sure that the comment(s) is/aren't in a latex block, and
+        #   ensure latex block isn't behind a comment
+        com_i = 0
+        tex_i = 0
+        cur_com = poss_com[com_i]
+        cur_tex = poss_tex[tex_i]
+        finalized_comment = -1
+        finalized_tex = []
+
+        while tex_i < len(poss_tex) :
+            cur_com = poss_com[com_i]
+            cur_tex = poss_tex[tex_i]
+            if cur_com < cur_tex[0] :
+                # comment is before tex, so this and later tex don't count
+                finalized_comment = cur_com
+                finalized_tex = poss_tex[:tex_i]
+                break
+
+            elif cur_com < cur_tex[1] :
+                # comment in tex block
+                if com_i < len(poss_com) -1 :
+                    # go to next potential comment
+                    com_i += 1
+                else :
+                    # no more next, no comments
+                    finalized_tex = poss_tex
+                    break
+
+            else :
+                # comment is after the tex we're looking at, get next tex
+                tex_i += 1
+                if tex_i >= len(poss_tex) :
+                    # We're at the end, and nothing has collided with the current comment.
+                    # Therefore, all possible latex are valid, and the current
+                    #   comment we're looking at is the true comment.
+                    finalized_comment = cur_com
+                    finalized_tex = poss_tex
+        
+        ret_tex, ret_com = len(finalized_tex) > 0, finalized_comment > -1
+
+        return (ret_tex, finalized_tex, ret_com, finalized_comment)
+
+    @staticmethod
     def detail_features(detail:LineReturn) -> LineReturn:
         """
         Annotates a LineReturn with relevant features, such as comment location or latex locations, if relevant.
@@ -223,40 +288,8 @@ class linereader() :
         finalized_macros = []
 
         if has_comment and has_latex :
-            # check what the overlap is; make sure that the comment(s) is/aren't in a latex block, and
-            #   ensure latex block isn't behind a comment
-            com_i = 0
-            tex_i = 0
-            cur_com = poss_comments[com_i]
-            cur_tex = poss_latex[tex_i]
-            while tex_i <= len(cur_tex) :
-                if cur_com < cur_tex[0] :
-                    # comment is before tex, so this and later tex don't count
-                    finalized_comment = cur_com
-                    finalized_tex = poss_latex[:tex_i]
-                    has_latex = len(finalized_tex) > 0
-                    break
+            has_latex, finalized_tex, has_comment, finalized_comment = linereader.determine_macro_latex_overlap(detail.line, poss_latex, poss_comments)
 
-                elif cur_com < cur_tex[1] :
-                    # comment in tex block
-                    if com_i < len(poss_comments) -1 :
-                        # go to next potential comment
-                        com_i += 1
-                    else :
-                        # no more next, no comments
-                        has_comment = False
-                        finalized_tex = poss_latex
-                        break
-
-                else :
-                    # comment is after the tex we're looking at, get next tex
-                    tex_i += 1
-                    if tex_i >= len(cur_tex) :
-                        # We're at the end, and nothing has collided.
-                        # therefore, all possible latex are valid, and the current
-                        #   comment we're looking at is the true comment.
-                        finalized_comment = cur_com
-                        finalized_tex = poss_latex
 
         if linereader.contains_macro_use(detail.line) :
             pass
