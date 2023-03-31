@@ -1,6 +1,6 @@
 from enum import Enum
 import re
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, TypeVar
 
 # Given a line, needs to figure out what the line represents.
 # Possible types:
@@ -41,6 +41,8 @@ from typing import List, Optional, Tuple
 #   detailparser to turn them into details, and there the more complex errors
 #   can be reported.
 
+Macro = Tuple[int, int, str]
+Tex = Tuple[int, int]
 class detail_statics():
     macro_header:str = "`@"
     comment_header:str = "#"
@@ -53,6 +55,7 @@ class detail_statics():
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
 
 class LineReturn :
+
     class LineType(Enum) :
         UNDEF = 0
         COMMENT = 1
@@ -69,7 +72,8 @@ class LineReturn :
     has_macro_use: bool = False
     has_LaTeX: bool = False
 
-    macro_locations: Optional[List[Tuple[int, int, str]]] = None # replace with class?
+    macro_locations: Optional[List[Macro]] = None # replace with class?
+    tex_locations: Optional[List[Tex]] = None
     comment_text: Optional[str] = None
 
     def __init__(self, inpLine:str, inpLineNo:int) :
@@ -86,6 +90,178 @@ class LineReturn :
 
     def is_detail(self) -> bool:
         return self.linetype == self.LineType.DETAIL
+
+    def add_features(self,  poss_macros: Optional[List[Macro]] = None, 
+                            poss_texs: Optional[List[Tex]] = None,
+                            poss_comments: Optional[List[int]] = None) -> None:
+        # I hate how this is set up. Is there a better way to strip the Optional tag from poss_?
+        #   Can only reach the `if tmp_hastex and tmp_hascom` block if poss_comments poss_texs are not None,
+        #   but it seems like there's no way to tell the type checker that and it's not smart enough
+        #   to figure it out itself
+        # 11 lines of code just to strip out the Optionals...
+        tmp_hasmacro, tmp_hastex, tmp_hascom = False, False, False
+        macros : List[Macro] = []
+        texs : List[Tex] = []
+        comments: List[int] = []
+        commloc: int = 0
+
+        if poss_macros != None :
+            tmp_hasmacro = True
+            macros = poss_macros
+        if poss_texs != None :
+            tmp_hastex = True
+            texs = poss_texs
+        if poss_comments != None :
+            tmp_hascom = True
+            comments = poss_comments
+
+        # following two if blocks always set self.tex_locations, self.macro_locations as [] if there are none.
+        # should this be changed so it sets it to None instead? not sure...
+        # They're defaulted as Optional[..] types, so will need to always check anyways
+        # predicted poss. fail state:
+        #   - no valid tex locations
+        #   - self.has_LaTeX = False
+        #   - self.tex_locations = []
+        #   - accidentally check if(self.has_inline_comment) instead
+        #   - proceed on empty list
+        #   quiet failure, kind of a concern
+        if tmp_hastex and tmp_hascom :
+            tmp_hastex, texs, tmp_hascom, commloc = LineReturn.determine_macro_latex_overlap(self.line, texs, comments)
+
+            self.has_inline_comment = tmp_hascom
+            self.comment_text = self.line[commloc:]
+            self.line = self.line[:commloc]
+            # TODO: test how this splits the line
+
+            self.has_LaTeX = tmp_hastex
+            self.tex_locations = texs
+        elif tmp_hastex :
+            # TODO : tests
+            self.has_LaTeX = tmp_hastex
+            self.tex_locations = texs
+        elif tmp_hascom :
+            # TODO : tests
+            commloc = comments[0]
+            self.has_inline_comment = tmp_hascom
+            self.comment_text = self.line[commloc:]
+            self.line = self.line[:commloc]
+
+        if tmp_hasmacro and (tmp_hastex or tmp_hascom):
+            tmp_hasmacro, macros = LineReturn.validate_macro_locs(texs if tmp_hastex else None, commloc if tmp_hascom else None, macros)
+
+            self.has_macro_use = tmp_hasmacro
+            self.macro_locations = macros
+            # TODO: test... well, everything
+
+        return
+    
+    @staticmethod
+    def validate_macro_locs(poss_tex:Optional[List[Tex]], poss_com_loc:Optional[int], poss_macros: List[Macro]) -> Tuple[bool, List[Macro]]: 
+        has_tex, has_comm = False, False
+        tex_loc: List[Tex] = []
+        com_loc: int = 0
+
+        if poss_tex != None :
+            has_tex = True
+            tex_loc = poss_tex
+        
+        if poss_com_loc != None :
+            has_comm = True
+            com_loc = poss_com_loc
+
+        finalized_macros: List[Macro] = []
+
+        for macro in poss_macros :
+            valid = True
+            if has_tex :
+                for tex in tex_loc :
+                    if tex[0] < macro[0] and macro[1] < tex[1] :
+                        # shouldn't be possible for a macro tail to go over the tex tail... $$ is not a valid macro name character
+                        valid = False
+                        break
+
+            if has_comm :
+                if macro[0] > com_loc :
+                    valid = False
+
+            if valid :
+                finalized_macros.append(macro)
+
+        return (len(finalized_macros) > 0, finalized_macros)
+    
+    @staticmethod
+    def determine_macro_latex_overlap(line:str, poss_tex:List[Tex], poss_com:List[int]) -> Tuple[bool, List[Tex], bool, int] :
+        """
+        Determines which latex regions and which comment actually exist in a line.
+
+        TODO: Maybe make this recursive? Also find a better way to type it -- the return type is horrifying..
+
+        Parameters
+        ----------
+        line        str
+            The line to analyze for tex, comment overlap.
+        poss_tex    List[Tuple[int,int]]
+            Locations of possible tex blocks within line; len(poss_com) > 0
+        poss_com    List[int]
+            Locations of possible inline comments within line; len(poss_com) > 0
+
+        Returns
+        -------
+        Tuple[ bool, List[Tuple[int,int]], bool, int ]
+        Tuple containing : whether there are valid tex blocks, the index ranges of those tex blocks, 
+        whether there is a valid inline comment, and the location of that comment.
+        """
+        
+        # check what the overlap is; make sure that the comment(s) is/aren't in a latex block, and
+        #   ensure latex block isn't behind a comment
+        com_i = 0
+        tex_i = 0
+        cur_com = poss_com[com_i]
+        cur_tex = poss_tex[tex_i]
+        finalized_comment = -1
+        finalized_tex = []
+
+        # I think there's an easier way to do this.
+        # 1. for every poss. comment, starting from earliest:
+        #   a. check if it's in a tex block
+        #       i. if it is, move on to next comment starting from the same tex block
+        #       ii. if it isn't, you're done
+        # instead of doing the stuff below this should be doable in a for loop over (0, len(poss_com)),
+        #   and using python cur_tex[0] < cur_com < cur_tex[1]
+
+        while tex_i < len(poss_tex) :
+            cur_com = poss_com[com_i]
+            cur_tex = poss_tex[tex_i]
+            if cur_com < cur_tex[0] :
+                # comment is before tex, so this and later tex don't count
+                finalized_comment = cur_com
+                finalized_tex = poss_tex[:tex_i]
+                break
+
+            elif cur_com < cur_tex[1] :
+                # comment in tex block
+                if com_i < len(poss_com) -1 :
+                    # go to next potential comment
+                    com_i += 1
+                else :
+                    # no more next, no comments
+                    finalized_tex = poss_tex
+                    break
+
+            else :
+                # comment is after the tex we're looking at, get next tex
+                tex_i += 1
+                if tex_i >= len(poss_tex) :
+                    # We're at the end, and nothing has collided with the current comment.
+                    # Therefore, all possible latex are valid, and the current
+                    #   comment we're looking at is the true comment.
+                    finalized_comment = cur_com
+                    finalized_tex = poss_tex
+        
+        ret_tex, ret_com = len(finalized_tex) > 0, finalized_comment > -1
+
+        return (ret_tex, finalized_tex, ret_com, finalized_comment)
+
         
 class linereader() :
     ## Methods to classify line type:
@@ -131,7 +307,7 @@ class linereader() :
         return locations
 
     @staticmethod
-    def find_macro_uses(line:str) -> List[Tuple[int,int]] :
+    def find_macro_uses(line:str) -> List[Macro] :
         locations = []
         all_poss_comments = re.finditer(detail_statics.macro_use_regex, line)
         for match in all_poss_comments:
@@ -139,7 +315,7 @@ class linereader() :
         return locations
 
     @staticmethod
-    def find_possible_latex(line:str) -> List[Tuple[int,int]] :
+    def find_possible_latex(line:str) -> List[Tex] :
         locations = []
         all_poss_comments = re.finditer(detail_statics.latex_use_regex, line)
         for match in all_poss_comments:
@@ -187,71 +363,6 @@ class linereader() :
         else :
             lr.linetype = LineReturn.LineType.CONT
         return lr
-    
-    @staticmethod
-    def determine_macro_latex_overlap(line:str, poss_tex:List[Tuple[int,int]], poss_com:List[int]) -> Tuple[bool, List[Tuple[int,int]], bool, int] :
-        """
-        Determines which latex regions and which comment actually exist in a line.
-
-        TODO: Maybe make this recursive? Also find a better way to type it -- the return type is horrifying..
-
-        Parameters
-        ----------
-        line        str
-            The line to analyze for tex, comment overlap.
-        poss_tex    List[Tuple[int,int]]
-            Locations of possible tex blocks within line; len(poss_com) > 0
-        poss_com    List[int]
-            Locations of possible inline comments within line; len(poss_com) > 0
-
-        Returns
-        -------
-        Tuple[ bool, List[Tuple[int,int]], bool, int ]
-        Tuple containing : whether there are valid tex blocks, the index ranges of those tex blocks, 
-        whether there is a valid inline comment, and the location of that comment.
-        """
-        
-        # check what the overlap is; make sure that the comment(s) is/aren't in a latex block, and
-        #   ensure latex block isn't behind a comment
-        com_i = 0
-        tex_i = 0
-        cur_com = poss_com[com_i]
-        cur_tex = poss_tex[tex_i]
-        finalized_comment = -1
-        finalized_tex = []
-
-        while tex_i < len(poss_tex) :
-            cur_com = poss_com[com_i]
-            cur_tex = poss_tex[tex_i]
-            if cur_com < cur_tex[0] :
-                # comment is before tex, so this and later tex don't count
-                finalized_comment = cur_com
-                finalized_tex = poss_tex[:tex_i]
-                break
-
-            elif cur_com < cur_tex[1] :
-                # comment in tex block
-                if com_i < len(poss_com) -1 :
-                    # go to next potential comment
-                    com_i += 1
-                else :
-                    # no more next, no comments
-                    finalized_tex = poss_tex
-                    break
-
-            else :
-                # comment is after the tex we're looking at, get next tex
-                tex_i += 1
-                if tex_i >= len(poss_tex) :
-                    # We're at the end, and nothing has collided with the current comment.
-                    # Therefore, all possible latex are valid, and the current
-                    #   comment we're looking at is the true comment.
-                    finalized_comment = cur_com
-                    finalized_tex = poss_tex
-        
-        ret_tex, ret_com = len(finalized_tex) > 0, finalized_comment > -1
-
-        return (ret_tex, finalized_tex, ret_com, finalized_comment)
 
     @staticmethod
     def detail_features(detail:LineReturn) -> LineReturn:
@@ -279,19 +390,10 @@ class linereader() :
         has_latex = linereader.contains_latex_use(detail.line)
         has_macros = linereader.contains_macro_use(detail.line)
 
-        poss_comments = linereader.find_possible_inline_comments(detail.line) if has_comment else []
-        poss_latex = linereader.find_possible_latex(detail.line) if has_latex else []
-        poss_macros = linereader.find_macro_uses(detail.line) if has_macros else []
+        poss_comments = linereader.find_possible_inline_comments(detail.line) if has_comment else None
+        poss_latex = linereader.find_possible_latex(detail.line) if has_latex else None
+        poss_macros = linereader.find_macro_uses(detail.line) if has_macros else None
 
-        finalized_comment = -1
-        finalized_tex = []
-        finalized_macros = []
-
-        if has_comment and has_latex :
-            has_latex, finalized_tex, has_comment, finalized_comment = linereader.determine_macro_latex_overlap(detail.line, poss_latex, poss_comments)
-
-
-        if linereader.contains_macro_use(detail.line) :
-            pass
+        detail.add_features(poss_macros, poss_latex, poss_comments)
 
         return detail

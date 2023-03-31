@@ -215,7 +215,7 @@ def test_separate_tex_comment() :
         poss_latex = linereader.find_possible_latex(ex_str)
         assert len(poss_latex) == 2
 
-        has_tex, tex, has_comm, comm = linereader.determine_macro_latex_overlap(ex[i], poss_latex, poss_comments)
+        has_tex, tex, has_comm, comm = LineReturn.determine_macro_latex_overlap(ex[i], poss_latex, poss_comments)
         assert has_tex == ex_sol[0]
         assert tex == ex_sol[1]
         assert has_comm == ex_sol[2]
