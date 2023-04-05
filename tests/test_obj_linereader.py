@@ -42,7 +42,8 @@ def noveldetail_ex_fixture() :
     ]
     invalid_lines = [
         "@ Major data",
-        #"@Major-minor-minor data",
+        #"@Major-minor-minor data", 
+        # ^^ Technically not invalid, should be a Detail error not a line parsing error
     ]
     return {"examples": example_lines, "invalid": invalid_lines}
 
@@ -93,3 +94,7 @@ def test_detect_noveldetail(noveldetail_ex_fixture, macro_ex_fixture, comment_ex
         assert not isinstance(LineReader.process_line(m, 0), NovelDetailLine)
 
 # TODO : move tests over from test_linereader to test "find" capabilities
+# TODO : add test for major-minor identification
+
+# TODO : add test to check indices of returned regex.
+#           reason: regex returns *were* including space after the regex *sometimes*. That is unacceptable.

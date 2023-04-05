@@ -1,5 +1,5 @@
 import re
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 from MEDFORD.objs.lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
 
 Macro = Tuple[int, int, str]
@@ -12,7 +12,9 @@ class detail_statics():
     _latex_marker:str = "$$"
     escaped_lm:str = re.escape(_latex_marker)
 
-    macro_use_regex:str = "({}\\{{[a-zA-Z0-9_]+\\}}|{}[a-zA-Z0-9]+(\\s|$))".format(macro_header, macro_header)
+    major_minor_reg:str = "{}(?P<major>[A-Za-z_]+)(-(?P<minor>[A-Za-z]+))?\\s".format(token_header)
+
+    macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$))".format(macro_header, macro_header)
     comment_use_regex:str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
 
@@ -33,6 +35,24 @@ class LineReader :
     def is_novel_token_line(line:str) -> bool :
         return re.match("{}[A-Za-z]".format(detail_statics.token_header), line) is not None
 
+    @staticmethod
+    def get_major_minor(line:str) -> Tuple[List[str], str, str] :
+        mm_res: Optional[re.Match[str]] = re.match(detail_statics.major_minor_reg, line)
+        if mm_res == None :
+            raise NotImplementedError("Something went horribly wrong trying to find Major and Minor tokens.")
+        else :
+            mm_match_res : re.Match[str] = mm_res
+            match_grps = mm_match_res.groupdict()
+
+            major_res : List[str] = match_grps['major'].split("_")
+            if 'minor' in match_grps.keys() :
+                minor_res : str = match_grps['minor']
+            else :
+                minor_res : str = ""
+
+            rest_of_line = line[mm_match_res.end():]
+            return(major_res, minor_res, rest_of_line)
+        
     ## Methods to describe line attributes:
     # + Contains comment
     # + Uses a macro
@@ -64,7 +84,10 @@ class LineReader :
         locations = []
         all_poss_comments = re.finditer(detail_statics.macro_use_regex, line)
         for match in all_poss_comments:
-            locations.append((match.start(), match.end()))
+            if match.group('r1') is not None :
+                locations.append((match.start('r1'), match.end('r1'), match.group('mname_closed')))
+            else :
+                locations.append((match.start('r2'), match.end('r2'), match.group('mname_open')))
         return locations
 
     @staticmethod
@@ -86,6 +109,7 @@ class LineReader :
             if LineReader.is_macro_def_line(line) :
                 return MacroLine(lineno, line, poss_inline, poss_tex, poss_macro)
             elif LineReader.is_novel_token_line(line) :
-                return NovelDetailLine(lineno, line, poss_inline, poss_tex, poss_macro)
+                major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
+                return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)
             else :
                 return ContinueLine(lineno, line, poss_inline, poss_tex, poss_macro)

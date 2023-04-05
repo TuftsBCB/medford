@@ -1,6 +1,6 @@
 import pytest
-from MEDFORD.objs.lines import ContinueLine
-from MEDFORD.medford_linereader import linereader
+from MEDFORD.objs.lines import ContinueLine, MacroLine, NovelDetailLine
+from MEDFORD.objs.linereader import LineReader
             
 def test_separate_tex_comment() :
     ex = [("@Major-minor $$block 1$$ and $$ block 2 $$ and # a comment", (True, [(13,24), (29,42)], True, 47)),
@@ -18,13 +18,13 @@ def test_separate_tex_comment() :
     for i in range(0, len(ex)) :
         ex_str = ex[i][0]
         ex_sol = ex[i][1]
-        assert linereader.contains_latex_use(ex_str)
-        assert linereader.contains_inline_comment(ex_str)
+        assert LineReader.contains_latex_use(ex_str)
+        assert LineReader.contains_inline_comment(ex_str)
 
-        poss_comments = linereader.find_possible_inline_comments(ex_str)
+        poss_comments = LineReader.find_possible_inline_comments(ex_str)
         assert len(poss_comments) > 0
 
-        poss_latex = linereader.find_possible_latex(ex_str)
+        poss_latex = LineReader.find_possible_latex(ex_str)
         assert len(poss_latex) == 2
 
         test_obj = ContinueLine(0, ex[i], poss_comments, poss_latex, [])
@@ -42,3 +42,49 @@ def test_separate_tex_comment() :
         if has_comm :
             comm = test_obj.comm_loc
             assert comm == ex_sol[3]
+
+
+#########################################
+# Macro definition line tests           #
+#########################################
+def test_MacroLine_FindMacro_UseMacro() :
+    test_line = "`@Macro def `@MacroUse"
+    lr = LineReader.process_line(test_line, -1)
+    assert isinstance(lr, MacroLine)
+    assert lr.has_macros
+    assert lr.macro_uses[0] == (12,22,"MacroUse")
+
+def test_MacroLine_FindMacro_UseMacro_Curly() :
+    test_line = "`@Macro def `@{MacroUse}"
+    lr = LineReader.process_line(test_line, -1)
+    assert isinstance(lr, MacroLine)
+    assert lr.has_macros
+    assert lr.macro_uses[0] == (12,24, "MacroUse")
+
+def test_MacroLine_FindMacro_NoUseMacro() :
+    test_line = "`@Macro def"
+    lr = LineReader.process_line(test_line, -1)
+    assert isinstance(lr, MacroLine)
+    assert not lr.has_macros
+
+def testMacroLine_FindMacro_UseTwoMacro() :
+    test_line = "`@Macro def `@MacroUse1 `@MacroUse2"
+    lr = LineReader.process_line(test_line, -1)
+    assert isinstance(lr, MacroLine)
+    assert lr.has_macros
+    assert len(lr.macro_uses) == 2
+    assert lr.macro_uses[0] == (12,23,"MacroUse1")
+    assert lr.macro_uses[1] == (24,35,"MacroUse2")
+
+#########################################
+# Novel detail line tests               #
+#########################################
+
+def test_NovelDetailLine_FindMacro_UseMacro() :
+    test_line = "@Major-minor `@MacroUse"
+    lr = LineReader.process_line(test_line, -1)
+    assert isinstance(lr, NovelDetailLine)
+    assert lr.has_macros
+    assert len(lr.macro_uses) == 1
+    assert lr.macro_uses[0] == (13,23,"MacroUse")
+    

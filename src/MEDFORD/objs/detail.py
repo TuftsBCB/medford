@@ -1,57 +1,63 @@
-from typing import List, Tuple, Optional
-from medford_linereader import LineReturn
+from typing import List, Tuple, Optional, Union, Dict
+from MEDFORD.objs.lines import NovelDetailLine, ContinueLine, Line
 import re
 
 class Detail :
-    major_token: str
+    major_tokens: List[str]
     minor_token: Optional[str]
+    # payload should only be obtained at the end, so macros, etc can be accurately replaced
 
-    _fulldesc: List[LineReturn] # keep LineReturns so we can extract comments, linenos later
+    has_macros: bool = False
+    macro_uses: Optional[List[str]]
+
+    _fulldesc: List[Union[NovelDetailLine, ContinueLine]] # keep LineReturns so we can extract comments, linenos later
 
     
-    def __init__(self, lines : List[LineReturn]) :
+    def __init__(self, lines : List[Union[NovelDetailLine, ContinueLine]]) :
         '''
         Create a Detail object from one DETAIL type LineReturn and any number of CONT type LineReturns.
 
         Parameters
         ------
-        lines: List[LineReturn]
+        lines: List[Line]
         '''
         if len(lines) == 0 :
             raise ValueError("At least one LineReturn must be provided to create a Detail object.")
+        if len(lines) > 1 :
+            for idx, l in enumerate(lines[1:]) :
+                if not isinstance(l, ContinueLine) :
+                    raise ValueError("Detail was provided a list of Line returns where the %d th object was not a ContinueLine." % idx)
         
-        detail_line : LineReturn = lines[0]
-        if not detail_line.is_detail :
-            raise ValueError("First provided LineReturn must be of type DETAIL.")
+        detail_line : Line = lines[0]
+        if not isinstance(detail_line, NovelDetailLine) :
+            raise ValueError("First provided Line must be a NovelDetailLine.")
         
-        self._fulldesc : List[LineReturn] = lines
+        self._fulldesc = lines
 
         # find major, minor tokens from first line
-        major_minor_reg : str = "@(?<major>[A-Za-z_]+)(-(?<minor>[A-Za-z]))? "
+        self.major_tokens = detail_line.major_tokens
+        self.minor_token = detail_line.minor_token
 
-        mm_res : Optional[re.Match[str]] = re.match(major_minor_reg, detail_line.line)
-        if mm_res == None :
-            # try to figure out what went wrong?
-            # possibilities :
-            # - poorly formatted major (@Major3-Minor Content)
-            # - poorly formatted minor (@Major-Minor3 Content)
-            # - missing both (@ Content)
-            # - no trailing space (@Major-MinorContent\n)
-            # - leading space?? ( @Major-Minor Content) <- no, impossible given how linereader finds lines
-            # for now, cry and give up.
-            # TODO : change to Medford error
-            raise NotImplementedError("Something went horribly wrong when trying to find the major and minor tokens.")
-        else :
-            mm_match_res : re.Match[str] = mm_res
-            match_grps = mm_match_res.groupdict()
-            
-            self.major_token = match_grps['major']
-            if 'minor' in match_grps.keys() :
-                self.minor_token = match_grps['minor']
-            else :
-                self.minor_token = None
-
-        return
+        self.validate()
+        self.gather_macros()
 
     def validate(self) :
         return
+
+    def gather_macros(self) :
+        found_macros = []
+        for line in self._fulldesc :
+            if line.has_macros :
+                self.has_macros = True
+                found_macros.append([macro[2] for macro in line.macro_uses])
+
+    def raw_payload(self) -> str :
+        out = ""
+        for l in self._fulldesc :
+            # TODO : deal with spacing
+            out = out + l.payload
+        return out
+    
+    def substituted_payload(self, macro_dict: Dict[str, str]) -> str :
+        raise NotImplementedError("substituted_payload not yet implemented.")
+        return ""

@@ -19,9 +19,9 @@ from typing import List, Tuple
 # MacroLine, ContinueLine, DetailLine use content mixin
 # ContinueLine, DetailLine use templateable mixin
 
-######################################
-# Mixins                             #
-######################################
+#################################
+# Mixins                        #
+#################################
 class ContentMixin() :
     has_inline: bool = False
     has_tex: bool = False
@@ -31,6 +31,21 @@ class ContentMixin() :
     comm_loc: int = -1
     tex_locs: List[Tuple[int, int]] = []
     macro_uses: List[Tuple[int,int,str]] = []
+
+    def resolve_comm_tex_macro_logic(self, poss_com: List[int], poss_tex: List[Tuple[int,int]], poss_macro: List[Tuple[int,int,str]]) -> None :
+        if len(poss_com) > 0 and len(poss_tex) > 0 :
+            self.deconvolute_comm_tex(poss_com, poss_tex)
+        elif len(poss_com) > 0 :
+            self.has_inline = True
+            self.comm_loc = poss_com[0]
+        elif len(poss_tex) > 0 :
+            self.has_tex = True
+            self.tex_locs = poss_tex
+
+        if len(poss_macro) > 0 :
+            self.find_macro_uses(poss_macro)
+
+        return
 
     def recurse_comm_tex_overlap(self, poss_com: List[int], poss_tex: List[Tuple[int, int]]) -> Tuple[int, List[Tuple[int, int]]]:
         """
@@ -116,8 +131,10 @@ class ContentMixin() :
                 if poss_macro[i][0] > self.comm_loc :
                     ind_last = i
                     break
+        else :
+            ind_last = len(poss_macro) - 1
         
-        if ind_last > 0 :
+        if ind_last >= 0 :
             if self.has_tex :
                 # iterate thru
                 deconv_results = self.recurse_macro_tex_overlap(poss_macro[:ind_last], self.tex_locs)
@@ -126,13 +143,13 @@ class ContentMixin() :
                     self.macro_uses = deconv_results
             else :
                 self.has_macros = True
-                self.macro_uses = poss_macro[:ind_last]
+                self.macro_uses = poss_macro[:ind_last+1]
 
 
 
-################################
-# Classes                      #
-################################
+#################################
+# Classes                       #
+#################################
 
 class Line() :
     lineno: int
@@ -153,14 +170,29 @@ class MacroLine(ContentMixin, Line) :
 
     def __init__(self, lineno: int, line: str, poss_inline, poss_tex, poss_macro) :
         super(MacroLine, self).__init__(lineno, line)
-    # TODO : complete
+
+        # [1:] is to skip the macro that this line itself is defining
+        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro[1:])
 
 class NovelDetailLine(ContentMixin, Line) :
+    major_tokens: List[str]
+    minor_token: str
+    payload: str
+
     # TODO : complete
-    def __init__(self, lineno: int, line: str, poss_inline, poss_tex, poss_macro) :
+    def __init__(self, lineno: int, line: str, majors: List[str], minor: str, payload: str, poss_inline, poss_tex, poss_macro) :
         super(NovelDetailLine, self).__init__(lineno, line)
+        self.major_tokens = majors
+        self.minor_token = minor
+        self.payload = payload
+
+        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
 class ContinueLine(ContentMixin, Line) :
+    payload: str
     # TODO : complete
     def __init__(self, lineno: int, line: str, poss_inline, poss_tex, poss_macro) :
         super(ContinueLine, self).__init__(lineno, line)
+        self.payload = line
+        
+        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
