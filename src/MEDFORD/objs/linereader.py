@@ -119,7 +119,7 @@ class LineReader :
             poss_tex = LineReader.find_possible_latex(line)
             poss_macro = LineReader.find_macro_uses(line)
 
-            if LineReader.is_macro_def_line(line) is not None :
+            if LineReader.is_macro_def_line(line) :
                 mname, mbody = LineReader.find_macro_name_body(line)
                 return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
             elif LineReader.is_novel_token_line(line) :

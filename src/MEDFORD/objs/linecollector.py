@@ -1,10 +1,8 @@
 from typing import List, Dict, Tuple, Optional
-from MEDFORD.objs.block import Block
-from MEDFORD.objs.detail import Detail
 from MEDFORD.objs.lines import Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
-from MEDFORD.objs.processed_lines import Macro
+from MEDFORD.objs.linecollections import Macro, Block, Detail
 
-class LineProcessor() :
+class LineCollector() :
     defined_macros: Dict[str, Macro]
     named_blocks: Dict[str, Block] 
     comments: List[CommentLine]

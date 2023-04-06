@@ -2,8 +2,8 @@ import pytest
 from typing import List, Optional, Dict
 from MEDFORD.objs.lines import Line, MacroLine
 from MEDFORD.objs.linereader import LineReader
-from MEDFORD.objs.LineProcessor import LineProcessor
-from MEDFORD.objs.processed_lines import Macro
+from MEDFORD.objs.linecollector import LineCollector
+from MEDFORD.objs.linecollections import Macro
 
 class TestMacroCreation():
     def setup_method(self, test_method) :
@@ -26,7 +26,7 @@ class TestMacroCreation():
 
     def test_basic_macro(self) :
         cur_line: Line = self.macro_lines[0]
-        lp: LineProcessor = LineProcessor([cur_line])
+        lp: LineCollector = LineCollector([cur_line])
         lp_dm: Dict[str, Macro] = lp.defined_macros
 
         assert len(lp_dm.keys()) == 1

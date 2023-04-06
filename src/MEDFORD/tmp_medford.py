@@ -1,7 +1,7 @@
 from typing import List
 from MEDFORD.objs.lines import Line
 from MEDFORD.objs.linereader import LineReader
-from MEDFORD.objs.LineProcessor import LineProcessor
+from MEDFORD.objs.linecollector import LineCollector
 # order of ops:
 # 1. open file
 # 2. turn all lines into Line objs (using LineReader)
@@ -14,7 +14,7 @@ from MEDFORD.objs.LineProcessor import LineProcessor
 class MFD() :
     filename: str
     object_lines: List[Line]
-    line_processor: LineProcessor
+    line_collector: LineCollector
 
     def __init__(self, filename) :
         self.filename = filename
@@ -26,7 +26,7 @@ class MFD() :
         self.object_lines = self._get_Line_objects(self.filename)
 
         # 3
-        self.line_processor = self._get_Line_Processor(self.object_lines)
+        self.line_collector = self._get_Line_Collector(self.object_lines)
 
         # 4
         # TODO : self.line_processor.JSON?
@@ -44,6 +44,6 @@ class MFD() :
 
         return object_lines
 
-    def _get_Line_Processor(self, object_lines: List[Line]) -> LineProcessor :
-        return LineProcessor(object_lines)
+    def _get_Line_Collector(self, object_lines: List[Line]) -> LineCollector:
+        return LineCollector(object_lines)
 
