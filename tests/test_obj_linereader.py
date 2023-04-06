@@ -95,6 +95,7 @@ def test_detect_noveldetail(noveldetail_ex_fixture, macro_ex_fixture, comment_ex
 
 # TODO : move tests over from test_linereader to test "find" capabilities
 # TODO : add test for major-minor identification
+# TODO : add raw content setting tests (e.g. mname, mbody)
 
 # TODO : add test to check indices of returned regex.
 #           reason: regex returns *were* including space after the regex *sometimes*. That is unacceptable.

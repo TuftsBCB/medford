@@ -1,0 +1,107 @@
+from typing import List, Dict, Tuple, Optional
+from MEDFORD.objs.block import Block
+from MEDFORD.objs.detail import Detail
+from MEDFORD.objs.lines import Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
+from MEDFORD.objs.processed_lines import Macro
+
+class LineProcessor() :
+    defined_macros: Dict[str, Macro]
+    named_blocks: Dict[str, Block] 
+    comments: List[CommentLine]
+    # TODO: what if multiple blocks with the same name? -> err
+    # TODO: provide error handler?
+
+    def __init__(self, lines: List[Line]) :
+        self.defined_macros = dict()
+        self.named_blocks = dict()
+        self.comments = []
+
+        self._ProcessLines(lines)
+    
+    def _ProcessLines(self, lines: List[Line]):
+        state: str = "na" # ?
+        line_collection = [] 
+        # TODO : figure out how to add type to line_collection without everything exploding
+        detail_collection: List[Detail] = []
+            
+        for line in lines :
+            line_collection, detail_collection = self._check_do_completion(False, line, state, line_collection, detail_collection)
+
+            if isinstance(line, MacroLine) :
+                state = "macro"
+                line_collection.append(line)
+            
+            elif isinstance(line, NovelDetailLine) :
+                state = "detail"
+                line_collection.append(line)
+
+            elif isinstance(line, ContinueLine) :
+                line_collection.append(line)
+            
+            elif isinstance(line, CommentLine) :
+                state = "comment"
+                line_collection.append(line)
+
+        # finish up
+        # TODO : move into a func so I don't gotta repeat this logic from above
+        if state != "na" :
+            _,_ = self._check_do_completion(True, None, state, line_collection, detail_collection)
+        else :
+            raise ValueError("Somehow reached completion of _ProcessLines without changing state.")
+
+    
+    def _generate_blocks(self, detail_coll: List[Detail]) -> List[Block] :
+        # iterate thru details and put them into blocks
+        tmp_coll: List[Detail] = [detail_coll[0]]
+        block_coll: List[Block] = []
+
+        if len(detail_coll) > 1 :
+            for idx, d in enumerate(detail_coll[1:]) :
+                if d.is_header or d.major_token != block_coll[0].major_token :
+                    block_coll.append(Block(tmp_coll))
+                    tmp_coll = [d]
+
+        else :
+            return [Block(tmp_coll)]
+
+        return block_coll
+
+    def _check_do_completion(self, final: bool, line:Optional[Line], state:str, line_collection, detail_collection: List[Detail]) -> Tuple[List[Line],List[Detail]] :
+        if final or (state != "na" and not isinstance(line, ContinueLine)) :
+            # finish whatever we're holding right now
+
+            # should probably have a mixin shared between macro and detail
+            #   to handle macro stuff
+            if state == "macro" :
+                headline = line_collection[0]
+                extralines = None
+                if len(line_collection) > 1 :
+                    extralines = line_collection[1:]
+
+                m = Macro(headline, extralines)
+                self.defined_macros[m.name] = m
+
+            elif state == "comment" :
+                self.comments.extend(line_collection)
+                # just throw the comment into the pile
+
+            elif state == "detail" :
+                headline = line_collection[0]
+                extralines = None
+                if len(line_collection) > 1 :
+                    extralines = line_collection[1:]
+                
+                d = Detail(headline, extralines)
+                detail_collection.append(d)
+
+            line_collection = []
+
+        if (final and detail_collection is not None and len(detail_collection) > 0) or (state == "detail" and not isinstance(line, NovelDetailLine)) :
+            bs = self._generate_blocks(detail_collection)
+            for b in bs :
+                self.named_blocks[b.name] = b
+
+            detail_collection = []
+
+        return (line_collection, detail_collection)
+

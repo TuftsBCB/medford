@@ -14,6 +14,7 @@ class detail_statics():
 
     major_minor_reg:str = "{}(?P<major>[A-Za-z_]+)(-(?P<minor>[A-Za-z]+))?\\s".format(token_header)
 
+    # TODO: make macro name regex reusable
     macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$))".format(macro_header, macro_header)
     comment_use_regex:str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
@@ -30,6 +31,14 @@ class LineReader :
     @staticmethod
     def is_macro_def_line(line:str) -> bool :
         return re.match("{}[A-Za-z]".format(detail_statics.macro_header), line) is not None
+    
+    @staticmethod
+    def find_macro_name_body(line:str) -> Tuple[str, str] :
+        m = re.match("{}(?P<mname>[A-Za-z0-9_]+)\\s(?P<mbody>.+)$".format(detail_statics.macro_header), line)
+        if m is not None :
+            return (m.group('mname'), m.group('mbody'))
+        else :
+            raise ValueError("Attempted to find macro name and body on an invalid string: {}".format(line))
 
     @staticmethod
     def is_novel_token_line(line:str) -> bool :
@@ -99,15 +108,20 @@ class LineReader :
         return locations
     
     @staticmethod 
-    def process_line(line: str, lineno: int) -> Line :
+    def process_line(line: str, lineno: int) -> Optional[Line] :
+        if line.strip() == "" :
+            return None
+        
         if LineReader.is_comment_line(line) :
             return CommentLine(lineno, line)
         else :
             poss_inline = LineReader.find_possible_inline_comments(line)
             poss_tex = LineReader.find_possible_latex(line)
             poss_macro = LineReader.find_macro_uses(line)
-            if LineReader.is_macro_def_line(line) :
-                return MacroLine(lineno, line, poss_inline, poss_tex, poss_macro)
+
+            if LineReader.is_macro_def_line(line) is not None :
+                mname, mbody = LineReader.find_macro_name_body(line)
+                return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
             elif LineReader.is_novel_token_line(line) :
                 major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
                 return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)

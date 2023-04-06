@@ -14,15 +14,15 @@ class Block :
             raise ValueError("Attempted to create a block with no details.")
         
         # ?
-        self.major_token = "_".join(details[0].major_tokens)
+        self.major_token = details[0].major_token
         if details[0].minor_token is not None and details[0].minor_token != "" :
             raise ValueError("No desc line for first detail provided to Block constructor.")
         self.name = details[0].raw_payload()
 
         if len(details) > 0 :
             for idx, detail in enumerate(details[1:]) :
-                if "_".join(detail.major_tokens) != self.major_token :
-                    raise ValueError("Block provided details of multiple major tokens: Block Major is %s while line %d has major of %s." % (self.major_token, idx, "_".join(detail.major_tokens)))
+                if detail.major_token != self.major_token :
+                    raise ValueError("Block provided details of multiple major tokens: Block Major is %s while line %d has major of %s." % (self.major_token, idx, detail.major_token))
                 if detail.minor_token is None :
                     raise ValueError("Block provided a detail with no minor token past first detail: detail # %d." % (idx))
                 

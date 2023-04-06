@@ -1,5 +1,4 @@
-from typing import List, Tuple
-
+from typing import List, Tuple, Dict
 
 # new plan:
 # three ABCs, Line, Content, and Templateable
@@ -23,6 +22,8 @@ from typing import List, Tuple
 # Mixins                        #
 #################################
 class ContentMixin() :
+    raw_content:str 
+
     has_inline: bool = False
     has_tex: bool = False
     has_macros: bool = False
@@ -145,7 +146,19 @@ class ContentMixin() :
                 self.has_macros = True
                 self.macro_uses = poss_macro[:ind_last+1]
 
+    def replace_macros(self, macro_defs: Dict[str, str]) -> None :
+        # TODO: add tests to make sure macro_uses is in first->last order
+        if not self.has_macros or len(self.macro_uses) == 0 :
+            raise ValueError("Attempted to replace macros in a line without macros.")
 
+        n_macro_uses: int = len(self.macro_uses)
+        for i in range(0, n_macro_uses) :
+            cur_macro:Tuple[int,int,str] = self.macro_uses[n_macro_uses - i - 1]
+            cur_macro_pos:Tuple[int,int] = (cur_macro[0],cur_macro[1])
+            cur_macro_name:str = cur_macro[2]
+
+            self.line = self.line[:cur_macro_pos[0]] + macro_defs[cur_macro_name] + self.line[cur_macro_pos[1]:]
+        
 
 #################################
 # Classes                       #
@@ -166,23 +179,24 @@ class CommentLine(Line) :
 
 class MacroLine(ContentMixin, Line) :
     macro_name: str
-    macro_content: str
 
-    def __init__(self, lineno: int, line: str, poss_inline, poss_tex, poss_macro) :
+    def __init__(self, lineno: int, line: str, macro_name:str, macro_body:str, poss_inline, poss_tex, poss_macro) :
         super(MacroLine, self).__init__(lineno, line)
+        self.macro_name = macro_name
+        self.raw_content = macro_body
 
         # [1:] is to skip the macro that this line itself is defining
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro[1:])
 
 class NovelDetailLine(ContentMixin, Line) :
-    major_tokens: List[str]
+    major_token: str
     minor_token: str
     payload: str
 
     # TODO : complete
     def __init__(self, lineno: int, line: str, majors: List[str], minor: str, payload: str, poss_inline, poss_tex, poss_macro) :
         super(NovelDetailLine, self).__init__(lineno, line)
-        self.major_tokens = majors
+        self.major_token = "_".join(majors)
         self.minor_token = minor
         self.payload = payload
 

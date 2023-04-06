@@ -88,3 +88,26 @@ def test_NovelDetailLine_FindMacro_UseMacro() :
     assert len(lr.macro_uses) == 1
     assert lr.macro_uses[0] == (13,23,"MacroUse")
     
+from typing import List, Optional
+from MEDFORD.objs.lines import Line
+class Macro_Replacement_Tests :
+    def setup_method(self) :
+        macro_strs: List[str] = [
+            "`@Macro1 definition",
+            "`@Macro2 `@Macro1",
+            "`@Macro3 `@{Macro1}",
+            "`@Macro4 `@Macro2",
+            "`@Macro5 `@Macro2 asdf"
+        ]
+
+        macro_lines: List[Line] = []
+
+        for idx,l in enumerate(macro_strs) :
+            r: Optional[Line] = LineReader.process_line(l, idx)
+            if r is not None :
+                macro_lines.append(r)
+
+        raise NotImplementedError()
+
+    def test_basic_replacement(self) :
+        raise NotImplementedError()
