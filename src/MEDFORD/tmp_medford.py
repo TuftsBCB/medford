@@ -5,7 +5,7 @@ from MEDFORD.objs.linecollector import LineCollector
 # order of ops:
 # 1. open file
 # 2. turn all lines into Line objs (using LineReader)
-# 3. turn Line objs into specialized objs (using LineProcessor)
+# 3. turn Line objs into specialized objs (using LineCollector)
 # 4. turn specialized objs into JSON (using ?)
 # 5. verify JSON using Pydantic (using ?)
 
