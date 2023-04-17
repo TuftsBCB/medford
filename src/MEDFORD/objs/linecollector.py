@@ -47,6 +47,7 @@ class LineCollector() :
                 line_collection.append(line)
 
             elif isinstance(line, ContinueLine) :
+                # TODO : ensure no continue lines after comments?
                 line_collection.append(line)
             
             elif isinstance(line, CommentLine) :
@@ -67,9 +68,21 @@ class LineCollector() :
 
         if len(detail_coll) > 1 :
             for idx, d in enumerate(detail_coll[1:]) :
-                if d.is_header or d.major_token != block_coll[0].major_token :
-                    block_coll.append(Block(tmp_coll))
-                    tmp_coll = [d]
+                # TODO: ?
+                if len(block_coll) > 0 :
+                    if d.is_header or d.major_token != block_coll[0].major_token :
+                        block_coll.append(Block(tmp_coll))
+                        tmp_coll = [d]
+                    else :
+                        tmp_coll.append(d)
+                else :
+                    if d.is_header :
+                        block_coll.append(Block(tmp_coll))
+                        tmp_coll = [d]
+                    else :
+                        tmp_coll.append(d)
+            
+            block_coll.append(Block(tmp_coll))
 
         else :
             return [Block(tmp_coll)]
@@ -106,7 +119,8 @@ class LineCollector() :
 
             line_collection = []
 
-        if (final and detail_collection is not None and len(detail_collection) > 0) or (state == "detail" and not isinstance(line, NovelDetailLine)) :
+        if (final and (detail_collection is not None) and len(detail_collection) > 0) or \
+                (state == "detail" and not (isinstance(line, NovelDetailLine) or isinstance(line, ContinueLine))) :
             bs = self._generate_blocks(detail_collection)
             for b in bs :
                 self.named_blocks[b.name] = b

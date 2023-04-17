@@ -63,7 +63,7 @@ class LineCollection() :
                     return False
                 else :
                     for idx, l in enumerate(self.extralines) :
-                        if l != other.extralines[l] :
+                        if l != other.extralines[idx] :
                             return False
 
         
@@ -132,8 +132,10 @@ class Detail(LineCollection) :
 
         if self.minor_token is None :
             self.is_header = True
+        else :
+            self.is_header = False
 
-        self.validate()
+        #self.validate()
 
     def validate(self) :
         raise NotImplementedError()
@@ -154,7 +156,7 @@ class Detail(LineCollection) :
     def __eq__(self, other) -> bool :
         if type(self) == type(other) :
             if self.major_token == other.major_token and self.is_header == other.is_header :
-                if self.minor_token is None ^ other.minor_token is None :
+                if (self.minor_token is None) ^ (other.minor_token is None) :
                     return False
                 elif self.minor_token != other.minor_token :
                     return False
@@ -166,7 +168,7 @@ class Detail(LineCollection) :
 # TODO: this shouldn't be a LineCollection
 class Block(LineCollection) :
     major_token: str
-    minor_tokens: List[str]
+    minor_tokens: Optional[List[str]] # Technically can have MFD block with nothing but a name
     details: List[Detail]
     
     name: str
@@ -183,6 +185,7 @@ class Block(LineCollection) :
         self.name = details[0].get_raw_content()
 
         if len(details) > 0 :
+            self.minor_tokens = []
             for idx, detail in enumerate(details[1:]) :
                 if detail.major_token != self.major_token :
                     raise ValueError("Block provided details of multiple major tokens: Block Major is %s while line %d has major of %s." % (self.major_token, idx, detail.major_token))
@@ -210,12 +213,16 @@ class Block(LineCollection) :
         if self.major_token != other.major_token :
             return False
         
-        if len(self.minor_tokens) != len(other.minor_tokens) :
+        if (self.minor_tokens is None) ^ (other.minor_tokens is None) :
             return False
-        else :
-            for idx, t in enumerate(self.minor_tokens) :
-                if t != other.minor_tokens[idx] :
-                    return False
+        
+        elif self.minor_tokens is not None :
+            if len(self.minor_tokens) != len(other.minor_tokens) :
+                return False
+            else :
+                for idx, t in enumerate(self.minor_tokens) :
+                    if t != other.minor_tokens[idx] :
+                        return False
         
         if len(self.details) != len(self.details) :
             return False
