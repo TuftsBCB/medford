@@ -1,13 +1,26 @@
 from typing import List, Dict, Tuple, Optional
 from MEDFORD.objs.lines import Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
 from MEDFORD.objs.linecollections import Macro, Block, Detail
+from enum import Enum
 
 class LineCollector() :
     defined_macros: Dict[str, Macro]
     named_blocks: Dict[str, Block] 
     comments: List[CommentLine]
-    # TODO: what if multiple blocks with the same name? -> err
+    # TODO: what if multiple blocks with the same name? 
     # TODO: provide error handler?
+
+    # how do I actually make this usable? still have to type LineCollector.(name) to use any of these.
+    class CollectorState(Enum) :
+        NA = 0
+        MACRO = 1
+        DETAIL = 2
+        COMMENT = 3
+
+    na = CollectorState.NA
+    macro = CollectorState.MACRO
+    detail = CollectorState.DETAIL
+    comment = CollectorState.COMMENT
 
     def __init__(self, lines: List[Line]) :
         self.defined_macros = dict()
@@ -41,7 +54,6 @@ class LineCollector() :
                 line_collection.append(line)
 
         # finish up
-        # TODO : move into a func so I don't gotta repeat this logic from above
         if state != "na" :
             _,_ = self._check_do_completion(True, None, state, line_collection, detail_collection)
         else :

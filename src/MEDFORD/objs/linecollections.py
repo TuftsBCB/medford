@@ -2,6 +2,7 @@ from typing import Optional, List, Dict
 from MEDFORD.objs.lines import Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
 
 # create mixin for macro, named obj handling
+# TODO: separate LineCollection into a LineCollection and FeatureContainer
 class LineCollection() :
     headline: ContentMixin
     extralines: Optional[List[ContinueLine]]
@@ -39,6 +40,35 @@ class LineCollection() :
 
     def substitute_macros(self, macro_definitions: Dict[str, 'Macro'], depth: Optional[int]) -> None :
         raise NotImplementedError()
+    
+    def __eq__(self, other) -> bool :
+        if type(self) != type(other) :
+            return False
+
+        if self.headline != other.headline :
+            return False
+        
+        if self.has_macros != other.has_macros :
+            return False
+        elif self.has_macros and self.used_macro_names is not None:
+            for idx, mn in self.used_macro_names :
+                if mn != other.used_macro_names[idx] :
+                    return False
+        
+        if (self.extralines is None) ^ (other.extralines is None) :
+            return False
+        else :
+            if self.extralines is not None:
+                if len(self.extralines) != len(other.extralines) :
+                    return False
+                else :
+                    for idx, l in enumerate(self.extralines) :
+                        if l != other.extralines[l] :
+                            return False
+
+        
+        return True
+
 
 class Macro(LineCollection) :
     name : str
@@ -66,6 +96,14 @@ class Macro(LineCollection) :
                 for exline in self.extralines :
                     exline.replace_macros(solved_macros)
         raise NotImplementedError()
+    
+    def __eq__(self, other) -> bool :
+        if type(self) == type(other) and self.name == other.name:
+            return super(Macro, self).__eq__(other)
+            
+        return False
+
+
     
 class Detail(LineCollection) :
     major_token: str
@@ -113,9 +151,23 @@ class Detail(LineCollection) :
         raise NotImplementedError("")
         return ""
 
+    def __eq__(self, other) -> bool :
+        if type(self) == type(other) :
+            if self.major_token == other.major_token and self.is_header == other.is_header :
+                if self.minor_token is None ^ other.minor_token is None :
+                    return False
+                elif self.minor_token != other.minor_token :
+                    return False
+                    
+                return super(Detail, self).__eq__(other)
+                
+        return False
+
+# TODO: this shouldn't be a LineCollection
 class Block(LineCollection) :
     major_token: str
     minor_tokens: List[str]
+    details: List[Detail]
     
     name: str
 
@@ -123,6 +175,7 @@ class Block(LineCollection) :
         if len(details) == 0 :
             raise ValueError("Attempted to create a block with no details.")
         
+        self.details = details
         # ?
         self.major_token = details[0].major_token
         if details[0].minor_token is not None and details[0].minor_token != "" :
@@ -148,4 +201,32 @@ class Block(LineCollection) :
                             self.used_macros.append(macro_use)
 
         return
+    
+
+    def __eq__(self, other) -> bool :
+        if type(self) != type(other) :
+            return False
+        
+        if self.major_token != other.major_token :
+            return False
+        
+        if len(self.minor_tokens) != len(other.minor_tokens) :
+            return False
+        else :
+            for idx, t in enumerate(self.minor_tokens) :
+                if t != other.minor_tokens[idx] :
+                    return False
+        
+        if len(self.details) != len(self.details) :
+            return False
+        else :
+            for idx, d in enumerate(self.details) :
+                if d != other.details[idx] :
+                    return False
+                
+        if self.name != other.name :
+            return False
+        
+        # TODO : check macro containment
+        return True
 

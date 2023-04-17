@@ -171,14 +171,24 @@ class Line() :
     def __init__(self, lineno : int, line : str) :
         self.lineno = lineno
         self.line = line
+    
+    def __eq__(self, other) -> bool :
+        if type(self) == type(other) :
+            return self.line == other.line and self.lineno == other.lineno
+        
+        return False
 
 class CommentLine(Line) :
     def __init__(self, lineno: int, line: str) :
         super(CommentLine, self).__init__(lineno, line)
+
+    def __eq__(self, other) -> bool :
+        return super(CommentLine, self).__eq__(other)
     # TODO : complete
 
 class MacroLine(ContentMixin, Line) :
     macro_name: str
+    raw_content: str
 
     def __init__(self, lineno: int, line: str, macro_name:str, macro_body:str, poss_inline, poss_tex, poss_macro) :
         super(MacroLine, self).__init__(lineno, line)
@@ -187,6 +197,14 @@ class MacroLine(ContentMixin, Line) :
 
         # [1:] is to skip the macro that this line itself is defining
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro[1:])
+    
+    def __eq__(self, other) -> bool:
+        if type(self) == type(other) and self.macro_name == other.macro_name and \
+            self.raw_content == other.raw_content :
+            return super(MacroLine, self).__eq__(other)
+        
+        return False
+
 
 class NovelDetailLine(ContentMixin, Line) :
     major_token: str
@@ -202,6 +220,13 @@ class NovelDetailLine(ContentMixin, Line) :
 
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
+    def __eq__(self, other) -> bool :
+        if type(self) == type(other) and self.major_token == other.major_token and \
+            self.minor_token == other.minor_token and self.payload == other.payload :
+            return super(NovelDetailLine, self).__eq__(other)
+        
+        return False
+
 class ContinueLine(ContentMixin, Line) :
     payload: str
     # TODO : complete
@@ -210,3 +235,9 @@ class ContinueLine(ContentMixin, Line) :
         self.payload = line
         
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
+
+    def __eq__(self, other) -> bool :
+        if type(self) == type(other) and self.payload == other.payload :
+            return super(ContinueLine, self).__eq__(other)
+        
+        return False
