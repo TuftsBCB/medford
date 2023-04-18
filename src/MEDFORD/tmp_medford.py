@@ -1,13 +1,13 @@
-from typing import List
-from MEDFORD.objs.lines import Line
-from MEDFORD.objs.linereader import LineReader
-from MEDFORD.objs.linecollector import LineCollector
+from typing import List, Dict
+from MEDFORD.objs.linereader import LineReader, Line
+from MEDFORD.objs.linecollector import LineCollector, Macro, Block
+from MEDFORD.objs.dictionizer import Dictionizer
 # order of ops:
 # 1. open file
 # 2. turn all lines into Line objs (using LineReader)
 # 3. turn Line objs into specialized objs (using LineCollector)
-# 4. turn specialized objs into JSON (using ?)
-# 5. verify JSON using Pydantic (using ?)
+# 4. turn specialized objs into dict (using ?)
+# 5. verify dict using Pydantic (using ?)
 
 # TODO : add error mgmt
 
@@ -15,6 +15,12 @@ class MFD() :
     filename: str
     object_lines: List[Line]
     line_collector: LineCollector
+    dictionizer: Dictionizer
+
+    macro_definitions: Dict[str, Macro]
+    named_blocks: Dict[str, Block]
+
+    dict_data: Dict[str, List[Dict]]
 
     def __init__(self, filename) :
         self.filename = filename
@@ -27,9 +33,14 @@ class MFD() :
 
         # 3
         self.line_collector = self._get_Line_Collector(self.object_lines)
+        # TODO : shouldn't have to reach into line collector.
+        self.macro_definitions = self.line_collector.defined_macros
+        self.named_blocks = self.line_collector.named_blocks
+        self.blocks = [v for k,v in self.named_blocks.items()]
 
         # 4
-        # TODO : self.line_processor.JSON?
+        self.dictionizer = self._get_Dictionizer(self.macro_definitions)
+        self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
         # 5
         # TODO : cat_scream.gif
@@ -47,3 +58,5 @@ class MFD() :
     def _get_Line_Collector(self, object_lines: List[Line]) -> LineCollector:
         return LineCollector(object_lines)
 
+    def _get_Dictionizer(self, macro_definitions: Dict[str, Macro]) -> Dictionizer :
+        return Dictionizer(macro_definitions)

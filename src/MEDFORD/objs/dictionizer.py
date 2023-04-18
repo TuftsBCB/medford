@@ -1,8 +1,8 @@
-from MEDFORD.objs.linecollections import Block, Detail
+from MEDFORD.objs.linecollections import Block, Detail, Macro
 from typing import Any, List, Dict, Tuple, Union
 
 class Dictionizer() :
-    def __init__(self, macro_dictionary: Dict[str, str]) :
+    def __init__(self, macro_dictionary: Dict[str, Macro]) :
         self.macro_dictionary = macro_dictionary
 
     def generate_dict(self, bls: List[Block]) -> Dict[str, List[Dict]]:
@@ -28,7 +28,7 @@ class Dictionizer() :
         # TODO : sometimes name is called from block, sometimes it's called from details...?
         # concerned about when Macros are actually parsed, can have a macro in a name?
         # saying no for now. add to validation for Blocks?
-        cur_parent_dict["name"] = cur_block.name
+        cur_parent_dict["name"] = (cur_block.headDetail, cur_block.name)
         if cur_block.minor_tokens is not None :
             for idx, (minor, detail) in enumerate(cur_block.minor_tokens) :
                 if minor not in cur_parent_dict.keys() :

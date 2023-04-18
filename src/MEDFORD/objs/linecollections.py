@@ -149,7 +149,7 @@ class Detail(LineCollection) :
                 out = out + l.raw_content
         return out
     
-    def get_content(self, macro_dict: Dict[str, str]) -> str :
+    def get_content(self, macro_dict: Dict[str, Macro]) -> str :
         raise NotImplementedError("")
         return ""
 
@@ -170,7 +170,8 @@ class Block(LineCollection) :
     major_tokens: List[str]
     minor_tokens: Optional[List[Tuple[str, Detail]]] # Technically can have MFD block with nothing but a name
     details: List[Detail]
-    
+    headDetail: Detail
+
     name: str
 
     def __init__(self, details: List[Detail]) :
@@ -182,6 +183,7 @@ class Block(LineCollection) :
         self.major_tokens = details[0].major_tokens
         if details[0].minor_token is not None and details[0].minor_token != "" :
             raise ValueError("No desc line for first detail provided to Block constructor.")
+        self.headDetail = details[0]
         self.name = details[0].get_raw_content()
 
         if len(details) > 0 :
