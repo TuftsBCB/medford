@@ -2,6 +2,7 @@ from typing import List, Dict
 from MEDFORD.objs.linereader import LineReader, Line
 from MEDFORD.objs.linecollector import LineCollector, Macro, Block
 from MEDFORD.objs.dictionizer import Dictionizer
+from MEDFORD.models.generics import Entity
 # order of ops:
 # 1. open file
 # 2. turn all lines into Line objs (using LineReader)
@@ -20,7 +21,8 @@ class MFD() :
     macro_definitions: Dict[str, Macro]
     named_blocks: Dict[str, Block]
 
-    dict_data: Dict[str, List[Dict]]
+    dict_data = None
+    pydantic_version = None
 
     def __init__(self, filename) :
         self.filename = filename
@@ -43,7 +45,11 @@ class MFD() :
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
         # 5
-        # TODO : cat_scream.gif
+        # TODO : this kind of breaks all of my type checking and requires
+        # me to use Dict[str, Any] instead of Dict[str, Dict[...]]...
+        # maybe in the future look into fixing this?
+        #   problem is Blocks aren't Dicts.
+        self.pydantic_version = Entity(**self.dict_data)
 
     def _get_Line_objects(self, filename: str) -> List[Line] :
         object_lines = []
@@ -60,3 +66,4 @@ class MFD() :
 
     def _get_Dictionizer(self, macro_definitions: Dict[str, Macro]) -> Dictionizer :
         return Dictionizer(macro_definitions)
+

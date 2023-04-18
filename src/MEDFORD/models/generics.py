@@ -7,9 +7,13 @@ from typing import TypeVar, Tuple, List, Optional
 #############################################
 
 T = TypeVar('T')
-DatumT = Tuple[Detail, T]
-DataT = List[DatumT[T]]
-OptDataT = Optional[DataT[T]]
+MinorT = Tuple[Detail, T]
+MinorsT = List[MinorT[T]]
+OptMinorT = Optional[MinorsT[T]]
+
+MajorsT = List[T]
+OptMajorT = Optional[MajorsT[T]]
+
 
 class BaseModel(PydanticBaseModel) :
     class Config:
@@ -23,15 +27,15 @@ class BlockModel(BaseModel) :
 #############################################
 
 class Contributor(BlockModel) :
-    name: DatumT[str]
-    ORCID: OptDataT[int]
-    Association: OptDataT[str]
-    Role: OptDataT[str]
-    Email: OptDataT[str]
+    name: MinorT[str]
+    ORCID: OptMinorT[int]
+    Association: OptMinorT[str]
+    Role: OptMinorT[str]
+    Email: OptMinorT[str]
 
 #############################################
 # File-Wide Validation                      #
 #############################################
 
 class Entity(BaseModel) :
-    Contributor: OptDataT[Contributor]
+    Contributor: OptMajorT[Contributor]

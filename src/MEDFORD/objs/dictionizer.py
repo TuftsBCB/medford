@@ -5,8 +5,8 @@ class Dictionizer() :
     def __init__(self, macro_dictionary: Dict[str, Macro]) :
         self.macro_dictionary = macro_dictionary
 
-    def generate_dict(self, bls: List[Block]) -> Dict[str, List[Dict]]:
-        root_dict: Dict[str, List[Dict]] = {}
+    def generate_dict(self, bls: List[Block]):
+        root_dict: Dict[str, Any] = {}
         for idx, bl in enumerate(bls) :
             self._recurse_majors(root_dict, bl)
         
