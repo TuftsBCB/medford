@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 from MEDFORD.objs.lines import Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
 
 # create mixin for macro, named obj handling
@@ -106,7 +106,7 @@ class Macro(LineCollection) :
 
     
 class Detail(LineCollection) :
-    major_token: str
+    major_tokens: List[str]
     minor_token: Optional[str]
     is_header: bool
     # payload should only be obtained at the end, so macros, etc can be accurately replaced
@@ -127,7 +127,7 @@ class Detail(LineCollection) :
         self.extralines = extralines
 
         # find major, minor tokens from first line
-        self.major_token = headline.major_token
+        self.major_tokens = headline.major_tokens
         self.minor_token = headline.minor_token
 
         if self.minor_token is None :
@@ -155,7 +155,7 @@ class Detail(LineCollection) :
 
     def __eq__(self, other) -> bool :
         if type(self) == type(other) :
-            if self.major_token == other.major_token and self.is_header == other.is_header :
+            if self.major_tokens == other.major_tokens and self.is_header == other.is_header :
                 if (self.minor_token is None) ^ (other.minor_token is None) :
                     return False
                 elif self.minor_token != other.minor_token :
@@ -167,8 +167,8 @@ class Detail(LineCollection) :
 
 # TODO: this shouldn't be a LineCollection
 class Block(LineCollection) :
-    major_token: str
-    minor_tokens: Optional[List[str]] # Technically can have MFD block with nothing but a name
+    major_tokens: List[str]
+    minor_tokens: Optional[List[Tuple[str, Detail]]] # Technically can have MFD block with nothing but a name
     details: List[Detail]
     
     name: str
@@ -179,7 +179,7 @@ class Block(LineCollection) :
         
         self.details = details
         # ?
-        self.major_token = details[0].major_token
+        self.major_tokens = details[0].major_tokens
         if details[0].minor_token is not None and details[0].minor_token != "" :
             raise ValueError("No desc line for first detail provided to Block constructor.")
         self.name = details[0].get_raw_content()
@@ -187,12 +187,12 @@ class Block(LineCollection) :
         if len(details) > 0 :
             self.minor_tokens = []
             for idx, detail in enumerate(details[1:]) :
-                if detail.major_token != self.major_token :
-                    raise ValueError("Block provided details of multiple major tokens: Block Major is %s while line %d has major of %s." % (self.major_token, idx, detail.major_token))
+                if detail.major_tokens != self.major_tokens :
+                    raise ValueError("Block provided details of multiple major tokens: Block Major is %s while line %d has major of %s." % ("_".join(self.major_tokens), idx, "_".join(detail.major_tokens)))
                 if detail.minor_token is None :
                     raise ValueError("Block provided a detail with no minor token past first detail: detail # %d." % (idx))
                 
-                self.minor_tokens.append(detail.minor_token)
+                self.minor_tokens.append((detail.minor_token, detail))
 
                 if detail.has_macros and detail.used_macro_names is not None :
                     if self.used_macros is None :
@@ -210,7 +210,7 @@ class Block(LineCollection) :
         if type(self) != type(other) :
             return False
         
-        if self.major_token != other.major_token :
+        if self.major_tokens != other.major_tokens :
             return False
         
         if (self.minor_tokens is None) ^ (other.minor_tokens is None) :

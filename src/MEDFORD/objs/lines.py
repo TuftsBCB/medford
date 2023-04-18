@@ -207,21 +207,21 @@ class MacroLine(ContentMixin, Line) :
 
 
 class NovelDetailLine(ContentMixin, Line) :
-    major_token: str
+    major_tokens: List[str]
     minor_token: str
     raw_content: str
 
     # TODO : complete
     def __init__(self, lineno: int, line: str, majors: List[str], minor: str, payload: str, poss_inline, poss_tex, poss_macro) :
         super(NovelDetailLine, self).__init__(lineno, line)
-        self.major_token = "_".join(majors)
+        self.major_tokens = majors
         self.minor_token = minor
         self.raw_content = payload
 
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
     def __eq__(self, other) -> bool :
-        if type(self) == type(other) and self.major_token == other.major_token and \
+        if type(self) == type(other) and self.major_tokens == other.major_tokens and \
             self.minor_token == other.minor_token and self.raw_content == other.raw_content :
             return super(NovelDetailLine, self).__eq__(other)
         

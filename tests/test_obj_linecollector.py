@@ -330,7 +330,6 @@ class TestLineCollection() :
         assert isinstance(confirmed_lines[0], MacroLine)
         assert isinstance(confirmed_lines[1], ContinueLine)
         assert isinstance(confirmed_lines[2], CommentLine)
-        # lines 3, 5 unkn
         assert isinstance(confirmed_lines[3], MacroLine)
         assert isinstance(confirmed_lines[4], NovelDetailLine)
         assert isinstance(confirmed_lines[5], NovelDetailLine)
