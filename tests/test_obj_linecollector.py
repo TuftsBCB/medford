@@ -2,7 +2,7 @@ from MEDFORD.objs.linecollector import LineCollector
 from MEDFORD.objs.linereader import LineReader
 from MEDFORD.objs.lines import Line, ContinueLine, MacroLine, CommentLine, NovelDetailLine
 from MEDFORD.objs.linecollections import Macro, Detail, Block
-from typing import List
+from typing import List, Dict
 
 from typing import Optional
 
@@ -276,6 +276,174 @@ class TestLineCollection() :
         ex_bl = Block(details)
 
         assert lc.named_blocks['name namecont'] == ex_bl
+
+    #########################################
+    # Test Macro Resolution Capabilities    #
+    #########################################
+
+    # TODO: add these tests to a new file named test_obj_linecollections?
+    def test_simple_macro_replace(self) :
+        test_lines: List[str] = [
+            "`@Macro value",
+            "@Major `@Macro"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 1
+        resolved = lc.defined_macros["Macro"].resolve(lc.defined_macros)
+        assert resolved == "value"
+
+        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        assert len(blocks) == 1
+        assert blocks[0].get_content({"Macro":resolved}) == "value"
+
+    def test_multiline_macro_replace(self) :
+        test_lines: List[str] = [
+            "`@Macro value",
+            " value 2",
+            "@Major `@Macro"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 1
+        resolved = lc.defined_macros["Macro"].resolve(lc.defined_macros)
+        assert resolved == "value value 2"
+
+        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        assert len(blocks) == 1
+        assert blocks[0].get_content({"Macro":resolved}) == "value value 2"
+
+    def test_multilayer_macro_replace(self) :
+        test_lines: List[str] = [
+            "`@Macro1 value",
+            "`@Macro2 `@Macro1",
+            "@Major `@Macro2"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 2
+        resolved_macros : Dict[str, str] = {}
+        for m in lc.defined_macros.keys() :
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            
+        assert resolved_macros['Macro1'] == "value"
+        assert resolved_macros['Macro2'] == "value"
+
+        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        assert len(blocks) == 1
+        assert blocks[0].get_content(resolved_macros) == "value"
+    
+    def test_multilayer_macro_replace_3(self) :
+        test_lines: List[str] = [
+            "`@Macro1 value",
+            "`@Macro2 21`@Macro1",
+            "@Major 23`@Macro2"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 2
+        resolved_macros : Dict[str, str] = {}
+        for m in lc.defined_macros.keys() :
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            
+        assert resolved_macros['Macro1'] == "value"
+        assert resolved_macros['Macro2'] == "21value"
+
+        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        assert len(blocks) == 1
+        assert blocks[0].get_content(resolved_macros) == "2321value"
+    
+    def test_multilayer_macro_replace_2(self) :
+        test_lines: List[str] = [
+            "`@Macro1 value",
+            "`@Macro2 21`@Macro1",
+            "@Major 23`@{Macro2}32",
+            "@Majortwo 23{`@Macro2}32"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 2
+        resolved_macros : Dict[str, str] = {}
+        for m in lc.defined_macros.keys() :
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            
+        assert resolved_macros['Macro1'] == "value"
+        assert resolved_macros['Macro2'] == "21value"
+
+        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        assert len(blocks) == 2
+        assert blocks[0].get_content(resolved_macros) == "2321value32"
+        assert blocks[1].get_content(resolved_macros) == "23{21value}32"
+
+    def test_multiline_multilayer_macro_replace(self) :
+        test_lines: List[str] = [
+            "`@Macro value",
+            " value 2",
+            "`@Macro2 hello",
+            " `@Macro hello",
+            " hello",
+            "@Major `@Macro2"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 2
+        resolved_macros : Dict[str, str] = {}
+        for m in lc.defined_macros.keys() :
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+        assert resolved_macros['Macro'] == "value value 2"
+        assert resolved_macros['Macro2'] == "hello value value 2 hello hello"
+
+        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        assert len(blocks) == 1
+        assert blocks[0].get_content(resolved_macros) == "hello value value 2 hello hello"
 
     #########################################
     # Free-for-all. Yipee!                  #

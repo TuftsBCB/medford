@@ -48,7 +48,7 @@ class MFD() :
         # TODO : this kind of breaks all of my type checking and requires
         # me to use Dict[str, Any] instead of Dict[str, Dict[...]]...
         # maybe in the future look into fixing this?
-        #   problem is Blocks aren't Dicts.
+        #   The problem is that Blocks aren't Dicts.
         self.pydantic_version = Entity(**self.dict_data)
 
     def _get_Line_objects(self, filename: str) -> List[Line] :

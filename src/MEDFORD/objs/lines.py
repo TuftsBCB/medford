@@ -24,6 +24,8 @@ from typing import List, Tuple, Dict
 class ContentMixin() :
     raw_content:str 
 
+    offset: int = -1
+
     has_inline: bool = False
     has_tex: bool = False
     has_macros: bool = False
@@ -33,7 +35,26 @@ class ContentMixin() :
     tex_locs: List[Tuple[int, int]] = []
     macro_uses: List[Tuple[int,int,str]] = []
 
+    # TODO: is this the right place to put this?
+    #           line is technically undefined...
+    def _get_raw_content_offset(self) -> None:
+        offset = self.line.find(self.raw_content)
+        if offset == -1 :
+            raise ValueError("Unable to find raw content in line")
+        else :
+            self.offset = offset
+
+    def _offset_positions(self, poss_com: List[int], poss_tex: List[Tuple[int, int]], poss_macro: List[Tuple[int, int, str]]) -> Tuple[List[int], List[Tuple[int, int]], List[Tuple[int, int, str]]] :
+        new_com = [x - self.offset for x in poss_com]
+        new_tex = [(x - self.offset, y - self.offset) for (x,y) in poss_tex]
+        new_macro = [(x - self.offset, y - self.offset, name) for (x,y,name) in poss_macro]
+        return (new_com, new_tex, new_macro)
+
     def resolve_comm_tex_macro_logic(self, poss_com: List[int], poss_tex: List[Tuple[int,int]], poss_macro: List[Tuple[int,int,str]]) -> None :
+        # adjust to raw_content positions
+        self._get_raw_content_offset()
+        (poss_com, poss_tex, poss_macro) = self._offset_positions(poss_com, poss_tex, poss_macro)
+
         if len(poss_com) > 0 and len(poss_tex) > 0 :
             self.deconvolute_comm_tex(poss_com, poss_tex)
         elif len(poss_com) > 0 :
@@ -158,6 +179,23 @@ class ContentMixin() :
             cur_macro_name:str = cur_macro[2]
 
             self.line = self.line[:cur_macro_pos[0]] + macro_defs[cur_macro_name] + self.line[cur_macro_pos[1]:]
+
+    def get_content(self, macro_defs: Dict[str, str]) -> str :
+        if not self.has_macros or len(self.macro_uses) == 0 :
+            return self.raw_content
+        else :
+            n_macro_uses: int = len(self.macro_uses)
+            out = self.raw_content
+            for i in range(0, n_macro_uses) :
+                cur_macro:Tuple[int, int, str] = self.macro_uses[n_macro_uses - i - 1]
+                cur_macro_pos: Tuple[int, int] = (cur_macro[0], cur_macro[1])
+                cur_macro_name: str = cur_macro[2]
+
+                out = out[:cur_macro_pos[0]] + macro_defs[cur_macro_name] + out[cur_macro_pos[1]:]
+
+            return out
+
+                
         
 
 #################################
@@ -188,7 +226,6 @@ class CommentLine(Line) :
 
 class MacroLine(ContentMixin, Line) :
     macro_name: str
-    raw_content: str
 
     def __init__(self, lineno: int, line: str, macro_name:str, macro_body:str, poss_inline, poss_tex, poss_macro) :
         super(MacroLine, self).__init__(lineno, line)
@@ -209,7 +246,6 @@ class MacroLine(ContentMixin, Line) :
 class NovelDetailLine(ContentMixin, Line) :
     major_tokens: List[str]
     minor_token: str
-    raw_content: str
 
     # TODO : complete
     def __init__(self, lineno: int, line: str, majors: List[str], minor: str, payload: str, poss_inline, poss_tex, poss_macro) :
@@ -228,7 +264,6 @@ class NovelDetailLine(ContentMixin, Line) :
         return False
 
 class ContinueLine(ContentMixin, Line) :
-    raw_content: str
     # TODO : complete
     def __init__(self, lineno: int, line: str, poss_inline, poss_tex, poss_macro) :
         super(ContinueLine, self).__init__(lineno, line)

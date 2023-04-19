@@ -1,5 +1,5 @@
 from MEDFORD.objs.dictionizer import Dictionizer
-from MEDFORD.objs.linecollections import Block
+from MEDFORD.objs.linecollections import Block, Detail
 from MEDFORD.objs.linereader import LineReader as LR
 from MEDFORD.objs.linecollector import LineCollector as LC
 from MEDFORD.objs.lines import Line
@@ -39,7 +39,7 @@ class TestDictionizer() :
         c_d: Dict[str, Any] = res_d["Major"][0]
         assert len(c_d.keys()) == 2
         assert c_d["Block"] == bl[0]
-        assert c_d["name"] == "name1"
+        assert c_d["name"][1] == "name1"
     
     def test_single_layer_dictionary_two_same_entry(self) :
         sample_lines = ["@Major name1", "@Major name2"]
@@ -54,12 +54,12 @@ class TestDictionizer() :
         c_d: Dict[str, Any] = res_d["Major"][0]
         assert len(c_d.keys()) == 2
         assert c_d["Block"] == bl[0]
-        assert c_d["name"] == "name1"
+        assert c_d["name"][1] == "name1"
 
         c_d: Dict[str, Any] = res_d["Major"][1]
         assert len(c_d.keys()) == 2
         assert c_d["Block"] == bl[1]
-        assert c_d["name"] == "name2"
+        assert c_d["name"][1] == "name2"
 
     def test_single_layer_dictionary_two_diff_entry(self) :
         # TODO : number in major token throws unuseful error; make useful
@@ -77,9 +77,35 @@ class TestDictionizer() :
         c_d: Dict[str, Any] = res_d["Major"][0]
         assert len(c_d.keys()) == 2
         assert c_d["Block"] == bl[0]
-        assert c_d["name"] == "name1"
+        assert c_d["name"][1] == "name1"
 
         c_d: Dict[str, Any] = res_d["MajorTwo"][0]
         assert len(c_d.keys()) == 2
         assert c_d["Block"] == bl[1]
-        assert c_d["name"] == "name2"
+        assert c_d["name"][1] == "name2"
+
+    #########################################
+    # Simple Minor Tokens                   #
+    #########################################
+
+    def test_double_layer_dictionary_one_entry(self) :
+        sample_lines = [
+            "@Major name1",
+            "@Major-minor minor1"
+            ]
+        bl = self.preprocess_lines(sample_lines)
+
+        d = Dictionizer({})
+        res_d : Dict[str, List[Dict]] = d.generate_dict(bl)
+        assert len(res_d.keys()) == 1
+        assert "Major" in res_d.keys()
+        assert len(res_d["Major"]) == 1
+        
+        c_d: Dict[str, Any] = res_d["Major"][0]
+        assert len(c_d.keys()) == 3
+        assert c_d["Block"] == bl[0]
+        assert c_d["name"][1] == "name1"
+        assert 'minor' in c_d.keys()
+        assert len(c_d["minor"][0]) == 2
+        assert isinstance(c_d["minor"][0][0], Detail)
+        assert c_d["minor"][0][1] == "minor1"

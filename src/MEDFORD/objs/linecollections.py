@@ -8,7 +8,7 @@ class LineCollection() :
     extralines: Optional[List[ContinueLine]]
 
     has_macros: bool = False
-    used_macro_names: Optional[List[str]]
+    used_macro_names: Optional[List[str]] = None
 
     def __init__(self, headline: ContentMixin, extralines: Optional[List[ContinueLine]]) :
         self.headline = headline
@@ -30,16 +30,14 @@ class LineCollection() :
     #has_references: bool = False
     #references: Optional[list[str]]
 
-    def _validate_depth(self, macro_definitions: Dict[str, 'Macro'], depth: int) :
-        if self.has_macros and self.used_macro_names is not None :
-            if depth >= 9 :
-                raise ValueError("Maximum macro recursion of 10 reached.")
-            for macro_name in self.used_macro_names :
-                macro_definitions[macro_name]._validate_depth(macro_definitions, depth + 1)
+    def get_content(self, resolved_macros: Dict[str, str]) -> str :
+        out : str = self.headline.get_content(resolved_macros)
+        if self.extralines is not None :
+            for l in self.extralines :
+                out += l.get_content(resolved_macros)
+        
+        return out
 
-
-    def substitute_macros(self, macro_definitions: Dict[str, 'Macro'], depth: Optional[int]) -> None :
-        raise NotImplementedError()
     
     def __eq__(self, other) -> bool :
         if type(self) != type(other) :
@@ -72,6 +70,8 @@ class LineCollection() :
 
 class Macro(LineCollection) :
     name : str
+    _is_resolved: bool = False
+    resolution: str
 
     def __init__(self, headline: MacroLine, extralines: Optional[List[ContinueLine]]):
         super(Macro, self).__init__(headline, extralines)
@@ -83,19 +83,33 @@ class Macro(LineCollection) :
             for el in self.extralines :
                 outstr = outstr + el.raw_content
         return outstr
+    
+    def resolve(self, macro_definitions: Dict[str, 'Macro'], depth: Optional[int] = None) -> str :
+        if depth is None :
+            depth = 0
+        if self._is_resolved : 
+            return self.resolution
+        
+        if depth == 11 :
+            raise ValueError("Macro Recursion reached a depth of 11.")
+        
+        if self.has_macros == False :
+            self._is_resolved = True
+            self.resolution = self.get_content({})
+            return self.resolution
+        
+        if self.used_macro_names is not None and len(self.used_macro_names) > 0:
+            resolved_macros : Dict[str, str] = {}
+            for m in self.used_macro_names :
+                resolved_macros[m] = macro_definitions[m].resolve(macro_definitions, depth + 1)
+            res = self.get_content(resolved_macros)
+            self._is_resolved = True
+            self.resolution = res
+            return res
+        
+        else :
+            raise ValueError("Somehow has_macros is True but used_macro_names is None.")
 
-    def get_content(self, macro_definitions: Dict[str, 'Macro']) -> str :
-        if self.has_macros and self.used_macro_names is not None :
-            # tell the macros to solve themselves
-            solved_macros: Dict[str, str] = dict()
-            for macro_name in self.used_macro_names :
-                solved_macros[macro_name] = macro_definitions[macro_name].get_content(macro_definitions)
-            
-            self.headline.replace_macros(solved_macros)
-            if self.extralines is not None :
-                for exline in self.extralines :
-                    exline.replace_macros(solved_macros)
-        raise NotImplementedError()
     
     def __eq__(self, other) -> bool :
         if type(self) == type(other) and self.name == other.name:
@@ -149,9 +163,12 @@ class Detail(LineCollection) :
                 out = out + l.raw_content
         return out
     
-    def get_content(self, macro_dict: Dict[str, Macro]) -> str :
-        raise NotImplementedError("")
-        return ""
+    def get_content(self, macro_dict: Dict[str, str]) -> str :
+        out = self.headline.get_content(macro_dict)
+        if self.extralines is not None :
+            for l in self.extralines :
+                out = out + l.get_content(macro_dict)
+        return out
 
     def __eq__(self, other) -> bool :
         if type(self) == type(other) :
@@ -206,6 +223,13 @@ class Block(LineCollection) :
                             self.used_macros.append(macro_use)
 
         return
+
+    def get_content(self, defined_macros: Dict[str, str]) -> str :
+        out = ""
+        for detail in self.details :
+            out = out + detail.get_content(defined_macros)
+
+        return out
     
 
     def __eq__(self, other) -> bool :

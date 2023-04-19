@@ -93,6 +93,15 @@ def test_detect_noveldetail(noveldetail_ex_fixture, macro_ex_fixture, comment_ex
     for m in macros:
         assert not isinstance(LineReader.process_line(m, 0), NovelDetailLine)
 
+def test_detect_macro_badcurly() :
+    # TODO : smart recognize this mis-use and throw an error?
+    example_lines = [
+        "@Major wrong{`@macrouse}"
+    ]
+    res = LineReader.process_line(example_lines[0], 0)
+    assert res is not None
+    assert isinstance(res, NovelDetailLine)
+    assert res.has_macros
 # TODO : move tests over from test_linereader to test "find" capabilities
 # TODO : add test for major-minor identification
 # TODO : add raw content setting tests (e.g. mname, mbody)

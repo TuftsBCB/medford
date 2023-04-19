@@ -15,7 +15,7 @@ class detail_statics():
     major_minor_reg:str = "{}(?P<major>[A-Za-z_]+)(-(?P<minor>[A-Za-z]+))?\\s".format(token_header)
 
     # TODO: make macro name regex reusable
-    macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$))".format(macro_header, macro_header)
+    macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$|\\}}))".format(macro_header, macro_header)
     comment_use_regex:str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
 

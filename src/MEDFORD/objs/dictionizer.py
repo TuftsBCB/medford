@@ -2,8 +2,14 @@ from MEDFORD.objs.linecollections import Block, Detail, Macro
 from typing import Any, List, Dict, Tuple, Union
 
 class Dictionizer() :
+    macro_dictionary: Dict[str, Macro]
+    resolved_macros: Dict[str, str]
+
     def __init__(self, macro_dictionary: Dict[str, Macro]) :
         self.macro_dictionary = macro_dictionary
+        self.resolved_macros = {}
+        for (n,m) in macro_dictionary.items() :
+            self.resolved_macros[n] = m.resolve(self.macro_dictionary)
 
     def generate_dict(self, bls: List[Block]):
         root_dict: Dict[str, Any] = {}
@@ -33,4 +39,4 @@ class Dictionizer() :
             for idx, (minor, detail) in enumerate(cur_block.minor_tokens) :
                 if minor not in cur_parent_dict.keys() :
                     cur_parent_dict[minor] = []
-                cur_parent_dict[minor].append((detail, detail.get_content(self.macro_dictionary)))
+                cur_parent_dict[minor].append((detail, detail.get_content(self.resolved_macros)))
