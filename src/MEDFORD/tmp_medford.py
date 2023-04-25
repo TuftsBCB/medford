@@ -3,6 +3,12 @@ from MEDFORD.objs.linereader import LineReader, Line
 from MEDFORD.objs.linecollector import LineCollector, Macro, Block
 from MEDFORD.objs.dictionizer import Dictionizer
 from MEDFORD.models.generics import Entity
+
+import argparse
+
+from enum import Enum
+from pathlib import PurePath #?
+
 # order of ops:
 # 1. open file
 # 2. turn all lines into Line objs (using LineReader)
@@ -11,6 +17,36 @@ from MEDFORD.models.generics import Entity
 # 5. verify dict using Pydantic (using ?)
 
 # TODO : add error mgmt
+class ParserMode(Enum) :
+    validate = 'validate'
+    compile = 'compile'
+
+    def __str__(self) :
+        return self.value
+
+class OutputMode(Enum):
+    OTHER = 'OTHER'
+    BCODMO = 'BCODMO'
+    BAGIT = 'BAGIT'
+
+    def __str__(self) :
+        return self.value
+    
+
+ap = argparse.ArgumentParser()
+# basic arguments
+ap.add_argument("action", type=ParserMode, choices=list(ParserMode),
+                help="Whether to run the MEDFORD parser in Validation or Compilation mode. (Compilation creates a novel output file.)")
+ap.add_argument("file", type=str, 
+                help="Input MEDFORD file to validate or compile.")
+ap.add_argument("-m", "--mode", type=OutputMode, choices=list(OutputMode), default=OutputMode.OTHER,
+                help="The output mode of the MEDFORD parser; what format should be validated against or compiled to.")
+
+# debug arguments
+ap.add_argument("--write_json", action="store_true", default=False,
+                help="FOR DEBUG: Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
+ap.add_argument("-d", "--debug", action="store_true", default=False,
+                help="FOR DEBUG: Enable DEBUG mode for MEDFORD, enabling a significant amount of intermediate stdout output. (currently unimplemented.)")
 
 class MFD() :
     filename: str
@@ -35,10 +71,8 @@ class MFD() :
 
         # 3
         self.line_collector = self._get_Line_Collector(self.object_lines)
-        # TODO : shouldn't have to reach into line collector.
-        self.macro_definitions = self.line_collector.defined_macros
-        self.named_blocks = self.line_collector.named_blocks
-        self.blocks = [v for k,v in self.named_blocks.items()]
+        self.macro_definitions = self.line_collector.get_macros()
+        self.blocks = self.line_collector.get_flat_blocks()
 
         # 4
         self.dictionizer = self._get_Dictionizer(self.macro_definitions)
@@ -67,3 +101,7 @@ class MFD() :
     def _get_Dictionizer(self, macro_definitions: Dict[str, Macro]) -> Dictionizer :
         return Dictionizer(macro_definitions)
 
+if __name__ == "__main__" :
+    args = ap.parse_args()
+    mfd = MFD(PurePath(args.file))
+    mfd.runMedford()

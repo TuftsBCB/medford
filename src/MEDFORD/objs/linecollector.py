@@ -5,9 +5,10 @@ from enum import Enum
 
 class LineCollector() :
     defined_macros: Dict[str, Macro]
-    named_blocks: Dict[str, Block] 
+    named_blocks: Dict[str, Dict[str, Block]]
     comments: List[CommentLine]
-    # TODO: what if multiple blocks with the same name? 
+    # TODO: what if multiple blocks with the same name?
+    #       ADJUSTED: 2 layer dict, first by block major then by name
     # TODO: provide error handler?
 
     # how do I actually make this usable? still have to type LineCollector.(name) to use any of these.
@@ -123,9 +124,18 @@ class LineCollector() :
                 (state == "detail" and not (isinstance(line, NovelDetailLine) or isinstance(line, ContinueLine))) :
             bs = self._generate_blocks(detail_collection)
             for b in bs :
-                self.named_blocks[b.name] = b
+                self.named_blocks[b.get_str_major()][b.name] = b
 
             detail_collection = []
 
         return (line_collection, detail_collection)
 
+    def get_flat_blocks(self) -> List[Block] :
+        t : List[Dict[str, Block]] = [named_blocks for major_token, named_blocks in self.named_blocks.items()]
+        out : List[Block] = []
+        for name_dict in t :
+            out.extend([block for name, block in name_dict.items()])
+        return out
+
+    def get_macros(self) -> Dict[str, Macro] :
+        return self.defined_macros

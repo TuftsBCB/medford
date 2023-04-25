@@ -230,6 +230,9 @@ class Block(LineCollection) :
             out = out + detail.get_content(defined_macros)
 
         return out
+
+    def get_str_major(self) -> str :
+        return "_".join(self.major_tokens)
     
 
     def __eq__(self, other) -> bool :
