@@ -19,8 +19,8 @@ class TestDictionizer() :
                 line_objs.append(pl)
 
         lc = LC(line_objs)
-        bl = lc.named_blocks
-        return [v for k,v in bl.items()]
+        bl = lc.get_flat_blocks()
+        return bl
 
     #########################################
     # No Minor Tokens                       #

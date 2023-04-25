@@ -19,8 +19,7 @@ class TestPydanticModels() :
                 line_objs.append(pl)
 
         lc = LC(line_objs)
-        bl = lc.named_blocks
-        bls = [v for k,v in bl.items()]
+        bls = lc.get_flat_blocks()
         d = D(lc.defined_macros)
         return (bls, d.generate_dict(bls))
 
