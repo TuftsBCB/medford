@@ -27,10 +27,17 @@ class ParserMode(Enum) :
 class OutputMode(Enum):
     OTHER = 'OTHER'
     BCODMO = 'BCODMO'
+    RDF = 'RDF'
     BAGIT = 'BAGIT'
 
     def __str__(self) :
         return self.value
+    
+    @classmethod
+    def _missing_(cls, name):
+        for member in cls :
+            if member.name.lower() == name.lower() :
+                return member
     
 
 ap = argparse.ArgumentParser()
@@ -103,5 +110,6 @@ class MFD() :
 
 if __name__ == "__main__" :
     args = ap.parse_args()
+    #print(args.mode)
     mfd = MFD(PurePath(args.file))
     mfd.runMedford()
