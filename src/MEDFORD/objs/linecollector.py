@@ -124,6 +124,9 @@ class LineCollector() :
                 (state == "detail" and not (isinstance(line, NovelDetailLine) or isinstance(line, ContinueLine))) :
             bs = self._generate_blocks(detail_collection)
             for b in bs :
+                major = b.get_str_major()
+                if major not in self.named_blocks.keys() :
+                    self.named_blocks[major] = {}
                 self.named_blocks[b.get_str_major()][b.name] = b
 
             detail_collection = []

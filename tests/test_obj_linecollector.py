@@ -61,7 +61,7 @@ class TestLineCollection() :
 
         assert len(blocks) == 1
 
-        assert lc.named_blocks['NameOfBlock'] == blocks[0] 
+        assert lc.named_blocks['Major']['NameOfBlock'] == blocks[0] 
 
     #########################################
     # Two-Line Tests                        #
@@ -129,7 +129,7 @@ class TestLineCollection() :
         # TODO : test that these constructors work as intended...
         ex_d = Detail(confirmed_1, [confirmed_2])
         ex_b = Block([ex_d])
-        assert lc.named_blocks['content continue'] == ex_b
+        assert lc.named_blocks['Major']['content continue'] == ex_b
 
     #########################################
     # Multiple Of One Type Tests            #
@@ -207,8 +207,8 @@ class TestLineCollection() :
             details.append(Detail(c, None))
         ex_bl = Block(details)
 
-        assert 'name' in lc.named_blocks.keys()
-        assert lc.named_blocks['name'] == ex_bl
+        assert 'name' in lc.named_blocks['Major'].keys()
+        assert lc.named_blocks['Major']['name'] == ex_bl
     
     #########################################
     # Multiline, Multiple One Type Tests    #
@@ -260,7 +260,7 @@ class TestLineCollection() :
         assert len(lc.defined_macros.keys()) == 0
         assert len(lc.comments) == 0
 
-        assert 'name namecont' in lc.named_blocks.keys()
+        assert 'name namecont' in lc.named_blocks['Major'].keys()
 
         assert isinstance(confirmed_lines[0], NovelDetailLine)
         assert isinstance(confirmed_lines[1], ContinueLine)
@@ -275,7 +275,7 @@ class TestLineCollection() :
 
         ex_bl = Block(details)
 
-        assert lc.named_blocks['name namecont'] == ex_bl
+        assert lc.named_blocks['Major']['name namecont'] == ex_bl
 
     #########################################
     # Test Macro Resolution Capabilities    #
@@ -301,7 +301,7 @@ class TestLineCollection() :
         resolved = lc.defined_macros["Macro"].resolve(lc.defined_macros)
         assert resolved == "value"
 
-        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
         assert blocks[0].get_content({"Macro":resolved}) == "value"
 
@@ -325,7 +325,7 @@ class TestLineCollection() :
         resolved = lc.defined_macros["Macro"].resolve(lc.defined_macros)
         assert resolved == "value value 2"
 
-        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
         assert blocks[0].get_content({"Macro":resolved}) == "value value 2"
 
@@ -353,7 +353,7 @@ class TestLineCollection() :
         assert resolved_macros['Macro1'] == "value"
         assert resolved_macros['Macro2'] == "value"
 
-        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
         assert blocks[0].get_content(resolved_macros) == "value"
     
@@ -381,7 +381,7 @@ class TestLineCollection() :
         assert resolved_macros['Macro1'] == "value"
         assert resolved_macros['Macro2'] == "21value"
 
-        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
         assert blocks[0].get_content(resolved_macros) == "2321value"
     
@@ -410,7 +410,7 @@ class TestLineCollection() :
         assert resolved_macros['Macro1'] == "value"
         assert resolved_macros['Macro2'] == "21value"
 
-        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 2
         assert blocks[0].get_content(resolved_macros) == "2321value32"
         assert blocks[1].get_content(resolved_macros) == "23{21value}32"
@@ -441,7 +441,7 @@ class TestLineCollection() :
         assert resolved_macros['Macro'] == "value value 2"
         assert resolved_macros['Macro2'] == "hello value value 2 hello hello"
 
-        blocks:List[Block] = [v for (k,v) in lc.named_blocks.items()]
+        blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
         assert blocks[0].get_content(resolved_macros) == "hello value value 2 hello hello"
 
@@ -486,14 +486,16 @@ class TestLineCollection() :
 
         lc : LineCollector = LineCollector(confirmed_lines)
 
-        assert len(lc.named_blocks.keys()) == 2
+        assert len(lc.named_blocks.keys()) == 1
         assert len(lc.defined_macros.keys()) == 2
         assert len(lc.comments) == 3
 
         assert 'Tufts' in lc.defined_macros.keys()
         assert 'CheesecakeRes' in lc.defined_macros.keys()
-        assert 'Polina Shpilker' in lc.named_blocks.keys()
-        assert 'Kiki Shpilker' in lc.named_blocks.keys()
+        assert 'Contributor' in lc.named_blocks.keys()
+        assert len(lc.named_blocks['Contributor'].keys()) == 2
+        assert 'Polina Shpilker' in lc.named_blocks['Contributor'].keys()
+        assert 'Kiki Shpilker' in lc.named_blocks['Contributor'].keys()
 
         assert isinstance(confirmed_lines[0], MacroLine)
         assert isinstance(confirmed_lines[1], ContinueLine)
@@ -537,7 +539,7 @@ class TestLineCollection() :
         assert lc.defined_macros['Tufts'] == macro1
         assert lc.defined_macros['CheesecakeRes'] == macro2
 
-        assert lc.named_blocks['Polina Shpilker'] == block_1
-        assert lc.named_blocks['Kiki Shpilker'] == block_2
+        assert lc.named_blocks['Contributor']['Polina Shpilker'] == block_1
+        assert lc.named_blocks['Contributor']['Kiki Shpilker'] == block_2
 
         assert lc.comments == [comment_1, comment_2, comment_3]
