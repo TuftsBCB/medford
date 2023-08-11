@@ -15,7 +15,7 @@ You can install this library using pip:
 
 How to Use
 ------------------
-To use the JSON to RDF Converter, follow the steps below:
+To use the MEDFORD JSON to RDF Converter, follow the steps below:
 
 1. Clone the repository to your local machine.
 2. Prepare your JSON data: Create or obtain the JSON data that you want to convert to RDF.
