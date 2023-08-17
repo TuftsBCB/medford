@@ -221,6 +221,7 @@ class Detail(LineCollection) :
         if self.extralines is not None :
             for l in self.extralines :
                 out = out + l.get_content(macro_dict)
+        out = out.strip()
         return out
 
     def __eq__(self, other) -> bool :
@@ -279,10 +280,12 @@ class Block(LineCollection) :
         return
 
     def get_content(self, defined_macros: Dict[str, str]) -> str :
+        # TODO : I don't think this is currently ever called, because
+        #   the dictionizer calls on a detail-per-detail basis. Is this
+        #   function necessary?
         out = ""
         for detail in self.details :
             out = out + detail.get_content(defined_macros)
-
         return out
 
     def get_str_major(self) -> str :
