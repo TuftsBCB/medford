@@ -1,16 +1,19 @@
-from typing import Optional, List, Dict, Tuple
+from typing import Optional, List, Dict, Tuple, Union
 from MEDFORD.objs.lines import Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
+
+from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
+from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
 class LineCollection() :
-    headline: ContentMixin
+    headline: Union[MacroLine, NovelDetailLine]
     extralines: Optional[List[ContinueLine]]
 
     has_macros: bool = False
     used_macro_names: Optional[List[str]] = None
 
-    def __init__(self, headline: ContentMixin, extralines: Optional[List[ContinueLine]]) :
+    def __init__(self, headline: Union[MacroLine, NovelDetailLine], extralines: Optional[List[ContinueLine]]) :
         self.headline = headline
         self.extralines = extralines
 
@@ -37,8 +40,15 @@ class LineCollection() :
                 out += l.get_content(resolved_macros)
         
         return out
-
     
+    def get_linenos(self) -> List[int] :
+        lines: List[int] = [self.headline.get_lineno()]
+        if self.extralines is not None :
+            for el in self.extralines :
+                lines.append(el.get_lineno())
+        return lines
+    
+    # add type annotations?
     def __eq__(self, other) -> bool :
         if type(self) != type(other) :
             return False
@@ -71,6 +81,8 @@ class LineCollection() :
 class Macro(LineCollection) :
     name : str
     _is_resolved: bool = False
+    _n_resolutions: int
+    _deepest_res_macro: Optional['Macro'] = None
     resolution: str
 
     def __init__(self, headline: MacroLine, extralines: Optional[List[ContinueLine]]):
@@ -84,24 +96,60 @@ class Macro(LineCollection) :
                 outstr = outstr + el.raw_content
         return outstr
     
-    def resolve(self, macro_definitions: Dict[str, 'Macro'], depth: Optional[int] = None) -> str :
+    def resolve(self, macro_definitions: Dict[str, 'Macro'], depth: Optional[int] = None) -> Union[str, List['Macro']] :
+        # TODO : add a new way to track max resolutions.
         if depth is None :
-            depth = 0
+            cdepth: int = 0
+        else :
+            cdepth: int = depth
+            
         if self._is_resolved : 
             return self.resolution
         
-        if depth == 11 :
-            raise ValueError("Macro Recursion reached a depth of 11.")
+        if cdepth == 10 :
+            return [self]
         
         if self.has_macros == False :
             self._is_resolved = True
             self.resolution = self.get_content({})
+            self._n_resolutions = 0
             return self.resolution
         
         if self.used_macro_names is not None and len(self.used_macro_names) > 0:
             resolved_macros : Dict[str, str] = {}
+            deepest_resolution : int = 0
+            deepest_macro : Macro = self
+
             for m in self.used_macro_names :
-                resolved_macros[m] = macro_definitions[m].resolve(macro_definitions, depth + 1)
+                r = macro_definitions[m].resolve(macro_definitions, cdepth + 1)
+
+                # error branch
+                if isinstance(r, List) :
+                    r.insert(0,self)
+                    if cdepth == 0 :
+                        em.instance().add_err(MaxMacroDepthExceeded(r))
+                        return "ERROR"
+                    else :
+                        return r
+
+                # macro resolved successfully
+                elif isinstance(r, str) :
+                    resolved_macros[m] = r
+                    cur_res_depth = macro_definitions[m]._n_resolutions + 1
+                    if cur_res_depth > deepest_resolution :
+                        deepest_resolution = cur_res_depth
+                        deepest_macro = macro_definitions[m]
+
+                else :
+                    raise TypeError("Unknown type returned from Macro.resolve(): %s" % type(r).__name__)
+                
+            self._n_resolutions = deepest_resolution
+            self._deepest_res_macro = deepest_macro
+
+            if self._n_resolutions == 10 :
+                em.instance().add_err(MaxMacroDepthExceeded(self._get_resolution_chain()))
+                return 'ERROR'
+
             res = self.get_content(resolved_macros)
             self._is_resolved = True
             self.resolution = res
@@ -110,6 +158,11 @@ class Macro(LineCollection) :
         else :
             raise ValueError("Somehow has_macros is True but used_macro_names is None.")
 
+    def _get_resolution_chain(self) -> List['Macro'] :
+        tmp : List['Macro'] = [self]
+        if self._deepest_res_macro is not None :
+            tmp.append(self._deepest_res_macro)
+        return tmp
     
     def __eq__(self, other) -> bool :
         if type(self) == type(other) and self.name == other.name:
@@ -199,6 +252,7 @@ class Block(LineCollection) :
         # ?
         self.major_tokens = details[0].major_tokens
         if details[0].minor_token is not None and details[0].minor_token != "" :
+            em.instance().add_syntax_err(MissingDescError(details[0]))
             raise ValueError("No desc line for first detail provided to Block constructor.")
         self.headDetail = details[0]
         self.name = details[0].get_raw_content()

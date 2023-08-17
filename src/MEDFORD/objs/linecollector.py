@@ -71,7 +71,7 @@ class LineCollector() :
             for idx, d in enumerate(detail_coll[1:]) :
                 # TODO: ?
                 if len(block_coll) > 0 :
-                    if d.is_header or d.major_tokens != block_coll[0].major_tokens :
+                    if d.is_header or d.major_tokens != tmp_coll[0].major_tokens :
                         block_coll.append(Block(tmp_coll))
                         tmp_coll = [d]
                     else :

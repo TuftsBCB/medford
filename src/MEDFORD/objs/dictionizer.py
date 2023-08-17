@@ -9,7 +9,10 @@ class Dictionizer() :
         self.macro_dictionary = macro_dictionary
         self.resolved_macros = {}
         for (n,m) in macro_dictionary.items() :
-            self.resolved_macros[n] = m.resolve(self.macro_dictionary)
+            res = m.resolve(self.macro_dictionary)
+            if not isinstance(res, str) :
+                raise ValueError(f"Attempting to resolve macro {m.name} resulted in an error return, not a string.")
+            self.resolved_macros[n] = res
 
     def generate_dict(self, bls: List[Block]):
         root_dict: Dict[str, Any] = {}

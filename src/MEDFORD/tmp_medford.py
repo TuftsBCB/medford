@@ -28,7 +28,9 @@ class OutputMode(Enum):
     OTHER = 'OTHER'
     BCODMO = 'BCODMO'
     RDF = 'RDF'
-    BAGIT = 'BAGIT'
+    BAGIT = 'BAGIT' 
+    # TODO : Make creating a bag a separate option?
+    # Could want to make an output RDF file AND zip it.
 
     def __str__(self) :
         return self.value
@@ -50,8 +52,10 @@ ap.add_argument("-m", "--mode", type=OutputMode, choices=list(OutputMode), defau
                 help="The output mode of the MEDFORD parser; what format should be validated against or compiled to.")
 
 # debug arguments
+# TODO: Implement
 ap.add_argument("--write_json", action="store_true", default=False,
                 help="FOR DEBUG: Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
+# TODO: Implement
 ap.add_argument("-d", "--debug", action="store_true", default=False,
                 help="FOR DEBUG: Enable DEBUG mode for MEDFORD, enabling a significant amount of intermediate stdout output. (currently unimplemented.)")
 
@@ -91,6 +95,9 @@ class MFD() :
         # maybe in the future look into fixing this?
         #   The problem is that Blocks aren't Dicts.
         self.pydantic_version = Entity(**self.dict_data)
+        print(self.pydantic_version.dict())
+        # TODO: export to json, bag
+        # TODO: implement all of the old models
 
     def _get_Line_objects(self, filename: str) -> List[Line] :
         object_lines = []
@@ -102,11 +109,22 @@ class MFD() :
 
         return object_lines
 
+    # note for later: what happens when it takes too long to process ?
+    # user writes a new line, add it to LineCollector that single line at a time?
+    # 10s of ms amount of time to run is allocation usually
     def _get_Line_Collector(self, object_lines: List[Line]) -> LineCollector:
         return LineCollector(object_lines)
 
     def _get_Dictionizer(self, macro_definitions: Dict[str, Macro]) -> Dictionizer :
         return Dictionizer(macro_definitions)
+
+
+# wants to: ask parser what major/minor tokens it understands
+# -> dumping schema of Entity & parsing manually
+
+# syntax check -> get back both line objects & errors
+
+# want full API call to include all minor api calls; return dict w/ string indices?
 
 if __name__ == "__main__" :
     args = ap.parse_args()

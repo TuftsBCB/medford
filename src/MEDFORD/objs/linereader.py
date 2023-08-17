@@ -127,3 +127,5 @@ class LineReader :
                 return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)
             else :
                 return ContinueLine(lineno, line, poss_inline, poss_tex, poss_macro)
+    # "syntax check" -> return whether line is valid MEDFORD
+    #   -> "tell me all the syntax problems with this list of strings"

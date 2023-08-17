@@ -216,6 +216,9 @@ class Line() :
         
         return False
 
+    def get_lineno(self) -> int :
+        return self.lineno
+
 class CommentLine(Line) :
     def __init__(self, lineno: int, line: str) :
         super(CommentLine, self).__init__(lineno, line)
