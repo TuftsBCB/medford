@@ -237,7 +237,7 @@ class Detail(LineCollection) :
         return False
 
 # TODO: this shouldn't be a LineCollection
-class Block(LineCollection) :
+class Block() :
     major_tokens: List[str]
     minor_tokens: Optional[List[Tuple[str, Detail]]] # Technically can have MFD block with nothing but a name
     details: List[Detail]
@@ -256,7 +256,7 @@ class Block(LineCollection) :
             em.instance().add_syntax_err(MissingDescError(details[0]))
             raise ValueError("No desc line for first detail provided to Block constructor.")
         self.headDetail = details[0]
-        self.name = details[0].get_raw_content()
+        self.name = details[0].get_raw_content().strip()
 
         if len(details) > 0 :
             self.minor_tokens = []
@@ -322,4 +322,10 @@ class Block(LineCollection) :
         
         # TODO : check macro containment
         return True
+    
+    def get_linenos(self) -> List[int] :
+        tmp_linenos: List[int] = []
+        for d in self.details :
+            tmp_linenos.extend(d.get_linenos())
+        return tmp_linenos
 

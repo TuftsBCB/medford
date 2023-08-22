@@ -1,8 +1,12 @@
 from typing import List, Dict
+
+from pydantic import ValidationError
 from MEDFORD.objs.linereader import LineReader, Line
 from MEDFORD.objs.linecollector import LineCollector, Macro, Block
 from MEDFORD.objs.dictionizer import Dictionizer
 from MEDFORD.models.generics import Entity
+
+from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
 
 import argparse
 
@@ -94,8 +98,12 @@ class MFD() :
         # me to use Dict[str, Any] instead of Dict[str, Dict[...]]...
         # maybe in the future look into fixing this?
         #   The problem is that Blocks aren't Dicts.
-        self.pydantic_version = Entity(**self.dict_data)
-        print(self.pydantic_version.dict())
+        try :
+            self.pydantic_version = Entity(**self.dict_data)
+            print(self.pydantic_version.dict())
+        except ValidationError as e:
+            em.instance().handle_pydantic_errors(e)
+
         # TODO: export to json, bag
         # TODO: implement all of the old models
 

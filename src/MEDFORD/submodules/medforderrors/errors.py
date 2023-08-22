@@ -17,7 +17,7 @@ class MFDErr():
     def get_head_lineno(self) -> int :
         raise NotImplementedError("not implemented :)")
     
-    def get_lineno_range(self) -> Tuple[int] :
+    def get_lineno_range(self) -> Tuple[int, int] :
         raise NotImplementedError("also not implemented. :)")
 
 # Syntax -> easy for discovery; helpful; fast
@@ -96,3 +96,46 @@ class MaxMacroDepthExceeded(MFDErr) :
     
     def get_lineno_range(self) -> Tuple[int]:
         raise NotImplementedError("ahh")
+
+# Specific error types: Content
+class MissingRequiredField(MFDErr) :
+    major_token: str
+    minor_token: str
+
+    name: str
+
+    lineno_head: int
+    lineno_range: Tuple[int, int]
+    lineno_all: List[int]
+
+    def __init__(self, block_inp, missing_token:str) :
+        from MEDFORD.objs.linecollections import Block
+
+        if not isinstance(block_inp, Block) :
+            raise ValueError("Attempted to create a MissingRequiredFieldError without a Block.")
+        
+        block_typed : Block = block_inp
+        self.block : Block = block_typed
+
+        self.major_token = block_typed.get_str_major()
+        self.minor_token = missing_token
+        self.name = block_typed.name
+
+        message: str = f"Block for major token {self.major_token} named {self.name} is missing the required field {self.minor_token}."
+        helpmsg: str = f"Blocks of major token {self.major_token} require a minor token of name {self.minor_token}, which can be written as:\n@{self.major_token}-{self.minor_token} CONTENT"
+
+        super(MissingRequiredField, self).__init__(type(self).__name__, message, helpmsg)
+
+    def get_head_lineno(self) -> int:
+        if self.block is not None :
+            return self.block.get_linenos()[0]
+        else :
+            raise ValueError("Attempted to get a head lineno of a {self.__name__} error that does not have a Block.")
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        if self.block is not None :
+            temp_lines: List[int] = self.block.get_linenos()
+            return (temp_lines[0], temp_lines[-1])
+        else :
+            raise ValueError("Attempted to get a lineno range of a {self.__name__} error that does not have a Block.")
+    pass
