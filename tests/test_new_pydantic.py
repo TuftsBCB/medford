@@ -20,7 +20,7 @@ class TestPydanticModels() :
 
         lc = LC(line_objs)
         bls = lc.get_flat_blocks()
-        d = D(lc.defined_macros)
+        d = D(lc.defined_macros, lc.get_1lvl_blocks())
         return (bls, d.generate_dict(bls))
 
     def test_contributor(self) :

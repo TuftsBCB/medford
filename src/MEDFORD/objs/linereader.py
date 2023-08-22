@@ -1,6 +1,6 @@
 import re
 from typing import Tuple, List, Optional
-from MEDFORD.objs.lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
+from MEDFORD.objs.lines import AtAtLine, Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
 
 Macro = Tuple[int, int, str]
 Tex = Tuple[int, int]
@@ -18,6 +18,7 @@ class detail_statics():
     macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$|\\}}))".format(macro_header, macro_header)
     comment_use_regex:str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
+    atat_use_regex:str = "{}(?P<major>[A-Za-z_]+)-{}(?P<reference>[A-Za-z_]+)\\s(?P<name>.+)^".format(token_header, token_header)
 
 class LineReader :
     ## Methods to classify line type:
@@ -32,6 +33,10 @@ class LineReader :
     def is_macro_def_line(line:str) -> bool :
         return re.match("{}[A-Za-z]".format(detail_statics.macro_header), line) is not None
     
+    @staticmethod
+    def is_atat_line(line:str) -> bool :
+        return re.match(detail_statics.atat_use_regex, line) is not None
+
     @staticmethod
     def find_macro_name_body(line:str) -> Tuple[str, str] :
         m = re.match("{}(?P<mname>[A-Za-z0-9_]+)\\s(?P<mbody>.+)$".format(detail_statics.macro_header), line)
@@ -61,6 +66,18 @@ class LineReader :
 
             rest_of_line = line[mm_match_res.end():]
             return(major_res, minor_res, rest_of_line)
+        
+    @staticmethod
+    def get_atat_attr(line:str) -> Tuple[List[str], List[str], str] :
+        aa_res: Optional[re.Match[str]] = re.match(detail_statics.atat_use_regex, line)
+        if aa_res == None :
+            raise ValueError("Attempted to get @-@ attributes on a line that does not contain @-@ use.")
+        else :
+            aa_match_res : re.Match[str] = aa_res
+            match_grps = aa_match_res.groupdict()
+            major_res = match_grps['major'].split("_")
+            referenced_res = match_grps['referenced'].split("_")
+            return (major_res, referenced_res, match_grps['name'])
         
     ## Methods to describe line attributes:
     # + Contains comment
@@ -125,6 +142,10 @@ class LineReader :
             elif LineReader.is_novel_token_line(line) :
                 major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
                 return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)
+            elif LineReader.is_atat_line(line) :
+                majors, referenced_major, referenced_name = LineReader.get_atat_attr(line)
+                return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
+                # TODO: need to check for inline, macro, etc?
             else :
                 return ContinueLine(lineno, line, poss_inline, poss_tex, poss_macro)
     # "syntax check" -> return whether line is valid MEDFORD

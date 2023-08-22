@@ -4,17 +4,32 @@ from typing import Any, List, Dict, Tuple, Union
 class Dictionizer() :
     macro_dictionary: Dict[str, Macro]
     resolved_macros: Dict[str, str]
+    name_dictionary: Dict[str, Block]
 
-    def __init__(self, macro_dictionary: Dict[str, Macro]) :
+    def __init__(self, macro_dictionary: Dict[str, Macro], name_dictionary: Dict[str, Block]) :
         self.macro_dictionary = macro_dictionary
+        self.name_dictionary = name_dictionary
         self.resolved_macros = {}
+        # ask the macros to resolve themselves
         for (n,m) in macro_dictionary.items() :
             res = m.resolve(self.macro_dictionary)
             if not isinstance(res, str) :
                 raise ValueError(f"Attempting to resolve macro {m.name} resulted in an error return, not a string.")
             self.resolved_macros[n] = res
+        
+
+    def validate_atat(self, bls: List[Block]) :
+        # TODO : add error manager hooks
+        all_valid = True
+        for bl in bls :
+            all_valid = all_valid and bl.validate_atat(self.resolved_macros, self.name_dictionary)
+        if not all_valid :
+            raise ValueError("There is an invalid @-@ somewhere.")
+        else :
+            print("yipee")
 
     def generate_dict(self, bls: List[Block]):
+        self.validate_atat(bls)
         root_dict: Dict[str, Any] = {}
         for idx, bl in enumerate(bls) :
             self._recurse_majors(root_dict, bl)

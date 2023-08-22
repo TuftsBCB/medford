@@ -118,7 +118,7 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         line_objs: Dict[str, Macro] = self.preprocess_lines(lines)
 
         em._clear_errors()
-        d = Dictionizer(line_objs)
+        d = Dictionizer(line_objs, {})
         error_coll = em.instance()._other_err_coll
         assert len(error_coll.keys()) == 1
         assert 0 in error_coll.keys()
@@ -150,7 +150,7 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         line_objs: Dict[str, Macro] = self.preprocess_lines(lines)
         
         em._clear_errors()
-        d = Dictionizer(line_objs)
+        d = Dictionizer(line_objs, {})
         error_coll = em.instance()._other_err_coll
         assert len(error_coll.keys()) == 1
         assert 11 in error_coll.keys()

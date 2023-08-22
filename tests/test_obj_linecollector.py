@@ -63,6 +63,19 @@ class TestLineCollection() :
 
         assert lc.named_blocks['Major']['NameOfBlock'] == blocks[0] 
 
+    def test_process_one_line_detail_has_macro(self) :
+        # Discovered I never actually flagged Details as having Macros.
+        # This test ensures that a detail correctly has that flag set.
+        test_line: Optional[Line] = LineReader.process_line("@Major-minor NameOfBlock `@macro", 0)
+        assert test_line is not None
+        assert isinstance(test_line, NovelDetailLine)
+
+        confirmed_line : NovelDetailLine = test_line
+
+        exdet = Detail(confirmed_line, None)
+        assert exdet.has_macros == True
+        assert exdet.used_macro_names == ['macro']
+
     #########################################
     # Two-Line Tests                        #
     #########################################

@@ -139,6 +139,16 @@ class LineCollector() :
         for name_dict in t :
             out.extend([block for name, block in name_dict.items()])
         return out
+    
+    # combines major token with name to flatten 2-level dict into 1 level
+    # later can be adjusted to keep 2 layer, but requires adjustment of Dictionizer
+    def get_1lvl_blocks(self) -> Dict[str, Block] :
+        tdict: Dict[str, Block] = {}
+        for major in self.named_blocks.keys() :
+            for name, block in self.named_blocks[major].items() :
+                tdict[major + '@' + name] = block
+
+        return tdict
 
     def get_macros(self) -> Dict[str, Macro] :
         return self.defined_macros

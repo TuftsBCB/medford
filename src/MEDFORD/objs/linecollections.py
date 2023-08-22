@@ -1,5 +1,5 @@
 from typing import Optional, List, Dict, Tuple, Union
-from MEDFORD.objs.lines import Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
+from MEDFORD.objs.lines import AtAtLine, Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
 
 from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
 from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded
@@ -7,13 +7,13 @@ from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDe
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
 class LineCollection() :
-    headline: Union[MacroLine, NovelDetailLine]
+    headline: Union[MacroLine, NovelDetailLine, AtAtLine]
     extralines: Optional[List[ContinueLine]]
 
     has_macros: bool = False
     used_macro_names: Optional[List[str]] = None
 
-    def __init__(self, headline: Union[MacroLine, NovelDetailLine], extralines: Optional[List[ContinueLine]]) :
+    def __init__(self, headline: Union[MacroLine, NovelDetailLine, AtAtLine], extralines: Optional[List[ContinueLine]]) :
         self.headline = headline
         self.extralines = extralines
 
@@ -47,6 +47,9 @@ class LineCollection() :
             for el in self.extralines :
                 lines.append(el.get_lineno())
         return lines
+    
+    def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool :
+        return True
     
     # add type annotations?
     def __eq__(self, other) -> bool :
@@ -189,9 +192,7 @@ class Detail(LineCollection) :
         ------
         lines: List[Line]
         '''
-        
-        self.headline = headline
-        self.extralines = extralines
+        super(Detail, self).__init__(headline, extralines)
 
         # find major, minor tokens from first line
         self.major_tokens = headline.major_tokens
@@ -202,11 +203,6 @@ class Detail(LineCollection) :
         else :
             self.is_header = False
 
-        #self.validate()
-
-    def validate(self) :
-        raise NotImplementedError()
-        return
 
     def get_raw_content(self) -> str :
         out = self.headline.raw_content
@@ -236,6 +232,26 @@ class Detail(LineCollection) :
                 
         return False
 
+class AtAt(LineCollection) :
+    major_tokens: List[str]
+    referenced_majors: List[str]
+
+    def __init__(self, headline: AtAtLine, extralines: Optional[List[ContinueLine]]):
+        super(AtAt, self).__init__(headline, extralines)
+        self.major_tokens = headline.major_tokens
+        self.referenced_majors = headline.referenced_majors
+
+    def _get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
+        temp_name = self.headline.get_content(macro_defs)
+        if self.extralines is not None :
+            for l in self.extralines :
+                temp_name += l.get_content(macro_defs)
+        return temp_name
+
+    def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool:
+        return self._get_referenced_name(macro_defs) in named_blocks
+        
+
 # TODO: this shouldn't be a LineCollection
 class Block() :
     major_tokens: List[str]
@@ -244,6 +260,11 @@ class Block() :
     headDetail: Detail
 
     name: str
+
+    has_macros: bool = False
+    used_macro_names: Optional[List[str]] = None
+
+    atats : List[str]
 
     def __init__(self, details: List[Detail]) :
         if len(details) == 0 :
@@ -268,14 +289,16 @@ class Block() :
                 
                 self.minor_tokens.append((detail.minor_token, detail))
 
+                #if detail
+
                 if detail.has_macros and detail.used_macro_names is not None :
-                    if self.used_macros is None :
-                        self.used_macros = []
+                    if self.used_macro_names is None :
+                        self.used_macro_names = []
                         self.has_macros = True
 
                     for macro_use in detail.used_macro_names :
-                        if macro_use not in self.used_macros :
-                            self.used_macros.append(macro_use)
+                        if macro_use not in self.used_macro_names :
+                            self.used_macro_names.append(macro_use)
 
         return
 
@@ -289,8 +312,7 @@ class Block() :
         return out
 
     def get_str_major(self) -> str :
-        return "_".join(self.major_tokens)
-    
+        return "_".join(self.major_tokens)  
 
     def __eq__(self, other) -> bool :
         if type(self) != type(other) :
@@ -328,4 +350,14 @@ class Block() :
         for d in self.details :
             tmp_linenos.extend(d.get_linenos())
         return tmp_linenos
+
+    def validate_atat(self, macro_defs: Dict[str, str], named_blocks : Dict[str, 'Block']) -> bool :
+        block_names_only = []
+        block_names_only.extend(named_blocks.keys())
+
+        for d in self.details :
+            if not d.validate_atat(macro_defs, block_names_only) :
+                return False
+            
+        return True
 

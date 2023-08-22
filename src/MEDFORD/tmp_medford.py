@@ -88,9 +88,10 @@ class MFD() :
         self.line_collector = self._get_Line_Collector(self.object_lines)
         self.macro_definitions = self.line_collector.get_macros()
         self.blocks = self.line_collector.get_flat_blocks()
+        self.named_blocks = self.line_collector.get_1lvl_blocks()
 
         # 4
-        self.dictionizer = self._get_Dictionizer(self.macro_definitions)
+        self.dictionizer = self._get_Dictionizer(self.macro_definitions, self.named_blocks)
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
         # 5
@@ -123,8 +124,8 @@ class MFD() :
     def _get_Line_Collector(self, object_lines: List[Line]) -> LineCollector:
         return LineCollector(object_lines)
 
-    def _get_Dictionizer(self, macro_definitions: Dict[str, Macro]) -> Dictionizer :
-        return Dictionizer(macro_definitions)
+    def _get_Dictionizer(self, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]) -> Dictionizer :
+        return Dictionizer(macro_definitions, name_dictionary)
 
 
 # wants to: ask parser what major/minor tokens it understands

@@ -30,7 +30,7 @@ class TestDictionizer() :
         sample_lines = ["@Major name1"]
         bl = self.preprocess_lines(sample_lines)
 
-        d = Dictionizer({})
+        d = Dictionizer({},{})
         res_d : Dict[str, List[Dict]] = d.generate_dict(bl)
         assert len(res_d.keys()) == 1
         assert "Major" in res_d.keys()
@@ -45,7 +45,7 @@ class TestDictionizer() :
         sample_lines = ["@Major name1", "@Major name2"]
         bl = self.preprocess_lines(sample_lines)
 
-        d = Dictionizer({})
+        d = Dictionizer({}, {})
         res_d : Dict[str, List[Dict]] = d.generate_dict(bl)
         assert len(res_d.keys()) == 1
         assert "Major" in res_d.keys()
@@ -66,7 +66,7 @@ class TestDictionizer() :
         sample_lines = ["@Major name1", "@MajorTwo name2"]
         bl = self.preprocess_lines(sample_lines)
 
-        d = Dictionizer({})
+        d = Dictionizer({}, {})
         res_d : Dict[str, List[Dict]] = d.generate_dict(bl)
         assert len(res_d.keys()) == 2
         assert "Major" in res_d.keys()
@@ -95,7 +95,7 @@ class TestDictionizer() :
             ]
         bl = self.preprocess_lines(sample_lines)
 
-        d = Dictionizer({})
+        d = Dictionizer({}, {})
         res_d : Dict[str, List[Dict]] = d.generate_dict(bl)
         assert len(res_d.keys()) == 1
         assert "Major" in res_d.keys()
