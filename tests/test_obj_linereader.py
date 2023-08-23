@@ -1,5 +1,5 @@
 import pytest
-from MEDFORD.objs.lines import CommentLine,MacroLine,NovelDetailLine,ContinueLine
+from MEDFORD.objs.lines import AtAtLine, CommentLine,MacroLine,NovelDetailLine,ContinueLine
 from MEDFORD.objs.linereader import LineReader
 
 #################################
@@ -50,6 +50,18 @@ def noveldetail_ex_fixture() :
 #################################
 # Tests                         #
 #################################
+
+class TestAtAtImplementation() :
+    def test_detect_atat(self) :
+        example_line = "@Major-@MajorTwo Content"
+        assert isinstance(LineReader.process_line(example_line, 0), AtAtLine)
+
+    def test_detect_atat_with_comment(self) :
+        example_line = "@Major-@MajorTwo Content # Inline"
+        res = LineReader.process_line(example_line, 0)
+        assert isinstance(res, AtAtLine)
+        assert res.has_inline
+        assert res.get_content({}) == "Content"
 
 def test_detect_comment(comment_ex_fixture, macro_ex_fixture, noveldetail_ex_fixture) :
     examples = comment_ex_fixture['examples']

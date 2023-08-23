@@ -62,7 +62,7 @@ class LineCollection() :
         if self.has_macros != other.has_macros :
             return False
         elif self.has_macros and self.used_macro_names is not None:
-            for idx, mn in self.used_macro_names :
+            for idx, mn in enumerate(self.used_macro_names) :
                 if mn != other.used_macro_names[idx] :
                     return False
         

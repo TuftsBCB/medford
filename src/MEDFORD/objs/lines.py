@@ -180,12 +180,17 @@ class ContentMixin() :
 
             self.line = self.line[:cur_macro_pos[0]] + macro_defs[cur_macro_name] + self.line[cur_macro_pos[1]:]
 
-    def get_content(self, macro_defs: Dict[str, str]) -> str :
+    def get_content(self, macro_defs: Dict[str, str], remove_comments = True) -> str :
+        if remove_comments :
+            temp_content = self.remove_inline_comment()
+        else :
+            temp_content = self.raw_content
+
         if not self.has_macros or len(self.macro_uses) == 0 :
-            return self.raw_content
+            return temp_content
         else :
             n_macro_uses: int = len(self.macro_uses)
-            out = self.raw_content
+            out = temp_content
             for i in range(0, n_macro_uses) :
                 cur_macro:Tuple[int, int, str] = self.macro_uses[n_macro_uses - i - 1]
                 cur_macro_pos: Tuple[int, int] = (cur_macro[0], cur_macro[1])
@@ -194,6 +199,12 @@ class ContentMixin() :
                 out = out[:cur_macro_pos[0]] + macro_defs[cur_macro_name] + out[cur_macro_pos[1]:]
 
             return out
+        
+    def remove_inline_comment(self) -> str :
+        if self.has_inline :
+            return self.raw_content[:self.comm_loc].strip()
+        else :
+            return self.raw_content
 
                 
         

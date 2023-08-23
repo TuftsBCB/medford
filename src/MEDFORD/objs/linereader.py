@@ -18,7 +18,7 @@ class detail_statics():
     macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$|\\}}))".format(macro_header, macro_header)
     comment_use_regex:str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
-    atat_use_regex:str = "{}(?P<major>[A-Za-z_]+)-{}(?P<reference>[A-Za-z_]+)\\s(?P<name>.+)^".format(token_header, token_header)
+    atat_use_regex:str = "{}(?P<major>[A-Za-z_]+)-{}(?P<referenced>[A-Za-z_]+)\\s(?P<name>.+)$".format(token_header, token_header)
 
 class LineReader :
     ## Methods to classify line type:
@@ -139,13 +139,12 @@ class LineReader :
             if LineReader.is_macro_def_line(line) :
                 mname, mbody = LineReader.find_macro_name_body(line)
                 return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
-            elif LineReader.is_novel_token_line(line) :
-                major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
-                return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)
             elif LineReader.is_atat_line(line) :
                 majors, referenced_major, referenced_name = LineReader.get_atat_attr(line)
                 return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
-                # TODO: need to check for inline, macro, etc?
+            elif LineReader.is_novel_token_line(line) :
+                major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
+                return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)
             else :
                 return ContinueLine(lineno, line, poss_inline, poss_tex, poss_macro)
     # "syntax check" -> return whether line is valid MEDFORD
