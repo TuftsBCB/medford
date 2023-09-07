@@ -1,6 +1,6 @@
 from typing import List, Dict, Tuple, Optional
-from MEDFORD.objs.lines import Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
-from MEDFORD.objs.linecollections import Macro, Block, Detail
+from MEDFORD.objs.lines import AtAtLine, Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
+from MEDFORD.objs.linecollections import AtAt, Macro, Block, Detail
 from enum import Enum
 
 class LineCollector() :
@@ -17,11 +17,13 @@ class LineCollector() :
         MACRO = 1
         DETAIL = 2
         COMMENT = 3
+        ATAT = 4
 
     na = CollectorState.NA
     macro = CollectorState.MACRO
     detail = CollectorState.DETAIL
     comment = CollectorState.COMMENT
+    atat = CollectorState.ATAT
 
     def __init__(self, lines: List[Line]) :
         self.defined_macros = dict()
@@ -43,10 +45,14 @@ class LineCollector() :
                 state = "macro"
                 line_collection.append(line)
             
+            elif isinstance(line, AtAtLine) :
+                state = "atat"
+                line_collection.append(line)
+
             elif isinstance(line, NovelDetailLine) :
                 state = "detail"
                 line_collection.append(line)
-
+            
             elif isinstance(line, ContinueLine) :
                 # TODO : ensure no continue lines after comments?
                 line_collection.append(line)
@@ -118,6 +124,13 @@ class LineCollector() :
                 d = Detail(headline, extralines)
                 detail_collection.append(d)
 
+            elif state == "atat" :
+                headline = line_collection[0]
+                extralines = None
+                if len(line_collection) > 1 :
+                    extralines = line_collection[1:]
+                a = AtAt(headline, extralines)
+                detail_collection.append(a)
             line_collection = []
 
         if (final and (detail_collection is not None) and len(detail_collection) > 0) or \

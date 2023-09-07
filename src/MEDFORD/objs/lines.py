@@ -277,6 +277,18 @@ class NovelDetailLine(ContentMixin, Line) :
         
         return False
 
+class AtAtLine(NovelDetailLine) :
+    major_tokens: List[str]
+    referenced_majors: List[str]
+
+    def __init__(self, lineno: int, line: str, majors: List[str], referenced_majors: List[str], referenced_name: str, poss_inline, poss_tex, poss_macro):
+        self.referenced_majors = referenced_majors
+        pseudo_minor = "_".join(referenced_majors)
+        super(AtAtLine, self).__init__(lineno, line, majors, pseudo_minor, referenced_name, poss_inline, poss_tex, poss_macro)
+
+    def get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
+        return self.get_content(macro_defs)
+
 class ContinueLine(ContentMixin, Line) :
     # TODO : complete
     def __init__(self, lineno: int, line: str, poss_inline, poss_tex, poss_macro) :
@@ -290,19 +302,3 @@ class ContinueLine(ContentMixin, Line) :
             return super(ContinueLine, self).__eq__(other)
         
         return False
-
-class AtAtLine(ContentMixin, Line) :
-    major_tokens: List[str]
-    referenced_majors: List[str]
-    referenced_name: str
-
-    def __init__(self, lineno: int, line: str, majors: List[str], referenced_majors: List[str], referenced_name: str, poss_inline, poss_tex, poss_macro):
-        super(AtAtLine, self).__init__(lineno, line)
-        self.major_tokens = majors
-        self.referenced_majors = referenced_majors
-        self.raw_content = referenced_name
-
-        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
-
-    def get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
-        return self.get_content(macro_defs)

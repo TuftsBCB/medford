@@ -1,6 +1,8 @@
 import pytest
 from MEDFORD.objs.lines import AtAtLine, CommentLine,MacroLine,NovelDetailLine,ContinueLine
 from MEDFORD.objs.linereader import LineReader
+from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
+from MEDFORD.submodules.medforderrors.errors import MissingAtAtName
 
 #################################
 # Fixtures                      #
@@ -55,6 +57,13 @@ class TestAtAtImplementation() :
     def test_detect_atat(self) :
         example_line = "@Major-@MajorTwo Content"
         assert isinstance(LineReader.process_line(example_line, 0), AtAtLine)
+    
+    def test_err_on_unnamed_atat(self) :
+        example_line = "@Major-@MajorTwo"
+        with pytest.raises(Exception) :
+            LineReader.process_line(example_line, 0)
+        assert len(em.instance()._syntax_err_coll) == 1
+        assert isinstance(em.instance()._syntax_err_coll[0][0], MissingAtAtName)
 
     def test_detect_atat_with_comment(self) :
         example_line = "@Major-@MajorTwo Content # Inline"
@@ -62,6 +71,23 @@ class TestAtAtImplementation() :
         assert isinstance(res, AtAtLine)
         assert res.has_inline
         assert res.get_content({}) == "Content"
+    
+    def test_detect_atat_with_macro(self) :
+        example_line = "@Major-@MajorTwo Content `@Macro"
+        res = LineReader.process_line(example_line, 0)
+        assert isinstance(res, AtAtLine)
+        assert res.has_macros
+        assert len(res.macro_uses) == 1
+        assert res.macro_uses[0][2] == "Macro"
+        assert res.get_content({'Macro':'value'}) == "Content value"
+
+    def test_detect_atat_with_latex(self) :
+        example_line = "@Major-@MajorTwo Content $$Tex$$"
+        res = LineReader.process_line(example_line, 0)
+        assert isinstance(res, AtAtLine)
+        assert res.has_tex
+        assert len(res.tex_locs) == 1
+        assert res.get_content({}) == "Content $$Tex$$"
 
 def test_detect_comment(comment_ex_fixture, macro_ex_fixture, noveldetail_ex_fixture) :
     examples = comment_ex_fixture['examples']

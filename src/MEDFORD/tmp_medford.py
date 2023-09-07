@@ -90,9 +90,13 @@ class MFD() :
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
 
+        # stop here and check for syntax errors
+
         # 4
         self.dictionizer = self._get_Dictionizer(self.macro_definitions, self.named_blocks)
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
+
+        # stop here and check for "other" errors
 
         # 5
         # TODO : this kind of breaks all of my type checking and requires
@@ -103,7 +107,9 @@ class MFD() :
             self.pydantic_version = Entity(**self.dict_data)
             print(self.pydantic_version.dict())
         except ValidationError as e:
+            # stop here and handle pydantic errors
             em.instance().handle_pydantic_errors(e)
+            print("errors found")
 
         # TODO: export to json, bag
         # TODO: implement all of the old models

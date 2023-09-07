@@ -139,3 +139,69 @@ class MissingRequiredField(MFDErr) :
         else :
             raise ValueError("Attempted to get a lineno range of a {self.__name__} error that does not have a Block.")
     pass
+
+class MissingAtAtName(MFDErr) :
+    major_token: str
+    referenced_major: str
+
+    lineno_head: int
+    lineno_range: Tuple[int, int]
+
+    def __init__(self, major_token: str, referenced_major: str, lineno: int) :
+        self.major_token = major_token
+        self.referenced_major = referenced_major
+        self.lineno_head = lineno
+        self.lineno_range = (lineno, lineno)
+
+    def get_head_lineno(self) -> int:
+        return self.lineno_head
+    
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return self.lineno_range
+
+
+class AtAtReferencedDoesNotExist(MFDErr) :
+    major_token: str
+    referenced_major: str
+    referenced_name: str
+
+    named_blocks: List[str]
+
+    lineno_head : int
+    lineno_range: Tuple[int, int]
+    lineno_all: List[int]
+
+    # TODO: add Blcok to give lineno range of block?
+    def __init__(self, atat_inp, referenced_name: str, named_blocks: List[str]) :
+        from MEDFORD.objs.linecollections import AtAt
+        
+        if not isinstance(atat_inp, AtAt) :
+            raise ValueError("Attempted to create an AtAtReferencedDoesNotExist without a Detail.")
+        
+        atat_typed : AtAt = atat_inp
+        self.atat : AtAt = atat_typed
+
+        self.major_token = atat_typed.get_str_majors()
+        self.referenced_major = atat_typed.get_referenced_str_majors()
+        self.referenced_name = referenced_name
+        self.named_blocks = named_blocks
+
+        message : str = f"Found an @-@ reference in a {self.major_token} that points to a {self.referenced_major} Block named {self.referenced_name} that does not exist."
+        helpmsg : str = f"For this @-@ reference to work, there must exist a @{self.referenced_major} Block that starts with the line '@{self.referenced_major} {self.referenced_name}'."
+
+        super(AtAtReferencedDoesNotExist, self).__init__(type(self).__name__, message, helpmsg)
+    
+    def get_head_lineno(self) -> int:
+        if self.atat is not None :
+            return self.atat.get_linenos()[0]
+        else :
+            raise ValueError("Attempted to get a head lineno of a {self.__name__} error that does not have an atat object.")
+        
+
+    def get_lineno_range(self) -> Tuple[int,int]:
+        if self.atat is not None :
+            temp_lines: List[int] = self.atat.get_linenos()
+            return (temp_lines[0], temp_lines[-1])
+        else :
+            raise ValueError("Attempted to get a head lineno of a {self.__name__} error that does not have an atat object.")
+        

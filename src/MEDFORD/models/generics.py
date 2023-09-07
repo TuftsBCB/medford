@@ -31,12 +31,12 @@ OptMajorT = Optional[MajorsT[T]]
 #           dictionizer know about the models.
 
 # TODO: there's gotta be a better way to store & check MEDFORD versions.
-all_versions = ["1.0","2.0"]
+all_versions = ["1.0","1.1"]
 
 class BaseModel(PydanticBaseModel) :
     class Config:
         arbitrary_types_allowed = True
-        #extra = 'allow' #comment out to check only defined attr
+        extra = 'allow' #comment out to check only defined attr
 
 class BlockModel(BaseModel) :
     Block: Block

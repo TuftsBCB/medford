@@ -24,9 +24,11 @@ class Dictionizer() :
         for bl in bls :
             all_valid = all_valid and bl.validate_atat(self.resolved_macros, self.name_dictionary)
         if not all_valid :
-            raise ValueError("There is an invalid @-@ somewhere.")
+            print("There is an invalid @-@ somewhere.")
         else :
-            print("yipee")
+            print("All @-@ successfully validated")
+
+    # TODO : add a hook to get the content an @-@ is referencing?
 
     def generate_dict(self, bls: List[Block]):
         self.validate_atat(bls)

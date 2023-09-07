@@ -1,6 +1,6 @@
 from MEDFORD.objs.linecollector import LineCollector
 from MEDFORD.objs.linereader import LineReader
-from MEDFORD.objs.lines import Line, ContinueLine, MacroLine, CommentLine, NovelDetailLine
+from MEDFORD.objs.lines import AtAtLine, Line, ContinueLine, MacroLine, CommentLine, NovelDetailLine
 from MEDFORD.objs.linecollections import Macro, Detail, Block
 from typing import List, Dict
 
@@ -14,6 +14,7 @@ class TestLineCollection() :
     #########################################
     # Single-Line Tests                     #
     #########################################
+
 
     def test_process_one_line_comment(self) :
         test_line: Optional[Line] = LineReader.process_line("#Comment", 0)
@@ -144,6 +145,25 @@ class TestLineCollection() :
         ex_b = Block([ex_d])
         assert lc.named_blocks['Major']['content continue'] == ex_b
 
+    def test_process_atat(self) :
+        test_lines : List[str] = ["@Major content", "@Major-@MajorTwo Test"]
+        test_Line_1 : Optional[Line] = LineReader.process_line(test_lines[0], 0)
+        test_Line_2 : Optional[Line] = LineReader.process_line(test_lines[1], 1)
+
+        assert test_Line_1 is not None
+        assert isinstance(test_Line_1, NovelDetailLine)
+        confirmed_1 : NovelDetailLine = test_Line_1
+
+        assert test_Line_2 is not None
+        assert isinstance(test_Line_2, AtAtLine)
+        confirmed_2 : AtAtLine = test_Line_2
+
+        # TODO : do I like that you HAVE to create a LineCollector object?
+        #           can't just call ProcessLines on its own?
+        lc : LineCollector = LineCollector([confirmed_1, confirmed_2])
+        assert len(lc.named_blocks.keys()) == 1
+        assert len(lc.defined_macros.keys()) == 0
+        assert len(lc.comments) == 0
     #########################################
     # Multiple Of One Type Tests            #
     #########################################
@@ -316,7 +336,7 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].get_content({"Macro":resolved}) == "value"
+        assert blocks[0].get_content({"Macro":resolved}) == "value" # type: ignore
 
     def test_multiline_macro_replace(self) :
         test_lines: List[str] = [
@@ -340,7 +360,7 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].get_content({"Macro":resolved}) == "value value 2"
+        assert blocks[0].get_content({"Macro":resolved}) == "value value 2" # type: ignore
 
     def test_multilayer_macro_replace(self) :
         test_lines: List[str] = [
@@ -361,7 +381,7 @@ class TestLineCollection() :
         assert len(lc.defined_macros.keys()) == 2
         resolved_macros : Dict[str, str] = {}
         for m in lc.defined_macros.keys() :
-            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros) # type: ignore
             
         assert resolved_macros['Macro1'] == "value"
         assert resolved_macros['Macro2'] == "value"
@@ -389,7 +409,7 @@ class TestLineCollection() :
         assert len(lc.defined_macros.keys()) == 2
         resolved_macros : Dict[str, str] = {}
         for m in lc.defined_macros.keys() :
-            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros) # type: ignore
             
         assert resolved_macros['Macro1'] == "value"
         assert resolved_macros['Macro2'] == "21value"
@@ -418,7 +438,7 @@ class TestLineCollection() :
         assert len(lc.defined_macros.keys()) == 2
         resolved_macros : Dict[str, str] = {}
         for m in lc.defined_macros.keys() :
-            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros) # type: ignore
             
         assert resolved_macros['Macro1'] == "value"
         assert resolved_macros['Macro2'] == "21value"
@@ -450,7 +470,7 @@ class TestLineCollection() :
         assert len(lc.defined_macros.keys()) == 2
         resolved_macros : Dict[str, str] = {}
         for m in lc.defined_macros.keys() :
-            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros) # type: ignore
         assert resolved_macros['Macro'] == "value value 2"
         assert resolved_macros['Macro2'] == "hello value value 2 hello hello"
 

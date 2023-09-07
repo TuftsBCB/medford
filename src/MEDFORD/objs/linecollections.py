@@ -2,7 +2,7 @@ from typing import Optional, List, Dict, Tuple, Union
 from MEDFORD.objs.lines import AtAtLine, Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
 
 from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
-from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded
+from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
@@ -174,7 +174,7 @@ class Macro(LineCollection) :
         return False
 
 
-    
+# TODO: create 'HasMajors' mixin
 class Detail(LineCollection) :
     major_tokens: List[str]
     minor_token: Optional[str]
@@ -204,6 +204,9 @@ class Detail(LineCollection) :
             self.is_header = False
 
 
+    def get_str_majors(self) -> str :
+        return "_".join(self.major_tokens)
+        
     def get_raw_content(self) -> str :
         out = self.headline.raw_content
         if self.extralines is not None :
@@ -232,23 +235,32 @@ class Detail(LineCollection) :
                 
         return False
 
-class AtAt(LineCollection) :
+class AtAt(Detail) :
     major_tokens: List[str]
+    minor_token: str
     referenced_majors: List[str]
+    is_header: bool = False
 
     def __init__(self, headline: AtAtLine, extralines: Optional[List[ContinueLine]]):
-        super(AtAt, self).__init__(headline, extralines)
+        super(Detail, self).__init__(headline, extralines)
         self.major_tokens = headline.major_tokens
         self.referenced_majors = headline.referenced_majors
+        self.minor_token = "_".join(headline.referenced_majors)
+
+    def get_referenced_str_majors(self) -> str :
+        return "_".join(self.referenced_majors)
 
     def _get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
-        temp_name = self.headline.get_content(macro_defs)
+        temp_name = self.minor_token + "@" + self.headline.get_content(macro_defs)
         if self.extralines is not None :
             for l in self.extralines :
                 temp_name += l.get_content(macro_defs)
         return temp_name
 
     def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool:
+        referenced_name = self._get_referenced_name(macro_defs)
+        if referenced_name not in named_blocks :
+            em.instance().add_err(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
         return self._get_referenced_name(macro_defs) in named_blocks
         
 
@@ -258,6 +270,9 @@ class Block() :
     minor_tokens: Optional[List[Tuple[str, Detail]]] # Technically can have MFD block with nothing but a name
     details: List[Detail]
     headDetail: Detail
+
+    has_atat: bool
+    atat_references: Optional[List[int]] # ?
 
     name: str
 
@@ -356,6 +371,11 @@ class Block() :
         block_names_only.extend(named_blocks.keys())
 
         for d in self.details :
+            if isinstance(d, AtAt) :
+                d_atat : AtAt = d
+                if not d.validate_atat(macro_defs, block_names_only) :
+                    return False
+                
             if not d.validate_atat(macro_defs, block_names_only) :
                 return False
             
