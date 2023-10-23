@@ -70,7 +70,7 @@ class LineReader :
             return(major_res, minor_res, rest_of_line)
         
     @staticmethod
-    def get_atat_attr(line:str, lineno:int) -> Tuple[List[str], List[str], str] :
+    def get_atat_attr(line:str, lineno:int) -> Optional[Tuple[List[str], List[str], str]] :
         aa_res: Optional[re.Match[str]] = re.match(detail_statics.atat_use_regex, line)
         if aa_res == None :
             raise ValueError("Attempted to get @-@ attributes on a line that does not contain @-@ use.")
@@ -78,9 +78,9 @@ class LineReader :
             aa_match_res : re.Match[str] = aa_res
             match_grps = aa_match_res.groupdict()
             if match_grps['name'] == None :
-                em.instance().add_syntax_err(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
-                # TODO: how to properly abort this?
-                raise ValueError("Poorly formatted @-@")
+                em.instance().add_error(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
+                return None
+
             major_res = match_grps['major'].split("_")
             referenced_res = match_grps['referenced'].split("_")
             return (major_res, referenced_res, match_grps['name'])
@@ -146,8 +146,12 @@ class LineReader :
                 mname, mbody = LineReader.find_macro_name_body(line)
                 return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
             elif LineReader.is_atat_line(line) :
-                majors, referenced_major, referenced_name = LineReader.get_atat_attr(line, lineno)
-                return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
+                res = LineReader.get_atat_attr(line, lineno)
+                if res is not None :
+                    majors, referenced_major, referenced_name = res
+                    return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
+                else :
+                    return None
             elif LineReader.is_novel_token_line(line) :
                 major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
                 return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)

@@ -2,7 +2,7 @@ from typing import Optional, List, Dict, Tuple, Union
 from MEDFORD.objs.lines import AtAtLine, Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
 
 from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
-from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist
+from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
@@ -130,7 +130,7 @@ class Macro(LineCollection) :
                 if isinstance(r, List) :
                     r.insert(0,self)
                     if cdepth == 0 :
-                        em.instance().add_err(MaxMacroDepthExceeded(r))
+                        em.instance().add_error(MaxMacroDepthExceeded(r))
                         return "ERROR"
                     else :
                         return r
@@ -150,7 +150,7 @@ class Macro(LineCollection) :
             self._deepest_res_macro = deepest_macro
 
             if self._n_resolutions == 10 :
-                em.instance().add_err(MaxMacroDepthExceeded(self._get_resolution_chain()))
+                em.instance().add_error(MaxMacroDepthExceeded(self._get_resolution_chain()))
                 return 'ERROR'
 
             res = self.get_content(resolved_macros)
@@ -202,6 +202,14 @@ class Detail(LineCollection) :
             self.is_header = True
         else :
             self.is_header = False
+
+        content_length = len(self.headline.raw_content.strip())
+        if self.extralines is not None :
+            for l in self.extralines :
+                content_length = content_length + len(l.raw_content.strip())
+
+        if content_length == 0 :
+            em.instance().add_error(MissingContent(self))
 
 
     def get_str_majors(self) -> str :
@@ -260,7 +268,7 @@ class AtAt(Detail) :
     def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool:
         referenced_name = self._get_referenced_name(macro_defs)
         if referenced_name not in named_blocks :
-            em.instance().add_err(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
+            em.instance().add_error(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
         return self._get_referenced_name(macro_defs) in named_blocks
         
 
@@ -289,8 +297,8 @@ class Block() :
         # ?
         self.major_tokens = details[0].major_tokens
         if details[0].minor_token is not None and details[0].minor_token != "" :
-            em.instance().add_syntax_err(MissingDescError(details[0]))
-            raise ValueError("No desc line for first detail provided to Block constructor.")
+            em.instance().add_error(MissingDescError(details[0]))
+            #raise ValueError("No desc line for first detail provided to Block constructor.")
         self.headDetail = details[0]
         self.name = details[0].get_raw_content().strip()
 

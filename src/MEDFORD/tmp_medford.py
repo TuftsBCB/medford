@@ -68,6 +68,7 @@ class MFD() :
     object_lines: List[Line]
     line_collector: LineCollector
     dictionizer: Dictionizer
+    em_inst: em
 
     macro_definitions: Dict[str, Macro]
     named_blocks: Dict[str, Block]
@@ -79,6 +80,8 @@ class MFD() :
         self.filename = filename
 
     def runMedford(self):
+        self.em_inst = em.instance() # this is just for debug purposes
+        
         # TODO: way to avoid putting all lines into memory?
         # TODO: make LineProcessor take all of the strs/filename and do the work itself?
         # 1, 2
@@ -91,12 +94,19 @@ class MFD() :
         self.named_blocks = self.line_collector.get_1lvl_blocks()
 
         # stop here and check for syntax errors
+        if em.instance().has_syntax_err() :
+            print("Syntax errors found! : %d errors" % em.instance().n_syntax_errs())
+            exit(1)
+            # TODO : enter error mode
 
         # 4
         self.dictionizer = self._get_Dictionizer(self.macro_definitions, self.named_blocks)
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
-        # stop here and check for "other" errors
+        if em.instance().has_other_err() :
+            print("Other errors found! : %d errors" % em.instance().n_other_errs())
+            exit(1)
+            # TODO : enter error mode
 
         # 5
         # TODO : this kind of breaks all of my type checking and requires

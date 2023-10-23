@@ -1,15 +1,23 @@
+from enum import Enum
 from typing import List, Tuple
 
+class ErrType(Enum) :
+    OTHER = "other"
+    SYNTAX = "syntax"
+    PYDANTIC = "pydantic"
+    MISSING_CONTENT = "missing_content"
+    MALFORMED_CONTENT = "malformed_content"
 
 class MFDErr():
     #lineobjs: List[Line]
-    errtype: str # TODO: not str?
+    errname: str
+    errtype: ErrType
     msg: str # verbose-ish error message
     helpmsg: str # extended error message for user help
 
-    def __init__(self, errtype: str, msg: str, helpmsg: str) :
+    def __init__(self, errname: str, msg: str, helpmsg: str) :
         #self.lineobjs = lineobjs
-        self.errtype = errtype
+        self.errname = errname
         self.msg = msg
         self.helpmsg = helpmsg
         # TODO: implement
@@ -26,6 +34,10 @@ class MFDErr():
 
 # Specific Error Types: Syntax
 class MissingDescError(MFDErr) :
+    # SPECIFICALLY, this means that a block is missing the DESC line
+    #   (the NAME line), aka we don't have a name for the block.
+    # IMO, this means don't even try to build the block. There's no
+    #   point.
     major_token: str
     minor_token: str
 
@@ -34,6 +46,8 @@ class MissingDescError(MFDErr) :
     lineno_all: List[int]
 
     def __init__(self, detailobj) :
+        self.errtype = ErrType.SYNTAX
+
         from MEDFORD.objs.linecollections import Detail
 
         if not isinstance(detailobj, Detail) :
@@ -41,14 +55,17 @@ class MissingDescError(MFDErr) :
         
         self.detail: Detail = detailobj
         self.major_token = "_".join(detailobj.major_tokens)
-        self.minor_found = detailobj.minor_token
+        if detailobj.minor_token is not None :
+            self.minor_token = detailobj.minor_token
+        else :
+            raise ValueError("Attempted to create a MissingDescError when the detail has no minor token, aka is a desc line.")
 
         self.lineno_all = detailobj.get_linenos()
         self.lineno_range = (min(self.lineno_all), max(self.lineno_all))
         self.lineno_head = self.lineno_range[0]
 
         message: str = f"A new block for major token {self.major_token} was created at line {self.lineno_head} without a Name line."
-        helpmsg: str = f"A MEDFORD Block should begin with a line like this:\n@{self.major_token} (name of this medford block)\n@{self.major_token}-{self.minor_found} %s" % (self.detail.get_raw_content())
+        helpmsg: str = f"A MEDFORD Block should begin with a line like this:\n@{self.major_token} (name of this medford block)\n@{self.major_token}-{self.minor_token} %s" % (self.detail.get_raw_content())
 
         super(MissingDescError, self).__init__(type(self).__name__, message, helpmsg)
 
@@ -58,6 +75,47 @@ class MissingDescError(MFDErr) :
     def get_lineno_range(self) -> Tuple[int]:
         raise NotImplementedError("ahh")
 
+class MissingContent(MFDErr) :
+    major_token: str
+    minor_token: str
+    
+    lineno_all: List[int]
+    lineno_head: int
+    lineno_range: Tuple[int, int]
+
+    def __init__(self, detailobj) :
+        self.errtype = ErrType.MISSING_CONTENT
+
+        from MEDFORD.objs.linecollections import Detail
+        
+        if not isinstance(detailobj, Detail) :
+            raise ValueError("Attempted to create a MissingContentError without a Detail.")
+        
+        self.detail : Detail = detailobj
+        self.major_token = "_".join(detailobj.major_tokens)
+        if detailobj.minor_token is not None :
+            self.minor_token = detailobj.minor_token
+        else :
+            self.minor_token = "desc"
+
+        self.lineno_all = detailobj.get_linenos()
+        self.lineno_range = (min(self.lineno_all), max(self.lineno_all))
+        self.lineno_head = self.lineno_range[0]
+
+        message: str = f"A detail line on line {self.lineno_head} was created without any content: {self.major_token}"
+        if self.minor_token != "desc" :
+            message = message + f"-{self.minor_token}."
+        helpmsg: str = f"All MEDFORD blocks must consist of either two or three parts: a name line, with a major token and content, or a detail line, with a major token, a minor token, and content."
+        
+        super(MissingContent, self).__init__(type(self).__name__, message, helpmsg)
+
+    def get_head_lineno(self) -> int:
+        return self.lineno_head
+    
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return self.lineno_range
+
+
 # Specific Error Types: Other
 class MaxMacroDepthExceeded(MFDErr) :
     lineno_all_flat: List[int] # list of ALL involved line no's
@@ -65,6 +123,8 @@ class MaxMacroDepthExceeded(MFDErr) :
     lineno_head_each_macro: List[int] # list of only head line of each macro
 
     def __init__(self, macroobjs: List) :
+        self.errtype = ErrType.OTHER
+
         from MEDFORD.objs.linecollections import Macro
 
         for (idx, mo) in enumerate(macroobjs) :
@@ -109,6 +169,8 @@ class MissingRequiredField(MFDErr) :
     lineno_all: List[int]
 
     def __init__(self, block_inp, missing_token:str) :
+        self.errtype = ErrType.PYDANTIC
+
         from MEDFORD.objs.linecollections import Block
 
         if not isinstance(block_inp, Block) :
@@ -140,6 +202,8 @@ class MissingRequiredField(MFDErr) :
             raise ValueError("Attempted to get a lineno range of a {self.__name__} error that does not have a Block.")
     pass
 
+
+
 class MissingAtAtName(MFDErr) :
     major_token: str
     referenced_major: str
@@ -148,10 +212,13 @@ class MissingAtAtName(MFDErr) :
     lineno_range: Tuple[int, int]
 
     def __init__(self, major_token: str, referenced_major: str, lineno: int) :
+        self.errtype = ErrType.MISSING_CONTENT
+
         self.major_token = major_token
         self.referenced_major = referenced_major
         self.lineno_head = lineno
         self.lineno_range = (lineno, lineno)
+        # TODO: add msg, helpmsg, super call
 
     def get_head_lineno(self) -> int:
         return self.lineno_head
@@ -173,6 +240,8 @@ class AtAtReferencedDoesNotExist(MFDErr) :
 
     # TODO: add Blcok to give lineno range of block?
     def __init__(self, atat_inp, referenced_name: str, named_blocks: List[str]) :
+        self.errtype = ErrType.MALFORMED_CONTENT
+
         from MEDFORD.objs.linecollections import AtAt
         
         if not isinstance(atat_inp, AtAt) :
