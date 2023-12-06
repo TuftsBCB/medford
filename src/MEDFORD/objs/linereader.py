@@ -145,13 +145,15 @@ class LineReader :
             if LineReader.is_macro_def_line(line) :
                 mname, mbody = LineReader.find_macro_name_body(line)
                 return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
+            # atat is currently being redefined.
             elif LineReader.is_atat_line(line) :
-                res = LineReader.get_atat_attr(line, lineno)
-                if res is not None :
-                    majors, referenced_major, referenced_name = res
-                    return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
-                else :
-                    return None
+                return None
+            #    res = LineReader.get_atat_attr(line, lineno)
+            #    if res is not None :
+            #        majors, referenced_major, referenced_name = res
+            #        return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
+            #    else :
+            #        return None
             elif LineReader.is_novel_token_line(line) :
                 major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
                 return NovelDetailLine(lineno, line, major_str, minor_str, rest_of_line, poss_inline, poss_tex, poss_macro)

@@ -9,6 +9,7 @@ from MEDFORD.models.generics import Entity
 from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
 
 import argparse
+import json
 
 from enum import Enum
 from pathlib import PurePath #?
@@ -70,14 +71,19 @@ class MFD() :
     dictionizer: Dictionizer
     em_inst: em
 
+    write_json: bool
+    output_path: str
+
     macro_definitions: Dict[str, Macro]
     named_blocks: Dict[str, Block]
 
     dict_data = None
     pydantic_version = None
 
-    def __init__(self, filename) :
+    def __init__(self, filename, write_json:bool=False, output_path:str=".") :
         self.filename = filename
+        self.write_json = write_json
+        self.output_path = output_path
 
     def runMedford(self):
         self.em_inst = em.instance() # this is just for debug purposes
@@ -123,6 +129,11 @@ class MFD() :
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
+
+        if(self.write_json) :
+            if(self.output_path == ".") :
+                with open("medford_output.json", 'w') as f:
+                    json.dump(self.dict_data, f, indent=2)
 
     def _get_Line_objects(self, filename: str) -> List[Line] :
         object_lines = []

@@ -1,6 +1,6 @@
 from typing import List, Optional, Union, TypeVar, Tuple
 import datetime
-from pydantic import BaseModel as PydanticBaseModel, validator
+from pydantic import BaseModel as PydanticBaseModel, field_validator, model_validator, validator
 from pydantic import AnyUrl, root_validator
 
 # bcodmo? + bag
@@ -42,7 +42,7 @@ class StrDescModel(BaseModel):
 class MEDFORDmodel(BaseModel) :
     desc: OptDataT[str]
     Version: DataT[str]
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def check_version(cls, values) :
         if values['Version'] == [] :
             raise IncompleteDataError()
@@ -71,7 +71,7 @@ class Contributor(StrDescModel) :
     Role: OptDataT[str]
     Email: OptDataT[str] #TODO: Email validation
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def check_corresponding_has_contact(cls, v) :
         if v['Role'] is not None:
             roles = [r[1] for r in v['Role']]
@@ -131,7 +131,7 @@ class ArbitraryFile(StrDescModel):
     Destination: OptDataT[str]
     URI: OptDataT[AnyUrl]
     outpath: str = ""
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def check_singular_path_subdirectory(cls, values):
         # TODO: Don't allow remote files, yet... Separate tag? RemoteFile?
         if (values['Path'] != None and len(values['Path']) > 1) :
@@ -142,7 +142,7 @@ class ArbitraryFile(StrDescModel):
         #v = create_new_bagit_loc(v, "local")
         return values
     
-    @root_validator
+    @root_validator(pre=False,skip_on_failure=True)
     def check_path_or_uri(cls, values) :
         if (values['Path'] == None or len(values['Path']) == 0) and (values['URI'] == None or len(values['URI']) == 0) :
             raise ValueError("Please provide a path or URI for the file.")
@@ -231,7 +231,7 @@ class Software(BaseModel):
 # Meant to store every single possible tag that we have defined
 class Entity(BaseModel):
     MEDFORD: DataT[MEDFORDmodel]
-    @validator('MEDFORD', pre=True)
+    @field_validator('MEDFORD')
     def only_one_MEDFORD_block(cls, values) :
         if len(values) > 1 :
             raise ValueError("There can only be exactly one MEDFORD block in a file")
