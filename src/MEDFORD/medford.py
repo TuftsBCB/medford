@@ -102,6 +102,9 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
             p = BCODMO(**final_dict)
         elif mode == MFDMode.BAGIT:
             p = BagIt(**final_dict)
+            if mode == MFDMode.BAGIT and action == ParserMode.compile:
+                runBagitMode(p, filename)
+
         elif mode == MFDMode.OTHER:
             p = Entity(**final_dict)
         else :
@@ -110,9 +113,6 @@ def runMedford(filename, output_json, mode, error_mode, error_sort, action):
         parser.parse_pydantic_errors(e, final_dict)
     else:
         print("No errors found.")
-
-    if mode == MFDMode.BAGIT and action == ParserMode.compile:
-        runBagitMode(p, filename)
 
     if(output_json) :
         with open(filename.parent / (filename.name + ".JSON"), 'w') as f:
