@@ -1,3 +1,6 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
 @Paper_Primary Comparative analysis of the Pocillopora damicornis genome highlights role of immune system in coral evolution
 @Paper_Primary-URI https://www.nature.com/articles/s41598-018-34459-8
 
@@ -15,7 +18,7 @@
 @Data_Ref-Filename data/file
 
 @File A random File
-@File-Path samples/bagit_example/made_up_BAGIT.MFD_BAG/data/licensing/LICENSE
+@File-Path licensing/LICENSE
 
 @File Medford File
-@File-Path samples/bagit_example/made_up_BAGIT.MFD_BAG/data/made_up_BAGIT.MFD
+@File-Path made_up_BAGIT.MFD
