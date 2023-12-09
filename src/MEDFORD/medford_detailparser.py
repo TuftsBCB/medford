@@ -55,9 +55,10 @@ class detailparser :
     def export(self) :
         return deepcopy(self.data)
 
+    @staticmethod
     def travel_major_tokens(curdat:BaseModel, current_majors: List[str]) -> List[str] :
-        set_attributes = curdat.__fields_set__
-        all_keys = list(curdat.__fields__.keys())
+        set_attributes = curdat.model_fields_set
+        all_keys = list(curdat.model_fields.keys())
         collapsed_majors = '_'.join(current_majors)
         output_strings = []
         
@@ -66,19 +67,25 @@ class detailparser :
                 all_keys.append(attr)
 
         for attr in all_keys :
-            if curdat.__getattribute__(attr) != None :
-                for val in curdat.__getattribute__(attr) :
-                    val = val[1]
-                    if issubclass(type(val), BaseModel) :
-                        # this is a major token again, so we need to recurse
-                        res = detailparser.travel_major_tokens(val, current_majors + [attr])
-                        output_strings.extend(res)
+            if attr not in curdat.model_fields and curdat.model_extra is not None:
+                vals = curdat.model_extra[attr]
+            elif curdat.__getattribute__(attr) != None :
+                vals = curdat.__getattribute__(attr)
+            else : 
+                continue
+            
+            for val in vals :
+                val = val[1]
+                if issubclass(type(val), BaseModel) :
+                    # this is a major token again, so we need to recurse
+                    res = detailparser.travel_major_tokens(val, current_majors + [attr])
+                    output_strings.extend(res)
+                else :
+                    # we're in a minor token, so start writing coach
+                    if attr != "desc" :
+                            output_strings.append(f'@{collapsed_majors}-{attr} {val}\n')
                     else :
-                        # we're in a minor token, so start writing coach
-                        if attr != "desc" :
-                                output_strings.append(f'@{collapsed_majors}-{attr} {val}\n')
-                        else :
-                            output_strings.append(f'@{collapsed_majors} {val}\n')
+                        output_strings.append(f'@{collapsed_majors} {val}\n')
         
         # if we haven't already had a newline, add a newline
         # ( double-newline happens if we're in a multi-major-token that is not followed by a sister major token,
@@ -160,7 +167,7 @@ class detailparser :
             self.err_mngr.add_error(error_obj)
         self.err_mngr.print_errors()
 
-
+    @staticmethod
     def write_from_model(model:BaseModel, location:str) -> None:
         with open(location, 'w') as f:
             lines = detailparser.travel_major_tokens(model, [])
