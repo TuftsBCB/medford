@@ -7,5 +7,3 @@ __pycache__/*
 samples/pshpil_rnaseq_example/pshpil_rnaseq.mfd
 dist/*
 src/*.egg-info
-pyproject.toml
-setup.cfg
