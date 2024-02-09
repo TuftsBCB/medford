@@ -200,6 +200,8 @@ def zip_all_files(mfd_input) :
     # WARNING: VERY fragile; not tested on windows or macs whatsoever.
     zipname = os.path.splitext(os.path.basename(mfd_input))[0]
     dirname = os.path.dirname(mfd_input)
+    if dirname == "" :
+        dirname = "."
     make_archive(dirname + "/" + zipname, "zip", outdir)
 
 
@@ -271,11 +273,23 @@ def runBagitMode(parameters: BaseModel, medford_input: str) :
     local_named = []
     remote_named = []
     if 'Data' in _parameters.model_fields and _parameters.Data is not None :
-        local_named = list(itertools.chain.from_iterable(itertools.dropwhile(lambda x: x is None, [_parameters.Data[0][1].Copy, _parameters.Data[0][1].Primary])))
-        remote_named = _parameters.Data[0][1].Ref if _parameters.Data[0][1].Ref is not None else []
+        if 'Copy' in _parameters.Data[0][1].model_fields and _parameters.Data[0][1].Copy is not None :
+            local_named.extend(_parameters.Data[0][1].Copy)
+        if 'Primary' in _parameters.Data[0][1].model_fields and _parameters.Data[0][1].Primary is not None :
+            local_named.extend(_parameters.Data[0][1].Primary)
+        #local_named = list(itertools.chain.from_iterable(itertools.dropwhile(lambda x: x is None, [_parameters.Data[0][1].Copy, _parameters.Data[0][1].Primary])))
+        if 'Ref' in _parameters.Data[0][1].model_fields and _parameters.Data[0][1].Ref is not None :
+            remote_named.extend(_parameters.Data[0][1].Ref)
+        #remote_named = _parameters.Data[0][1].Ref if _parameters.Data[0][1].Ref is not None else []
     if 'Software' in _parameters.model_fields and _parameters.Software is not None :
-        local_named = local_named + list(itertools.chain.from_iterable(itertools.dropwhile(lambda x: x is None, [_parameters.Software[0][1].Copy, _parameters.Software[0][1].Primary])))
-        remote_named = remote_named + _parameters.Software[0][1].Ref if _parameters.Software[0][1].Ref is not None else []
+        if 'Copy' in _parameters.Software[0][1].model_fields and _parameters.Software[0][1].Copy is not None :
+            local_named.extend(_parameters.Software[0][1].Copy)
+        if 'Primary' in _parameters.Software[0][1].model_fields and _parameters.Software[0][1].Primary is not None :
+            local_named.extend(_parameters.Software[0][1].Primary)
+        if 'Ref' in _parameters.Software[0][1].model_fields and _parameters.Software[0][1].Ref is not None :
+            remote_named.extend(_parameters.Software[0][1].Ref)
+        #local_named = local_named + list(itertools.chain.from_iterable(itertools.dropwhile(lambda x: x is None, [_parameters.Software[0][1].Copy, _parameters.Software[0][1].Primary])))
+        #remote_named = remote_named + _parameters.Software[0][1].Ref if _parameters.Software[0][1].Ref is not None else []
 
     all_local_files = itertools.chain(local_named, local_files)
     modified_locals = []
