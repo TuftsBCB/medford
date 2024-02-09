@@ -1,18 +1,21 @@
+"""Module containing the MEDFORD parser, which can validate and compile MEDFORD metadata files."""
+
+import sys
 from typing import List, Dict
-
-from pydantic import ValidationError
-from MEDFORD.objs.linereader import LineReader, Line
-from MEDFORD.objs.linecollector import LineCollector, Macro, Block
-from MEDFORD.objs.dictionizer import Dictionizer
-from MEDFORD.models.generics import Entity
-
-from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
 
 import argparse
 import json
 
 from enum import Enum
 from pathlib import PurePath #?
+
+from pydantic import ValidationError
+from objs.linereader import LineReader, Line
+from objs.linecollector import LineCollector, Macro, Block
+from objs.dictionizer import Dictionizer
+from models.generics import Entity
+
+from submodules.medforderrors.errormanager import MedfordErrorManager as em
 
 # order of ops:
 # 1. open file
@@ -23,35 +26,39 @@ from pathlib import PurePath #?
 
 # TODO : add error mgmt
 class ParserMode(Enum) :
-    validate = 'validate'
-    compile = 'compile'
+    """Enum storing the mode of operation of the MEDFORD parser."""
+    VALIDATE = 'validate'
+    COMPILE = 'compile'
 
     def __str__(self) :
         return self.value
 
 class OutputMode(Enum):
+    """Enum storing possible outout types of the MEDFORD parser."""
     OTHER = 'OTHER'
     BCODMO = 'BCODMO'
     RDF = 'RDF'
-    BAGIT = 'BAGIT' 
+    BAGIT = 'BAGIT'
     # TODO : Make creating a bag a separate option?
     # Could want to make an output RDF file AND zip it.
 
     def __str__(self) :
         return self.value
-    
-    @classmethod
-    def _missing_(cls, name):
-        for member in cls :
-            if member.name.lower() == name.lower() :
-                return member
-    
 
-ap = argparse.ArgumentParser()
+    @classmethod
+    def _missing_(cls, value: str):
+        for member in cls :
+            if member.name.lower() == value.lower() :
+                return member
+        return None
+
+
+ap = argparse.ArgumentParser(prog="MEDFORD parser")
 # basic arguments
+ap.add_argument("--version", action="version", version='%(prog)s v2.0')
 ap.add_argument("action", type=ParserMode, choices=list(ParserMode),
                 help="Whether to run the MEDFORD parser in Validation or Compilation mode. (Compilation creates a novel output file.)")
-ap.add_argument("file", type=str, 
+ap.add_argument("file", type=str,
                 help="Input MEDFORD file to validate or compile.")
 ap.add_argument("-m", "--mode", type=OutputMode, choices=list(OutputMode), default=OutputMode.OTHER,
                 help="The output mode of the MEDFORD parser; what format should be validated against or compiled to.")
@@ -65,16 +72,25 @@ ap.add_argument("-d", "--debug", action="store_true", default=False,
                 help="FOR DEBUG: Enable DEBUG mode for MEDFORD, enabling a significant amount of intermediate stdout output. (currently unimplemented.)")
 
 class MFD() :
+    """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
+
+    # TODO : ? is this the right way to implement this?
+    @classmethod
+    def get_version(cls) -> str :
+        """Returns the current MEDFORD parser version."""
+        return "2.0.0"
+
     filename: str
     object_lines: List[Line]
     line_collector: LineCollector
     dictionizer: Dictionizer
-    em_inst: em
+    em_inst: em #error manager instance
 
     write_json: bool
     output_path: str
 
     macro_definitions: Dict[str, Macro]
+    blocks: List[Block]
     named_blocks: Dict[str, Block]
 
     dict_data = None
@@ -85,33 +101,34 @@ class MFD() :
         self.write_json = write_json
         self.output_path = output_path
 
-    def runMedford(self):
+    def run_medford(self):
+        """Main function that runs MEDFORD compilation from start to finish."""
         self.em_inst = em.instance() # this is just for debug purposes
         
         # TODO: way to avoid putting all lines into memory?
         # TODO: make LineProcessor take all of the strs/filename and do the work itself?
         # 1, 2
-        self.object_lines = self._get_Line_objects(self.filename)
+        self.object_lines = self._get_line_objects(self.filename)
 
         # 3
-        self.line_collector = self._get_Line_Collector(self.object_lines)
+        self.line_collector = self._get_line_collector(self.object_lines)
         self.macro_definitions = self.line_collector.get_macros()
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
 
         # stop here and check for syntax errors
         if em.instance().has_syntax_err() :
-            print("Syntax errors found! : %d errors" % em.instance().n_syntax_errs())
-            exit(1)
+            print(f"Syntax errors found! : {em.instance().n_syntax_errs()} errors")
+            sys.exit(1)
             # TODO : enter error mode
 
         # 4
-        self.dictionizer = self._get_Dictionizer(self.macro_definitions, self.named_blocks)
+        self.dictionizer = self._get_dictionizer(self.macro_definitions, self.named_blocks)
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
         if em.instance().has_other_err() :
-            print("Other errors found! : %d errors" % em.instance().n_other_errs())
-            exit(1)
+            print(f"Other errors found! : {em.instance().n_other_errs()} errors")
+            sys.exit(1)
             # TODO : enter error mode
 
         # 5
@@ -130,14 +147,14 @@ class MFD() :
         # TODO: export to json, bag
         # TODO: implement all of the old models
 
-        if(self.write_json) :
-            if(self.output_path == ".") :
-                with open("medford_output.json", 'w') as f:
+        if self.write_json :
+            if self.output_path == "." :
+                with open("medford_output.json", 'w', encoding="utf-8") as f:
                     json.dump(self.dict_data, f, indent=2)
 
-    def _get_Line_objects(self, filename: str) -> List[Line] :
+    def _get_line_objects(self, filename: str) -> List[Line] :
         object_lines = []
-        with open(filename, 'r') as f :
+        with open(filename, 'r', encoding="utf-8") as f :
             for idx,line in enumerate(f.readlines()) :
                 p_line = LineReader.process_line(line, idx)
                 if p_line is not None :
@@ -148,10 +165,10 @@ class MFD() :
     # note for later: what happens when it takes too long to process ?
     # user writes a new line, add it to LineCollector that single line at a time?
     # 10s of ms amount of time to run is allocation usually
-    def _get_Line_Collector(self, object_lines: List[Line]) -> LineCollector:
+    def _get_line_collector(self, object_lines: List[Line]) -> LineCollector:
         return LineCollector(object_lines)
 
-    def _get_Dictionizer(self, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]) -> Dictionizer :
+    def _get_dictionizer(self, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]) -> Dictionizer :
         return Dictionizer(macro_definitions, name_dictionary)
 
 
@@ -166,4 +183,4 @@ if __name__ == "__main__" :
     args = ap.parse_args()
     #print(args.mode)
     mfd = MFD(PurePath(args.file))
-    mfd.runMedford()
+    mfd.run_medford()

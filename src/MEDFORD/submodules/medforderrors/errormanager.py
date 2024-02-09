@@ -1,5 +1,5 @@
 from typing import Dict, List
-from MEDFORD.submodules.medforderrors.errors import *
+from .errors import *
 
 class MedfordErrorManager(object):
     _instance = None

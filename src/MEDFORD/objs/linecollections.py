@@ -1,12 +1,32 @@
-from typing import Optional, List, Dict, Tuple, Union
-from MEDFORD.objs.lines import AtAtLine, Line, ContinueLine, ContentMixin, MacroLine, NovelDetailLine
+"""Module defining LineCollections and Blocks.
 
-from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
-from MEDFORD.submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
+Module defining the LineCollection object, which conceptually contains
+a collection of lines, and the Block object, which is a collection of Details. 
+Line collections include objects such as Macros and Details (e.g. a Macro 
+is defined as a MacroLine followed by 0 or more ContinueLines.)
+"""
+
+from typing import Optional, List, Dict, Tuple, Union
+from objs.lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
+
+from submodules.medforderrors.errormanager import MedfordErrorManager as em
+from submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
 class LineCollection() :
+    """Class representing a collection of Lines.
+    
+    Class that is defined as a collection of Lines. It must contain a 
+    headline, of type MacroLine or NovelDetailLine, which is used to define
+    the type of LineCollection to create. It may also contain 0 or more 
+    ContinueLines.
+    
+    A LineCollection contains collection-specific information, such as
+    whether or not the collection has a macro usage (has_macro), and if so,
+    the names of the macros that are used (used_macro_names) for easy
+    management and validation later.
+    """
     headline: Union[MacroLine, NovelDetailLine, AtAtLine]
     extralines: Optional[List[ContinueLine]]
 
@@ -20,7 +40,7 @@ class LineCollection() :
         if headline.has_macros :
             self.has_macros = True
             self.used_macro_names = [m[2] for m in headline.macro_uses]
-        
+
         if extralines is not None :
             for el in extralines :
                 if el.has_macros :
@@ -34,54 +54,80 @@ class LineCollection() :
     #references: Optional[list[str]]
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str :
+        """Returns the string content of the LineCollection.
+        
+        Returns a plain string containing only the line collection's content.
+        For a macro, this refers to the content that would get substituted in
+        for the macro's name. For a detail, this would be the actual metadata
+        content of the detail.
+        
+        Works by taking the content of the headline (with macros substituted
+        for their content), and if there are any, does the same process for
+        all of the extralines.
+        
+        Takes as input a dictionary containing all known macro names
+        and their substitutions.
+        """
         out : str = self.headline.get_content(resolved_macros)
         if self.extralines is not None :
             for l in self.extralines :
                 out += l.get_content(resolved_macros)
-        
+
         return out
-    
+
     def get_linenos(self) -> List[int] :
+        """Returns a list of line numbers of all lines in the LineCollection.
+        """
         lines: List[int] = [self.headline.get_lineno()]
         if self.extralines is not None :
             for el in self.extralines :
                 lines.append(el.get_lineno())
         return lines
-    
+
+    # pylint: disable=unused-argument
+    # yes, pylint, I know these aren't used. Temporary while atat is disabled.
     def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool :
+        """
+        TEMPORARILY DISABLED: ALWAYS RETURNS TRUE
+        
+        Validates that all At-At references within the line have been defined.
+        """
         return True
-    
+    # pylint: enable=unused-argument
+
     # add type annotations?
     def __eq__(self, other) -> bool :
-        if type(self) != type(other) :
+        if not isinstance(other, type(self)):
             return False
 
         if self.headline != other.headline :
             return False
-        
+
         if self.has_macros != other.has_macros :
             return False
-        elif self.has_macros and self.used_macro_names is not None:
+
+        if self.has_macros and self.used_macro_names is not None and other.used_macro_names is not None:
             for idx, mn in enumerate(self.used_macro_names) :
                 if mn != other.used_macro_names[idx] :
                     return False
-        
+
         if (self.extralines is None) ^ (other.extralines is None) :
             return False
-        else :
-            if self.extralines is not None:
-                if len(self.extralines) != len(other.extralines) :
-                    return False
-                else :
-                    for idx, l in enumerate(self.extralines) :
-                        if l != other.extralines[idx] :
-                            return False
 
-        
+        if self.extralines is not None and other.extralines is not None:
+            if len(self.extralines) != len(other.extralines) :
+                return False
+
+            for idx, l in enumerate(self.extralines) :
+                if l != other.extralines[idx] :
+                    return False
+
         return True
 
 
 class Macro(LineCollection) :
+    """Subclass of LineCollection that represents a Macro.
+    """
     name : str
     _is_resolved: bool = False
     _n_resolutions: int
@@ -93,31 +139,44 @@ class Macro(LineCollection) :
         self.name = headline.macro_name
 
     def get_raw_content(self) -> str :
+        """Returns the raw substitution string of the macro.
+
+        Specifically, returns the exact string content of the macro,
+        without attempting to substitute for referenced macro names or
+        other post-processing.
+        """
         outstr = self.headline.raw_content
         if self.extralines is not None :
             for el in self.extralines :
                 outstr = outstr + el.raw_content
         return outstr
-    
+
     def resolve(self, macro_definitions: Dict[str, 'Macro'], depth: Optional[int] = None) -> Union[str, List['Macro']] :
+        """Resolve the content of the macro, up to 10 recursions.
+
+        Given a list of macros that have currently been defined, and the
+        current recursion depth of resolution, either returns the resolved
+        macro string or, in failure case, a list of all macros that were
+        used to reach failure.
+        """
         # TODO : add a new way to track max resolutions.
         if depth is None :
             cdepth: int = 0
         else :
             cdepth: int = depth
-            
-        if self._is_resolved : 
+
+        if self._is_resolved :
             return self.resolution
-        
+
         if cdepth == 10 :
             return [self]
-        
-        if self.has_macros == False :
+
+        if not self.has_macros :
             self._is_resolved = True
             self.resolution = self.get_content({})
             self._n_resolutions = 0
             return self.resolution
-        
+
         if self.used_macro_names is not None and len(self.used_macro_names) > 0:
             resolved_macros : Dict[str, str] = {}
             deepest_resolution : int = 0
@@ -132,11 +191,11 @@ class Macro(LineCollection) :
                     if cdepth == 0 :
                         em.instance().add_error(MaxMacroDepthExceeded(r))
                         return "ERROR"
-                    else :
-                        return r
+
+                    return r
 
                 # macro resolved successfully
-                elif isinstance(r, str) :
+                if isinstance(r, str) :
                     resolved_macros[m] = r
                     cur_res_depth = macro_definitions[m]._n_resolutions + 1
                     if cur_res_depth > deepest_resolution :
@@ -144,8 +203,8 @@ class Macro(LineCollection) :
                         deepest_macro = macro_definitions[m]
 
                 else :
-                    raise TypeError("Unknown type returned from Macro.resolve(): %s" % type(r).__name__)
-                
+                    raise TypeError(f"Unknown type returned from Macro.resolve(): {type(r).__name__}")
+
             self._n_resolutions = deepest_resolution
             self._deepest_res_macro = deepest_macro
 
@@ -157,25 +216,26 @@ class Macro(LineCollection) :
             self._is_resolved = True
             self.resolution = res
             return res
-        
-        else :
-            raise ValueError("Somehow has_macros is True but used_macro_names is None.")
+
+        raise ValueError("Somehow has_macros is True but used_macro_names is None.")
 
     def _get_resolution_chain(self) -> List['Macro'] :
         tmp : List['Macro'] = [self]
         if self._deepest_res_macro is not None :
             tmp.append(self._deepest_res_macro)
         return tmp
-    
+
     def __eq__(self, other) -> bool :
-        if type(self) == type(other) and self.name == other.name:
-            return super(Macro, self).__eq__(other)
-            
+        if isinstance(other, type(self)) and self.name == other.name:
+            return super().__eq__(other)
+
         return False
 
 
 # TODO: create 'HasMajors' mixin
 class Detail(LineCollection) :
+    """Class that represents a collection of Lines that form a Detail.
+    """
     major_tokens: List[str]
     minor_token: Optional[str]
     is_header: bool
@@ -183,7 +243,7 @@ class Detail(LineCollection) :
 
 #    _fulldesc: List[Union[NovelDetailLine, ContinueLine]] # keep LineReturns so we can extract comments, linenos later
 
-    
+
     def __init__(self, headline: NovelDetailLine, extralines: Optional[List[ContinueLine]] = None) :
         '''
         Create a Detail object from one DETAIL type LineReturn and any number of CONT type LineReturns.
@@ -213,37 +273,44 @@ class Detail(LineCollection) :
 
 
     def get_str_majors(self) -> str :
+        """Returns the list of major tokens as a _-joined string.
+        """
         return "_".join(self.major_tokens)
-        
+
     def get_raw_content(self) -> str :
-        out = self.headline.raw_content
+        """Returns the content of the Detail, as a string without substitutions.
+        """
+        out = str.strip(self.headline.raw_content)
         if self.extralines is not None :
             for l in self.extralines :
-                # TODO : deal with spacing
-                out = out + l.raw_content
+                out = out + " " + str.strip(l.raw_content)
         return out
-    
-    def get_content(self, macro_dict: Dict[str, str]) -> str :
-        out = self.headline.get_content(macro_dict)
+
+    def get_content(self, resolved_macros: Dict[str, str]) -> str :
+        out = self.headline.get_content(resolved_macros)
         if self.extralines is not None :
             for l in self.extralines :
-                out = out + l.get_content(macro_dict)
+                out = out + l.get_content(resolved_macros)
         out = out.strip()
         return out
 
     def __eq__(self, other) -> bool :
-        if type(self) == type(other) :
+        if isinstance(other, type(self)) :
             if self.major_tokens == other.major_tokens and self.is_header == other.is_header :
                 if (self.minor_token is None) ^ (other.minor_token is None) :
                     return False
-                elif self.minor_token != other.minor_token :
+
+                if self.minor_token != other.minor_token :
                     return False
-                    
-                return super(Detail, self).__eq__(other)
-                
+
+                return super().__eq__(other)
+
         return False
 
 class AtAt(Detail) :
+    """DEPRECIATED.
+    
+    (Used to) represent a detail that contains a reference to a block."""
     major_tokens: List[str]
     minor_token: str
     referenced_majors: List[str]
@@ -270,14 +337,22 @@ class AtAt(Detail) :
         if referenced_name not in named_blocks :
             em.instance().add_error(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
         return self._get_referenced_name(macro_defs) in named_blocks
-        
 
-# TODO: this shouldn't be a LineCollection
 class Block() :
+    """
+    A named collection of Details.
+    
+    A Block represents the entirety of all Details that cohesively describe
+    a single object, the type of which is defined by the major tokens.
+    
+    Has features such as the defining major token, all defined minor tokens,
+    the head Detail that is the start of the block, any other details
+    describing the same object, and whether any macros have been used.
+    """
     major_tokens: List[str]
     minor_tokens: Optional[List[Tuple[str, Detail]]] # Technically can have MFD block with nothing but a name
     details: List[Detail]
-    headDetail: Detail
+    head_detail: Detail
 
     has_atat: bool
     atat_references: Optional[List[int]] # ?
@@ -292,24 +367,26 @@ class Block() :
     def __init__(self, details: List[Detail]) :
         if len(details) == 0 :
             raise ValueError("Attempted to create a block with no details.")
-        
+
         self.details = details
         # ?
         self.major_tokens = details[0].major_tokens
         if details[0].minor_token is not None and details[0].minor_token != "" :
             em.instance().add_error(MissingDescError(details[0]))
             #raise ValueError("No desc line for first detail provided to Block constructor.")
-        self.headDetail = details[0]
+        self.head_detail = details[0]
         self.name = details[0].get_raw_content().strip()
 
         if len(details) > 0 :
             self.minor_tokens = []
             for idx, detail in enumerate(details[1:]) :
                 if detail.major_tokens != self.major_tokens :
-                    raise ValueError("Block provided details of multiple major tokens: Block Major is %s while line %d has major of %s." % ("_".join(self.major_tokens), idx, "_".join(detail.major_tokens)))
+                    my_majors_str = "_".join(self.major_tokens)
+                    detail_majors_str = "_".join(detail.major_tokens)
+                    raise ValueError(f"Block provided details of multiple major tokens: Block Major is {my_majors_str} while line {idx} has major of {detail_majors_str}.")
                 if detail.minor_token is None :
-                    raise ValueError("Block provided a detail with no minor token past first detail: detail # %d." % (idx))
-                
+                    raise ValueError(f"Block provided a detail with no minor token past first detail: detail # {idx}.")
+
                 self.minor_tokens.append((detail.minor_token, detail))
 
                 #if detail
@@ -323,58 +400,53 @@ class Block() :
                         if macro_use not in self.used_macro_names :
                             self.used_macro_names.append(macro_use)
 
-        return
-
-    def get_content(self, defined_macros: Dict[str, str]) -> str :
-        # TODO : I don't think this is currently ever called, because
-        #   the dictionizer calls on a detail-per-detail basis. Is this
-        #   function necessary?
-        out = ""
-        for detail in self.details :
-            out = out + detail.get_content(defined_macros)
-        return out
-
     def get_str_major(self) -> str :
-        return "_".join(self.major_tokens)  
+        """Returns the Block's major tokens as a _-joined string.
+        """
+        return "_".join(self.major_tokens)
 
     def __eq__(self, other) -> bool :
-        if type(self) != type(other) :
+        if not isinstance(other, type(self)) :
             return False
-        
+
         if self.major_tokens != other.major_tokens :
             return False
-        
+
         if (self.minor_tokens is None) ^ (other.minor_tokens is None) :
             return False
-        
-        elif self.minor_tokens is not None :
+
+        elif self.minor_tokens is not None and other.minor_tokens is not None :
             if len(self.minor_tokens) != len(other.minor_tokens) :
                 return False
             else :
                 for idx, t in enumerate(self.minor_tokens) :
                     if t != other.minor_tokens[idx] :
                         return False
-        
+
         if len(self.details) != len(self.details) :
             return False
-        else :
-            for idx, d in enumerate(self.details) :
-                if d != other.details[idx] :
-                    return False
-                
+
+        for idx, d in enumerate(self.details) :
+            if d != other.details[idx] :
+                return False
+
         if self.name != other.name :
             return False
-        
+
         # TODO : check macro containment
         return True
     
     def get_linenos(self) -> List[int] :
+        """Returns the line numbers of all Details in this Block.
+        """
         tmp_linenos: List[int] = []
         for d in self.details :
             tmp_linenos.extend(d.get_linenos())
         return tmp_linenos
 
     def validate_atat(self, macro_defs: Dict[str, str], named_blocks : Dict[str, 'Block']) -> bool :
+        """DEPRECIATED.
+        """
         block_names_only = []
         block_names_only.extend(named_blocks.keys())
 
@@ -383,9 +455,9 @@ class Block() :
                 d_atat : AtAt = d
                 if not d.validate_atat(macro_defs, block_names_only) :
                     return False
-                
+
             if not d.validate_atat(macro_defs, block_names_only) :
                 return False
-            
+
         return True
 

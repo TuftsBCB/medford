@@ -1,7 +1,8 @@
-from typing import List, Dict, Tuple, Optional
-from MEDFORD.objs.lines import AtAtLine, Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
-from MEDFORD.objs.linecollections import AtAt, Macro, Block, Detail
+
 from enum import Enum
+from typing import List, Dict, Tuple, Optional
+from .lines import AtAtLine, Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
+from .linecollections import AtAt, Macro, Block, Detail
 
 class LineCollector() :
     defined_macros: Dict[str, Macro]
@@ -26,8 +27,8 @@ class LineCollector() :
     atat = CollectorState.ATAT
 
     def __init__(self, lines: List[Line]) :
-        self.defined_macros = dict()
-        self.named_blocks = dict()
+        self.defined_macros = {}
+        self.named_blocks = {}
         self.comments = []
 
         self._ProcessLines(lines)

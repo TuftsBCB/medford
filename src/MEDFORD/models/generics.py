@@ -1,9 +1,15 @@
+"""Module containing generic Model information for standard MEDFORD use. 
+These are models that are expected to be used across multiple MEDFORD metadata applications, 
+as well as some that are expected for our initial use case tests.
+
+These Models are defined for use with Pydantic, and contain custom data types and type validation."""
+
 import datetime
-from enum import Enum, Flag, auto
-from MEDFORD.objs.linecollections import Block, Detail
+from enum import Flag, auto
+from typing import TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
-from typing import TypeVar, Tuple, List, Optional, Union
+from objs.linecollections import Block, Detail
 
 #############################################
 # Building Blocks                           #
@@ -34,11 +40,17 @@ OptMajorT = Optional[MajorsT[T]]
 all_versions = ["1.0","1.1"]
 
 class BaseModel(PydanticBaseModel) :
+    """Base model for use by other MEDFORD model. Importantly, allows custom typing
+    and additional attributes, allowing users to add arbitrary minor tokens."""
     class Config:
+        """Configuration for the BaseModel allowing custom typing and extra attributes."""
         arbitrary_types_allowed = True
         extra = 'allow' #comment out to check only defined attr
 
 class BlockModel(BaseModel) :
+    """An extension to the BaseModel that adds an expected attribute Block,
+    for cases where the Block information is being provided alongside the expected
+    Model features."""
     Block: Block
 
 #############################################
@@ -46,8 +58,8 @@ class BlockModel(BaseModel) :
 #############################################
 
 class RoleOpts(Flag) :
-    HASROLES =  0 # TODO: does this actually only flag if they have a
-                  #   role set, or does it also flag ones w/o roles?
+    """A Flag describing author role features, such as Corresponding author or First author."""
+    HASROLES =  0 # TODO: does this actually only flag if they have a role set, or does it also flag ones w/o roles?
     CORR = auto()
     FIRST = auto()
     OTHER = auto()
@@ -58,11 +70,16 @@ class RoleOpts(Flag) :
 #############################################
 
 class MEDFORDmdl(BlockModel) :
+    """Model to store MEDFORD metadata describing the MEDFORD file itself,
+     such as MEDFORD file colloqiual name and the version of MEDFORD used
+     to write this file."""
     name: MinorT[str]
     Version: MinorsT[str] # TODO: a way to make this singular?
 
     @field_validator('Version')
+    @classmethod
     def check_version(cls, values) :
+        """Ensures that the version described in this entry is a valid MEDFORD version."""
         # TODO: make this a more generic version checker, e.g. right
         #       regex format.
         if values == [] :
@@ -95,7 +112,8 @@ class Contributor(BlockModel) :
     Email: OptMinorT[str] = None
 
     @model_validator(mode='after')
-    def check_corresopnding_has_email(cls, v) :
+    @classmethod
+    def check_corresponding_has_email(cls, v) :
         if v.Role is not None:
             roles = [r[1] for r in v.Role]
             if "Corresponding Author" in roles and v.Email is None:
@@ -111,6 +129,10 @@ class Contributor(BlockModel) :
         #       these strings. The flags are cool and all, but how
         #       can we expose the string equivalents to the LSP?
         cur_flags : RoleOpts = RoleOpts.HASROLES
+
+        # pylint: disable=unsupported-binary-operation
+        # known issue in pylint for py<3.11; throws false error when ENUMs are logic chained.
+        # https://github.com/pylint-dev/pylint/issues/7381
         if self.Role is not None :
             roles = [r[1] for r in self.Role]
             if "Corresponding Author" in roles :
