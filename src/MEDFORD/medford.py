@@ -15,7 +15,7 @@ from objs.linecollector import LineCollector, Macro, Block
 from objs.dictionizer import Dictionizer
 from models.generics import Entity
 
-from submodules.medforderrors.errormanager import MedfordErrorManager as em
+from submodules.mfdvalidator.validator import MedfordValidator as em
 
 import mfdglobals
 

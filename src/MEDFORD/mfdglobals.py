@@ -1,11 +1,11 @@
-from submodules.medforderrors.errormanager import MedfordErrorManager as em
+from submodules.mfdvalidator.validator import MedfordValidator as mv
 
-validator: em
+validator: mv
 version: str
 
 def init() :
     global validator
-    validator = em.init()
+    validator = mv.init()
 
     global version
     version = "2.0"

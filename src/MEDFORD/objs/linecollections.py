@@ -9,7 +9,7 @@ is defined as a MacroLine followed by 0 or more ContinueLines.)
 from typing import Optional, List, Dict, Tuple, Union
 from objs.lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
 
-from submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
+from submodules.mfdvalidator.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
 
 import mfdglobals 
 
@@ -71,8 +71,8 @@ class LineCollection() :
         """
         out : str = self.headline.get_content(resolved_macros)
         if self.extralines is not None :
-            for l in self.extralines :
-                out += l.get_content(resolved_macros)
+            for line in self.extralines :
+                out += line.get_content(resolved_macros)
 
         return out
 
@@ -119,8 +119,8 @@ class LineCollection() :
             if len(self.extralines) != len(other.extralines) :
                 return False
 
-            for idx, l in enumerate(self.extralines) :
-                if l != other.extralines[idx] :
+            for idx, line in enumerate(self.extralines) :
+                if line != other.extralines[idx] :
                     return False
 
         return True
@@ -271,8 +271,8 @@ class Detail(LineCollection) :
 
         content_length = len(self.headline.raw_content.strip())
         if self.extralines is not None :
-            for l in self.extralines :
-                content_length = content_length + len(l.raw_content.strip())
+            for line in self.extralines :
+                content_length = content_length + len(line.raw_content.strip())
 
         if content_length == 0 :
             mfdglobals.validator.add_error(MissingContent(self))
@@ -288,15 +288,15 @@ class Detail(LineCollection) :
         """
         out = str.strip(self.headline.raw_content)
         if self.extralines is not None :
-            for l in self.extralines :
-                out = out + " " + str.strip(l.raw_content)
+            for line in self.extralines :
+                out = out + " " + str.strip(line.raw_content)
         return out
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str :
         out = self.headline.get_content(resolved_macros)
         if self.extralines is not None :
-            for l in self.extralines :
-                out = out + l.get_content(resolved_macros)
+            for line in self.extralines :
+                out = out + line.get_content(resolved_macros)
         out = out.strip()
         return out
 
@@ -334,8 +334,8 @@ class AtAt(Detail) :
     def _get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
         temp_name = self.minor_token + "@" + self.headline.get_content(macro_defs)
         if self.extralines is not None :
-            for l in self.extralines :
-                temp_name += l.get_content(macro_defs)
+            for line in self.extralines :
+                temp_name += line.get_content(macro_defs)
         return temp_name
 
     def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool:
