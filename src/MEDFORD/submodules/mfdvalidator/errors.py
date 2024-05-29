@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 class ErrType(Enum) :
     OTHER = "other"
@@ -27,6 +27,12 @@ class MFDErr():
     
     def get_lineno_range(self) -> Tuple[int, int] :
         raise NotImplementedError("also not implemented. :)")
+    
+    def _overwrite_msg(self, msg:str) -> None :
+        self.msg = msg
+    
+    def _overwrite_helpmsg(self, helpmsg:str) -> None :
+        self.helpmsg = helpmsg
 
 # Syntax -> easy for discovery; helpful; fast
 # Other -> other errors
@@ -48,7 +54,7 @@ class MissingDescError(MFDErr) :
     def __init__(self, detailobj) :
         self.errtype = ErrType.SYNTAX
 
-        from MEDFORD.objs.linecollections import Detail
+        from objs.linecollections import Detail
 
         if not isinstance(detailobj, Detail) :
             raise ValueError("Attempted to create a MissingDescError without a Detail.")
@@ -86,7 +92,7 @@ class MissingContent(MFDErr) :
     def __init__(self, detailobj) :
         self.errtype = ErrType.MISSING_CONTENT
 
-        from MEDFORD.objs.linecollections import Detail
+        from objs.linecollections import Detail
         
         if not isinstance(detailobj, Detail) :
             raise ValueError("Attempted to create a MissingContentError without a Detail.")
@@ -125,7 +131,7 @@ class MaxMacroDepthExceeded(MFDErr) :
     def __init__(self, macroobjs: List) :
         self.errtype = ErrType.OTHER
 
-        from MEDFORD.objs.linecollections import Macro
+        from objs.linecollections import Macro
 
         for (idx, mo) in enumerate(macroobjs) :
             if not isinstance(mo, Macro) :
@@ -158,6 +164,8 @@ class MaxMacroDepthExceeded(MFDErr) :
         raise NotImplementedError("ahh")
 
 # Specific error types: Content
+
+
 class MissingRequiredField(MFDErr) :
     major_token: str
     minor_token: str
@@ -171,8 +179,8 @@ class MissingRequiredField(MFDErr) :
     def __init__(self, block_inp, missing_token:str) :
         self.errtype = ErrType.PYDANTIC
 
-        from MEDFORD.objs.linecollections import Block
-
+        from objs.linecollections import Block
+        
         if not isinstance(block_inp, Block) :
             raise ValueError("Attempted to create a MissingRequiredFieldError without a Block.")
         
@@ -202,6 +210,15 @@ class MissingRequiredField(MFDErr) :
             raise ValueError("Attempted to get a lineno range of a {self.__name__} error that does not have a Block.")
     pass
 
+class MissingRequiredFieldbcofLogic(MissingRequiredField) :
+    def __init__(self, block_inp, missing_token:str, token_logic_str:str) :
+        super(MissingRequiredFieldbcofLogic, self).__init__(block_inp, missing_token)
+
+        message: str = f"Block for major token {self.major_token} named {self.name} is missing the required field {self.minor_token}, because {token_logic_str}."
+        helpmsg: str = f"Blocks of major token {self.major_token} require a minor token of name {self.minor_token} when {token_logic_str}, which can be written as:\n@{self.major_token}-{self.minor_token} CONTENT"
+        
+        self._overwrite_msg(message)
+        self._overwrite_helpmsg(helpmsg)
 
 
 class MissingAtAtName(MFDErr) :
@@ -242,7 +259,7 @@ class AtAtReferencedDoesNotExist(MFDErr) :
     def __init__(self, atat_inp, referenced_name: str, named_blocks: List[str]) :
         self.errtype = ErrType.MALFORMED_CONTENT
 
-        from MEDFORD.objs.linecollections import AtAt
+        from objs.linecollections import AtAt
         
         if not isinstance(atat_inp, AtAt) :
             raise ValueError("Attempted to create an AtAtReferencedDoesNotExist without a Detail.")

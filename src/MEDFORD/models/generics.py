@@ -11,6 +11,8 @@ from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
 from objs.linecollections import Block, Detail
 
+from submodules.mfdvalidator.validator import MedfordValidator as mv
+from submodules.mfdvalidator.errors import MissingRequiredFieldbcofLogic
 #############################################
 # Building Blocks                           #
 #############################################
@@ -117,7 +119,8 @@ class Contributor(BlockModel) :
         if v.Role is not None:
             roles = [r[1] for r in v.Role]
             if "Corresponding Author" in roles and v.Email is None:
-                raise NotImplementedError("Need custom Missing Data Error type.")
+                mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Email", "Corresponding Author is listed under Roles"))
+                a = mv.instance()
         return v
     
     @computed_field

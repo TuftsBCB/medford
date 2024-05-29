@@ -5,7 +5,7 @@ in a line. Eventually returns Line objects."""
 
 import re
 from typing import Tuple, List, Optional
-from submodules.medforderrors.errors import MissingAtAtName
+from submodules.mfdvalidator.errors import MissingAtAtName
 from .lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
 
 import mfdglobals

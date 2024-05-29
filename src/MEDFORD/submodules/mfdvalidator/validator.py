@@ -84,6 +84,17 @@ class MedfordValidator(object):
             self._pydantic_err_coll[lineno].append(err)
         else :
             self._pydantic_err_coll[lineno] = [err]
+    
+    def has_pydantic_err(self) -> bool:
+        return len(self._pydantic_err_coll) > 0
+
+    def print_pydantic_errs(self) :
+        for line,errs in self._pydantic_err_coll.items() :
+            for err in errs :
+                print(f"line {line}: {err.msg}")
+
+    def n_pydantic_errs(self) -> int :
+        return len(self._pydantic_err_coll)
 
     def handle_pydantic_errors(self, errs):
         for e in errs.errors() :
@@ -92,6 +103,7 @@ class MedfordValidator(object):
                 missing_token = e['loc'][2]
                 # lock = (MAJOR, ?, MINOR) TODO: check in other cases
                 self.add_error(MissingRequiredField(block_info, missing_token))
+#            if e['type'] == "value_error" :
             else :
                 raise ValueError("Error manager was passed a pydantic error it does not know how to handle: %s" % str(e))
         pass

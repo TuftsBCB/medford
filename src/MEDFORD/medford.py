@@ -15,8 +15,6 @@ from objs.linecollector import LineCollector, Macro, Block
 from objs.dictionizer import Dictionizer
 from models.generics import Entity
 
-from submodules.mfdvalidator.validator import MedfordValidator as em
-
 import mfdglobals
 
 # order of ops:
@@ -96,7 +94,6 @@ class MFD() :
     object_lines: List[Line]
     line_collector: LineCollector
     dictionizer: Dictionizer
-    em_inst: em #error manager instance
 
     write_json: bool
     output_path: str
@@ -129,8 +126,8 @@ class MFD() :
         self.named_blocks = self.line_collector.get_1lvl_blocks()
 
         # stop here and check for syntax errors
-        if em.instance().has_syntax_err() :
-            print(f"Syntax errors found! : {em.instance().n_syntax_errs()} errors")
+        if mfdglobals.mv.instance().has_syntax_err() :
+            print(f"Syntax errors found! : {mfdglobals.mv.instance().n_syntax_errs()} errors")
             sys.exit(1)
             # TODO : enter error mode
 
@@ -138,8 +135,8 @@ class MFD() :
         self.dictionizer = MFD._get_dictionizer(self.macro_definitions, self.named_blocks)
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
-        if em.instance().has_other_err() :
-            print(f"Other errors found! : {em.instance().n_other_errs()} errors")
+        if mfdglobals.mv.instance().has_other_err() :
+            print(f"Other errors found! : {mfdglobals.mv.instance().n_other_errs()} errors")
             sys.exit(1)
             # TODO : enter error mode
 
@@ -148,13 +145,16 @@ class MFD() :
         # me to use Dict[str, Any] instead of Dict[str, Dict[...]]...
         # maybe in the future look into fixing this?
         #   The problem is that Blocks aren't Dicts.
-        try :
+        try:
             self.pydantic_version = Entity(**self.dict_data)
             print(self.pydantic_version.dict())
         except ValidationError as e:
-            # stop here and handle pydantic errors
-            em.instance().handle_pydantic_errors(e)
-            print("errors found")
+            if(len(e.errors()) != mfdglobals.mv.instance().n_pydantic_errs()) :
+                print("ERROR: Validation errors are not all being accounted for by the validator.")
+                raise Exception("Missing validation errors")
+            else :
+                if mfdglobals.mv.instance().has_pydantic_err() :
+                    mfdglobals.mv.instance().print_pydantic_errs()
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
