@@ -5,9 +5,10 @@ in a line. Eventually returns Line objects."""
 
 import re
 from typing import Tuple, List, Optional
-from submodules.medforderrors.errormanager import MedfordErrorManager as em
 from submodules.medforderrors.errors import MissingAtAtName
 from .lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
+
+import mfdglobals
 
 Macro = Tuple[int, int, str]
 Tex = Tuple[int, int]
@@ -105,7 +106,7 @@ class LineReader :
             aa_match_res : re.Match = aa_res
             match_grps = aa_match_res.groupdict()
             if match_grps['name'] is None :
-                em.instance().add_error(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
+                mfdglobals.validator.add_error(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
                 return None
 
             major_res = match_grps['major'].split("_")

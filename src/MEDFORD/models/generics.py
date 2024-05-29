@@ -37,7 +37,7 @@ OptMajorT = Optional[MajorsT[T]]
 #           dictionizer know about the models.
 
 # TODO: there's gotta be a better way to store & check MEDFORD versions.
-all_versions = ["1.0","1.1"]
+all_versions = ["1.0","1.1","2.0"]
 
 class BaseModel(PydanticBaseModel) :
     """Base model for use by other MEDFORD model. Importantly, allows custom typing
@@ -147,6 +147,13 @@ class Contributor(BlockModel) :
         #    print("is corresponding author")
 
         return cur_flags
+
+class Funding(BlockModel):
+    ID: OptMinorT[str]
+    # TODO: research possible funding IDs so we can implement validation
+
+class Keyword(BlockModel):
+    pass
 
 
 

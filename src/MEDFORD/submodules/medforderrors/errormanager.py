@@ -1,5 +1,6 @@
 from typing import Dict, List
 from .errors import *
+import random
 
 class MedfordErrorManager(object):
     _instance = None
@@ -7,6 +8,7 @@ class MedfordErrorManager(object):
     _syntax_err_coll: Dict[int, List[MFDErr]]
     _other_err_coll: Dict[int, List[MFDErr]]
     _pydantic_err_coll: Dict[int, List[MFDErr]]
+    _id: float
 
     # TODO: error options, eg:
     #   - sorting
@@ -14,17 +16,25 @@ class MedfordErrorManager(object):
     #   - verbosity (errors, warnings)
     
     @classmethod
-    def instance(cls) -> 'MedfordErrorManager':
-        if cls._instance is None :
-            print('Creating new MedfordErrorManager instance.')
-            cls._instance = super(MedfordErrorManager, cls).__new__(cls)
+    def init(cls) -> 'MedfordErrorManager': 
+        print('Creating new MedfordErrorManager instance.')
+        MedfordErrorManager._instance = super(MedfordErrorManager, cls).__new__(cls)
 
-            cls._instance._syntax_err_coll = {}
-            cls._instance._other_err_coll = {}
-            cls._instance._pydantic_err_coll = {}
-            # any initialization goes here
+        MedfordErrorManager._instance._syntax_err_coll = {}
+        MedfordErrorManager._instance._other_err_coll = {}
+        MedfordErrorManager._instance._pydantic_err_coll = {}
+        MedfordErrorManager._instance._id = random.random()
+
+        return MedfordErrorManager._instance
+
+    @classmethod
+    def instance(cls) -> 'MedfordErrorManager':
+        # TODO: change into proper error?
+        if MedfordErrorManager._instance is None :
+            print('Warning: had to create error manager in instance call.')
+            return MedfordErrorManager.init()
             
-        return cls._instance
+        return MedfordErrorManager._instance
 
     def add_error(self, err: MFDErr) :
         if err.errtype == ErrType.SYNTAX :
@@ -57,6 +67,7 @@ class MedfordErrorManager(object):
             self._other_err_coll[lineno].append(err)
         else :
             self._other_err_coll[lineno] = [err]
+        print(self._id)
 
     def has_other_err(self) :
         return len(self._other_err_coll) > 0
@@ -87,6 +98,14 @@ class MedfordErrorManager(object):
 
     @classmethod
     def _clear_errors(cls) :
-        cls._instance = None
-        return cls.instance()
+        print(MedfordErrorManager._instance)
+        if MedfordErrorManager._instance is not None :
+            MedfordErrorManager._instance._syntax_err_coll = {}
+            MedfordErrorManager._instance._other_err_coll = {}
+            MedfordErrorManager._instance._pydantic_err_coll = {}
+            MedfordErrorManager._instance._id = random.random()
+        else :
+            exit(1)
+            # todo: make a proper error
+        return MedfordErrorManager.instance()
 

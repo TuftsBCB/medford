@@ -1,4 +1,3 @@
-import pytest
 from MEDFORD.objs.lines import ContinueLine, MacroLine, NovelDetailLine
 from MEDFORD.objs.linereader import LineReader
             

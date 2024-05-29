@@ -1,0 +1,100 @@
+# Author: William Soylemez
+# Date: December 31, 2023
+
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Paper_Primary Compartment-specific transcriptomics in a reef-building coral exposed to elevated temperatures
+@Paper_Primary-Link https://doi.org/10.1111/mec.12982
+
+@Journal Molecular Ecology
+@Journal-Volume 23
+@Journal-Issue 23
+@Journal-Pages 5816-5830
+
+@Date 2014-07-13T00:00:00
+@Date-Note Received
+
+@Date 2014-10-15T00:00:00
+@Date-Note Revised
+
+@Date 2021-10-20T00:00:00
+@Date-Note Accepted
+
+@Date 2021-11-27T00:00:00
+@Date-Note Published
+
+@Funding National Science Foundation (NSF) of the United States of America. Grant Number: OCE-0852960
+@Funding-ID 0852960
+
+@Funding Khaled bin Sultan Living Oceans Foundation
+@Funding-ID None
+
+@Method DNA Collection
+@Method-Type Elevated temperature experiment, cDNA library preparation, and cDNA sequencing
+
+@Method MIRA
+@Method-Type Read quality control and assembly
+
+@Method NCBI Database
+@Method-Type Taxonomy distribution
+
+@Method Sequencing Facility
+@Method-Type RNA-Seq Analysis
+
+@Method RSEM
+@Method-Type Read quantification and statistical analyses
+
+@Method PCR Assays
+@Method-Type PCR verification of select genes
+
+@Method SQLite Database
+@Method-Type Database construction and content
+
+@Contributor Anderson B. Mayfield
+@Contributor-Association National Museum of Marine Biology and Aquarium, 2 Houwan Rd., Checheng, Pingtung, 944 Taiwan
+@Contributor-Association Living Oceans Foundation, 8181 Professional Place, Suite 215, Landover, MD, 20785 USA
+@Contributor-Role First Author
+@Contributor-Email andersonblairmayfield@gmail.com
+
+@Contributor Yu-Bin Wang
+@Contributor-Association Graduate Institute of Zoology, National Taiwan University, No. 1, Sec. 4, Roosevelt Rd., Taipei, 10617, Taiwan
+@Contributor-Association Institute of Information Sciences, Academia Sinica, 128 Academia Rd., Sec. 2, Nangang, Taipei, 115, Taiwan
+@Contributor-Role Author
+@Contributor-Email None
+
+@Contributor Chii-Shiarng Chen
+@Contributor-Association National Museum of Marine Biology and Aquarium, 2 Houwan Rd., Checheng, Pingtung, 944 Taiwan
+@Contributor-Association Graduate Institute of Marine Biology, National Dong-Hwa University, 2 Houwan Rd., Checheng, Pingtung, 944 Taiwan
+@Contributor-Association Department of Marine Biotechnology and Resources, National Sun Yat-Sen University, 70 Lianhai Rd., Kaohsiung, 80424 Taiwan
+@Contributor-Role Author
+@Contributor-Email None
+
+@Contributor Chung-Yen Lin
+@Contributor-Association Institute of Information Sciences, Academia Sinica, 128 Academia Rd., Sec. 2, Nangang, Taipei, 115, Taiwan
+@Contributor-Association Institute of Fisheries Science, National Taiwan University, No. 1, Sec. 4, Roosevelt Rd., Taipei, 10617 Taiwan
+@Contributor-Association Institute of Population Health Sciences, National Health Research Institutes, 5 Keyan Rd., Zhunan, Miaoli, 35053 Taiwan
+@Contributor-Role Author
+@Contributor-Email None
+
+@Contributor Shu-Hwa Chen
+@Contributor-Association Institute of Information Sciences, Academia Sinica, 128 Academia Rd., Sec. 2, Nangang, Taipei, 115, Taiwan
+@Contributor-Role Last Author
+@Contributor-Email andersonblairmayfield@gmail.com
+
+@Keyword acclimation
+@Keyword coral reef
+@Keyword dinoflagellate
+@Keyword endosymbiosis
+@Keyword gene expression
+@Keyword Symbiodinium
+
+@Data_Primary Supplementary Info
+@Data_Primary-Type PDF file
+@Data_Primary-Path ./samples/Shpilker_2021.mfd
+@Data_Primary-Size 3.2MB 
+
+@Data_Copy Supplementary Info
+@Data_Copy-Type PDF file
+@Data_Copy-Path ./samples/Shpilker_2021.mfd
+@Data_Copy-Size 3.2MB

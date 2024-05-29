@@ -1,5 +1,6 @@
 from typing import List, Tuple, Dict, Any
-from MEDFORD.objs.linecollections import Block, Line
+from MEDFORD.objs.linecollections import Block
+from MEDFORD.objs.lines import Line
 from MEDFORD.objs.linecollector import LineCollector as LC
 from MEDFORD.objs.linereader import LineReader as LR
 from MEDFORD.objs.dictionizer import Dictionizer as D

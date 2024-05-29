@@ -1,6 +1,6 @@
 from MEDFORD.submodules.medforderrors.errors import *
-from MEDFORD.submodules.medforderrors.errormanager import MedfordErrorManager as em
 
+import mfdglobals
 from MEDFORD.objs.linecollections import Detail, Macro
 from MEDFORD.objs.linereader import LineReader as LR
 from MEDFORD.objs.linecollector import LineCollector as LC, Line, NovelDetailLine
@@ -47,7 +47,8 @@ class TestMissingDescErr(ProcessToLineObj) :
 
         assert err.msg == "A new block for major token Major was created at line 0 without a Name line."
         assert err.helpmsg == "A MEDFORD Block should begin with a line like this:\n@Major (name of this medford block)\n@Major-minor content"
-        assert err.errtype == "MissingDescError"
+        assert err.errtype == ErrType.SYNTAX
+        assert err.errname == "MissingDescError"
 
 class TestMaxMacroDepthErr(ProcessToMacros) :
     def test_help_message(self) :
@@ -82,7 +83,8 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         assert err.msg == "Macro Macro0 on line 10 is 11 references deep in a macro reference chain. (Macro history: Macro0->Macro9->Macro8->Macro7->Macro6->Macro5->Macro4->Macro3->Macro2->Macro1)"
         assert err.helpmsg == "You can use a macro within a macro only up to 10 macros deep. You may have an loop of references (e.g. macro 1 uses macro 2, but macro 2 uses macro 1), or you need to reduce the number of layers. The full text of your macro reference is below: \nLines (10-10): (Macro0) `@Macro9\nLines (9-9): (Macro9) `@Macro8\nLines (8-8): (Macro8) `@Macro7\nLines (7-7): (Macro7) `@Macro6\nLines (6-6): (Macro6) `@Macro5\nLines (5-5): (Macro5) `@Macro4\nLines (4-4): (Macro4) `@Macro3\nLines (3-3): (Macro3) `@Macro2\nLines (2-2): (Macro2) `@Macro1\nLines (0-1): (Macro1) content content continue\n"
         # TODO : hanging \n, do we do anything about it?
-        assert err.errtype == "MaxMacroDepthExceeded"
+        assert err.errtype == ErrType.OTHER
+        assert err.errname == "MaxMacroDepthExceeded"
 
     # fun fact: on first implementation, if lines was not reversed,
     #   it would work fine.
@@ -100,6 +102,7 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
     #   it took, so we don't have inconsistent behavior based on resolution
     #   order.
     def test_natural_creation(self) :
+
         lines = [
             "`@Macro1 content ",
             "content continue",
@@ -117,9 +120,10 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         lines.reverse()
         line_objs: Dict[str, Macro] = self.preprocess_lines(lines)
 
-        em._clear_errors()
+        valr = mfdglobals.validator
+        print(valr._id)
         d = Dictionizer(line_objs, {})
-        error_coll = em.instance()._other_err_coll
+        error_coll = valr._other_err_coll
         assert len(error_coll.keys()) == 1
         assert 0 in error_coll.keys()
         errs: List[MFDErr] = error_coll[0]
@@ -149,9 +153,10 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         ]
         line_objs: Dict[str, Macro] = self.preprocess_lines(lines)
         
-        em._clear_errors()
+        valr = mfdglobals.validator
+        valr._clear_errors()
         d = Dictionizer(line_objs, {})
-        error_coll = em.instance()._other_err_coll
+        error_coll = valr._other_err_coll
         assert len(error_coll.keys()) == 1
         assert 11 in error_coll.keys()
         errs: List[MFDErr] = error_coll[11]

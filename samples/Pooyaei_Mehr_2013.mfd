@@ -1,0 +1,125 @@
+@MEDFORD Pooyaei Mehr 2013
+@MEDFORD-Version 1.0
+#Annotation by Michael Sayers 10/21/2023
+
+#'@Association The Graduate Center, Molecular, Cellular and Developmental Biology, City University of New York, New York, NY 10065, USA.
+
+@Paper_Primary Transcriptome deep-sequencing and clustering of expressed isoforms from Favia corals
+@Paper_Primary-Link https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-14-546
+
+@Date 2012-12-12
+@Date-Note Received
+
+@Date 2013-08-03
+@Date-Note Accepted
+
+@Date 2013-08-12
+@Date-Note Published
+
+# Not sure where you want to put this information. 
+# Authors’ contributions
+# DFG, RD, VAP and SFPM designed the study. SFPM carried out the
+# molecular genetic studies. SFPM and AN designed the bioinformatics
+# pipeline and data handling scripts. RD coordinated the statistical analysis.
+# H-T K, VAP and DFG designed synthetic genes for expression in mammalian
+# cells. ZH, VAP, DT and DFG participated in sample collection and Illumina
+# sequencing. DFG, RD, VAP and SFPM drafted the manuscript. All authors read
+# and approved the final manuscript
+
+# Author details
+# 1
+# The Graduate Center, Molecular, Cellular and Developmental Biology, City
+# University of New York, New York, NY 10065, USA. 2
+# American Museum of
+# Natural History, Sackler Institute of Comparative Genomics, New York, NY
+# 10024, USA. 3
+# Department of Psychiatry and Human Behavior, Division of
+# Biology and Medicine, Warren Alpert Medical School, Brown University,
+# Providence RI 02912, USA. 4
+# John B. Pierce Laboratory, Cellular and Molecular
+# Physiology, Yale University, New Haven, CT 06519, USA. 5
+# Marine Biology
+# Department, The Leon H. Charney School of Marine Sciences, University of
+# Haifa, Mount Carmel, Haifa 31905, Israel. 6
+# Department of Natural Sciences,
+# City University of New York, Baruch College, Box A-0506, 17 Lexington
+# Avenue, New York, NY 10010, USA.
+
+# Can contributors have multiple association tags?
+@Contributor Shaadi F Pooyaei Mehr
+@Contributor-Association The Graduate Center, Molecular, Cellular and Developmental Biology, City University of New York, New York, NY 10065, USA
+@Contributor-Association American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA
+@Contributor-Role First Author
+
+@Contributor Rob DeSalle
+@Contributor-Email fpooyaei-mehr@amnh.org
+@Contributor-Association American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA
+@Contributor-Role Author
+
+@Contributor Hung-Teh Kao
+@Contributor-Association Department of Psychiatry and Human Behavior, Division of Biology and Medicine, Warren Alpert Medical School, Brown University, Providence RI 02912, USA
+@Contributor-Role Author
+
+@Contributor Apurva Narechania
+@Contributor-Association American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA
+@Contributor-Role Author
+
+@Contributor Zhou Han 
+@Contributor-Association John B. Pierce Laboratory, Cellular and Molecular Physiology, Yale University, New Haven, CT 06519, USA
+@Contributor-Role Author
+
+@Contributor Dan Tchernov
+@Contributor-Association Marine Biology Department, The Leon H. Charney School of Marine Sciences, University of Haifa, Mount Carmel, Haifa 31905, Israel
+@Contributor-Role Author
+
+@Contributor Vincent Pieribone
+@Contributor-Association John B. Pierce Laboratory, Cellular and Molecular Physiology, Yale University, New Haven, CT 06519, USA
+@Contributor-Role Author
+
+@Contributor David F Gruber
+@Contributor-Association The Graduate Center, Molecular, Cellular and Developmental Biology, City University of New York, New York, NY 10065, USA.
+@Contributor-Association American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA
+@Contributor-Association Department of Natural Sciences, City University of New York, Baruch College, Box A-0506, 17 Lexington Avenue, New York, NY 10010, USA
+@Contributor-Role Last Author
+
+@Funding NSF grant 0920572 and via a Baruch College Travel Grant to DFG.
+@Funding-ID 0920572 
+
+@Keyword K-mer
+@Keyword Contig
+@Keyword Open reading frame
+@Keyword Fluorescent protein
+@Keyword Blast@Keyword Clustering
+@Keyword High-throughput sequencing
+@Keyword Illumina paired-end
+@Keyword Coral
+
+# Is an image Data?
+
+# Additional file 1: File S1: Parameters and commands used in this manuscript. (DOCX 142 KB)
+# https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM1_ESM.docx
+
+@Data_Ref Parameters and commands used in this manuscript.
+@Data_Ref-Type Word Doc Instructions
+@Data_Ref-URI https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM1_ESM.docx
+@Data_Ref-Filename 12864_2012_5260_MOESM1_ESM.docx
+@Data_Ref-Size 142 KB
+
+# 12864_2012_5260_MOESM2_ESM.txt
+# Additional file 2: Files S2: BlastP parsed output files against N. vectensis proteome for sample Fav1 and Fav2 with 2e-30. (TXT 10 MB)
+# https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM2_ESM.txt
+
+@Data_Ref BlastP parsed output files against N. vectensis proteome for sample Fav1 and Fav2 with 2e-30
+@Data_Ref-Type Text File
+@Data_Ref-URI https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM2_ESM.txt
+@Data_Ref-Filename 12864_2012_5260_MOESM2_ESM.txt
+@Data_Ref-Size 10 MB
+
+# Additional file 3: Files S3: BlastP parsed output files against N. vectensis proteome for sample Fav1 and Fav2 with 2e-30. (TXT 9 MB)
+# https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM3_ESM.txt
+
+@Data_Ref BlastP parsed output files against N. vectensis proteome for sample Fav1 and Fav2 with 2e-30
+@Data_Ref-Type Text File
+@Data_Ref-URI https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM3_ESM.txt
+@Data_Ref-Filename 12864_2012_5260_MOESM3_ESM.txt
+@Data_Ref-Size 9 MB

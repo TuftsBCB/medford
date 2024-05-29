@@ -1,0 +1,84 @@
+# I ran `medford -m BAGIT compile DeSalvo-2010.mfd` and got:
+# 
+# Traceback (most recent call last):
+#   File "/Users/williamsoylemez/opt/anaconda3/bin/medford", line 8, in <module>
+#     sys.exit(medford.parse_args_and_go())
+#   File "/Users/williamsoylemez/opt/anaconda3/lib/python3.9/site-packages/MEDFORD/medford.py", line 114, in parse_args_and_go
+#     runMedford(args.file, args.write_json, args.mode, args.error_mode, args.error_sort, args.action)
+#   File "/Users/williamsoylemez/opt/anaconda3/lib/python3.9/site-packages/MEDFORD/medford.py", line 106, in runMedford
+#     runBagitMode(p, filename)
+#   File "/Users/williamsoylemez/opt/anaconda3/lib/python3.9/site-packages/MEDFORD/medford_BagIt.py", line 258, in runBagitMode
+#     local_named = list(itertools.chain.from_iterable(itertools.dropwhile(lambda x: x is None, [_parameters.Data[0][1].Copy, _parameters.Data[0][1].Primary])))
+# TypeError: 'NoneType' object is not iterable
+
+# Author: William Soylemez
+# Date: October 20, 2023
+
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Paper_Primary Transcriptomic responses to heat stress and bleaching in the elkhorn coral Acropora palmata
+@Paper_Primary-Link https://doi.org/10.3354/meps08372
+
+@Journal Marine Ecology Progress Series
+@Journal-Volume 402
+@Journal-Issue 1
+@Journal-Pages klsjdf
+
+@Date 2009-06-12T00:00:00
+@Date-Note Submitted
+
+@Date 2009-10-13T00:00:00
+@Date-Note Accepted
+
+@Date 2010-02-16T00:00:00
+@Date-Note Proofs received
+
+@Date 2010-03-08T00:00:00
+@Date-Note Published
+
+@Keyword Coral bleaching
+@Keyword Microarray
+@Keyword Transcriptomics
+@Keyword Heat stress
+
+@Method Field Experiment
+@Method-Type Coral placed in heated vs. control water
+
+@Method Symbiodinium cell counts and 18S rRNA gene restriction fragment length polymorphism (RFLP) analysis
+@Method-Type ?
+
+@Method QIAzol lysis reagent (Qiagen)
+@Method-Type RNA extraction and microarray hybridization
+
+@Method Axon 4000B scanner (Molecular Devices)
+@Method-Type Microarray data analysis
+
+@Method Quantitative real-time PCR (qRT-PCR)
+@Method-Type Quantified gene expression and relationship 
+
+@Contributor Michael K. DeSalvo
+@Contributor-Association School of Natural Sciences, University of California Merced
+@Contributor-Role First Author
+@Contributor-Email bla
+
+@Contributor Shinichi Sunagawa
+@Contributor-Association School of Natural Sciences, University of California Merced
+@Contributor-Role Author
+@Contributor-Email bla
+
+@Contributor Christian R. Voolstra
+@Contributor-Association School of Natural Sciences, University of California Merced
+@Contributor-Role Author
+@Contributor-Email bla
+
+@Contributor Mónica Medina
+@Contributor-Association School of Natural Sciences, University of California Merced
+@Contributor-Role Last Author
+@Contributor-Email bla
+
+@Data_Copy Transcriptomic responses to heat stress and bleaching in the elkhorn coral Acropora palmata
+@Data_Copy-Type Xlsx file
+@Data_Copy-Path ./samples/Shpilker_2021.mfd
+@Data_Copy-Size 182KB
+# Am I supposed to put size? Other examples have it but the tag isn't recognized

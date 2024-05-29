@@ -9,8 +9,9 @@ is defined as a MacroLine followed by 0 or more ContinueLines.)
 from typing import Optional, List, Dict, Tuple, Union
 from objs.lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
 
-from submodules.medforderrors.errormanager import MedfordErrorManager as em
 from submodules.medforderrors.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
+
+import mfdglobals 
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
@@ -134,6 +135,8 @@ class Macro(LineCollection) :
     _deepest_res_macro: Optional['Macro'] = None
     resolution: str
 
+    MAX_DEPTH: int = 10
+
     def __init__(self, headline: MacroLine, extralines: Optional[List[ContinueLine]]):
         super(Macro, self).__init__(headline, extralines)
         self.name = headline.macro_name
@@ -165,10 +168,13 @@ class Macro(LineCollection) :
         else :
             cdepth: int = depth
 
+        print(self.name)
+        print(cdepth)
+
         if self._is_resolved :
             return self.resolution
 
-        if cdepth == 10 :
+        if cdepth == Macro.MAX_DEPTH :
             return [self]
 
         if not self.has_macros :
@@ -189,7 +195,7 @@ class Macro(LineCollection) :
                 if isinstance(r, List) :
                     r.insert(0,self)
                     if cdepth == 0 :
-                        em.instance().add_error(MaxMacroDepthExceeded(r))
+                        mfdglobals.validator.add_error(MaxMacroDepthExceeded(r))
                         return "ERROR"
 
                     return r
@@ -208,8 +214,8 @@ class Macro(LineCollection) :
             self._n_resolutions = deepest_resolution
             self._deepest_res_macro = deepest_macro
 
-            if self._n_resolutions == 10 :
-                em.instance().add_error(MaxMacroDepthExceeded(self._get_resolution_chain()))
+            if self._n_resolutions == Macro.MAX_DEPTH :
+                mfdglobals.validator.add_error(MaxMacroDepthExceeded(self._get_resolution_chain()))
                 return 'ERROR'
 
             res = self.get_content(resolved_macros)
@@ -269,7 +275,7 @@ class Detail(LineCollection) :
                 content_length = content_length + len(l.raw_content.strip())
 
         if content_length == 0 :
-            em.instance().add_error(MissingContent(self))
+            mfdglobals.validator.add_error(MissingContent(self))
 
 
     def get_str_majors(self) -> str :
@@ -335,7 +341,7 @@ class AtAt(Detail) :
     def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool:
         referenced_name = self._get_referenced_name(macro_defs)
         if referenced_name not in named_blocks :
-            em.instance().add_error(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
+            mfdglobals.validator.add_error(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
         return self._get_referenced_name(macro_defs) in named_blocks
 
 class Block() :
@@ -372,7 +378,7 @@ class Block() :
         # ?
         self.major_tokens = details[0].major_tokens
         if details[0].minor_token is not None and details[0].minor_token != "" :
-            em.instance().add_error(MissingDescError(details[0]))
+            mfdglobals.validator.add_error(MissingDescError(details[0]))
             #raise ValueError("No desc line for first detail provided to Block constructor.")
         self.head_detail = details[0]
         self.name = details[0].get_raw_content().strip()

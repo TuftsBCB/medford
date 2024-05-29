@@ -17,6 +17,8 @@ from models.generics import Entity
 
 from submodules.medforderrors.errormanager import MedfordErrorManager as em
 
+import mfdglobals
+
 # order of ops:
 # 1. open file
 # 2. turn all lines into Line objs (using LineReader)
@@ -63,6 +65,13 @@ ap.add_argument("file", type=str,
 ap.add_argument("-m", "--mode", type=OutputMode, choices=list(OutputMode), default=OutputMode.OTHER,
                 help="The output mode of the MEDFORD parser; what format should be validated against or compiled to.")
 
+# argument for base directory of files for BagIT
+ap.add_argument("--dir", type=str,
+                help="Base directory of files described in the given Medford file for BagIt compression.")
+# argument for "permissible" mode
+ap.add_argument("--permissible", action="store_true", default=False,
+                help="Enables permissible mode for the MEDFORD parser. This disables a significant number of the parser's validation features. (not implemented)")
+
 # debug arguments
 # TODO: Implement
 ap.add_argument("--write_json", action="store_true", default=False,
@@ -79,6 +88,9 @@ class MFD() :
     def get_version(cls) -> str :
         """Returns the current MEDFORD parser version."""
         return "2.0.0"
+
+
+    mfdglobals.init()
 
     filename: str
     object_lines: List[Line]
@@ -103,15 +115,15 @@ class MFD() :
 
     def run_medford(self):
         """Main function that runs MEDFORD compilation from start to finish."""
-        self.em_inst = em.instance() # this is just for debug purposes
+        self.em_inst = mfdglobals.validator # this is just for debug purposes
         
         # TODO: way to avoid putting all lines into memory?
         # TODO: make LineProcessor take all of the strs/filename and do the work itself?
         # 1, 2
-        self.object_lines = self._get_line_objects(self.filename)
+        self.object_lines = MFD._get_line_objects(self.filename)
 
         # 3
-        self.line_collector = self._get_line_collector(self.object_lines)
+        self.line_collector = MFD._get_line_collector(self.object_lines)
         self.macro_definitions = self.line_collector.get_macros()
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
@@ -123,7 +135,7 @@ class MFD() :
             # TODO : enter error mode
 
         # 4
-        self.dictionizer = self._get_dictionizer(self.macro_definitions, self.named_blocks)
+        self.dictionizer = MFD._get_dictionizer(self.macro_definitions, self.named_blocks)
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
         if em.instance().has_other_err() :
@@ -152,7 +164,8 @@ class MFD() :
                 with open("medford_output.json", 'w', encoding="utf-8") as f:
                     json.dump(self.dict_data, f, indent=2)
 
-    def _get_line_objects(self, filename: str) -> List[Line] :
+    @classmethod
+    def _get_line_objects(cls, filename: str) -> List[Line] :
         object_lines = []
         with open(filename, 'r', encoding="utf-8") as f :
             for idx,line in enumerate(f.readlines()) :
@@ -161,14 +174,27 @@ class MFD() :
                     object_lines.append(p_line)
 
         return object_lines
+    
+    # for testing purposes in model unit tests
+    @classmethod
+    def _get_unvalidated_blocks(cls, input: str)-> List[Block] :
+        object_lines = MFD._get_line_objects(input)
+        line_collector = MFD._get_line_collector(object_lines)
+        #macro_definitions = line_collector.get_macros()
+        blocks = line_collector.get_flat_blocks()
+
+        return blocks
+
 
     # note for later: what happens when it takes too long to process ?
     # user writes a new line, add it to LineCollector that single line at a time?
     # 10s of ms amount of time to run is allocation usually
-    def _get_line_collector(self, object_lines: List[Line]) -> LineCollector:
+    @classmethod
+    def _get_line_collector(cls, object_lines: List[Line]) -> LineCollector:
         return LineCollector(object_lines)
 
-    def _get_dictionizer(self, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]) -> Dictionizer :
+    @classmethod
+    def _get_dictionizer(cls, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]) -> Dictionizer :
         return Dictionizer(macro_definitions, name_dictionary)
 
 
