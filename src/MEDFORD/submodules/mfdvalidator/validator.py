@@ -1,8 +1,8 @@
 from typing import Dict, List
-from .errors import *
+from .errors import MFDErr, ErrType, MissingRequiredField
 import random
 
-class MedfordErrorManager(object):
+class MedfordValidator(object):
     _instance = None
 
     _syntax_err_coll: Dict[int, List[MFDErr]]
@@ -16,25 +16,25 @@ class MedfordErrorManager(object):
     #   - verbosity (errors, warnings)
     
     @classmethod
-    def init(cls) -> 'MedfordErrorManager': 
+    def init(cls) -> 'MedfordValidator': 
         print('Creating new MedfordErrorManager instance.')
-        MedfordErrorManager._instance = super(MedfordErrorManager, cls).__new__(cls)
+        MedfordValidator._instance = super(MedfordValidator, cls).__new__(cls)
 
-        MedfordErrorManager._instance._syntax_err_coll = {}
-        MedfordErrorManager._instance._other_err_coll = {}
-        MedfordErrorManager._instance._pydantic_err_coll = {}
-        MedfordErrorManager._instance._id = random.random()
+        MedfordValidator._instance._syntax_err_coll = {}
+        MedfordValidator._instance._other_err_coll = {}
+        MedfordValidator._instance._pydantic_err_coll = {}
+        MedfordValidator._instance._id = random.random()
 
-        return MedfordErrorManager._instance
+        return MedfordValidator._instance
 
     @classmethod
-    def instance(cls) -> 'MedfordErrorManager':
+    def instance(cls) -> 'MedfordValidator':
         # TODO: change into proper error?
-        if MedfordErrorManager._instance is None :
+        if MedfordValidator._instance is None :
             print('Warning: had to create error manager in instance call.')
-            return MedfordErrorManager.init()
+            return MedfordValidator.init()
             
-        return MedfordErrorManager._instance
+        return MedfordValidator._instance
 
     def add_error(self, err: MFDErr) :
         if err.errtype == ErrType.SYNTAX :
@@ -98,14 +98,14 @@ class MedfordErrorManager(object):
 
     @classmethod
     def _clear_errors(cls) :
-        print(MedfordErrorManager._instance)
-        if MedfordErrorManager._instance is not None :
-            MedfordErrorManager._instance._syntax_err_coll = {}
-            MedfordErrorManager._instance._other_err_coll = {}
-            MedfordErrorManager._instance._pydantic_err_coll = {}
-            MedfordErrorManager._instance._id = random.random()
+        print(MedfordValidator._instance)
+        if MedfordValidator._instance is not None :
+            MedfordValidator._instance._syntax_err_coll = {}
+            MedfordValidator._instance._other_err_coll = {}
+            MedfordValidator._instance._pydantic_err_coll = {}
+            MedfordValidator._instance._id = random.random()
         else :
             exit(1)
             # todo: make a proper error
-        return MedfordErrorManager.instance()
+        return MedfordValidator.instance()
 
