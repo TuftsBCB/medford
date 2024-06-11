@@ -3,7 +3,7 @@ such as macro definitions and generating the output dictionary for pydantic
 consumption."""
 
 from typing import Any, List, Dict
-from .linecollections import Block, Macro
+from MEDFORD.objs.linecollections import Block, Macro
 
 class Dictionizer() :
     """Class to handle dictionary-based management of MEDFORD metadata.

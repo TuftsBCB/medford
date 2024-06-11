@@ -9,10 +9,10 @@ from enum import Flag, auto
 from typing import TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
-from objs.linecollections import Block, Detail
+from MEDFORD.objs.linecollections import Block, Detail
 
-from submodules.mfdvalidator.validator import MedfordValidator as mv
-from submodules.mfdvalidator.errors import InvalidValue, MissingRequiredFieldbcofLogic
+from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as mv
+from MEDFORD.submodules.mfdvalidator.errors import InvalidValue, MissingRequiredFieldbcofLogic
 #############################################
 # Building Blocks                           #
 #############################################

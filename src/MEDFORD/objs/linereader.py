@@ -5,10 +5,10 @@ in a line. Eventually returns Line objects."""
 
 import re
 from typing import Tuple, List, Optional
-from submodules.mfdvalidator.errors import MissingAtAtName
-from .lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
+from MEDFORD.submodules.mfdvalidator.errors import MissingAtAtName
+from MEDFORD.objs.lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
 
-import mfdglobals
+import MEDFORD.mfdglobals as mfdglobals
 
 Macro = Tuple[int, int, str]
 Tex = Tuple[int, int]

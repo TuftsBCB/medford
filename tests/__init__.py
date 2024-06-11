@@ -1,3 +1,3 @@
-import mfdglobals
+import MEDFORD.mfdglobals as mfdglobals
 
 mfdglobals.init()

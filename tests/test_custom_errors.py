@@ -1,6 +1,6 @@
 from MEDFORD.submodules.medforderrors.errors import *
 
-import mfdglobals
+import MEDFORD.mfdglobals as mfdglobals
 from MEDFORD.objs.linecollections import Detail, Macro
 from MEDFORD.objs.linereader import LineReader as LR
 from MEDFORD.objs.linecollector import LineCollector as LC, Line, NovelDetailLine

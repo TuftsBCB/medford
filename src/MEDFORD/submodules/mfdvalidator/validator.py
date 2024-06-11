@@ -1,5 +1,5 @@
 from typing import Dict, List
-from .errors import MFDErr, ErrType, MissingRequiredField
+from MEDFORD.submodules.mfdvalidator.errors import MFDErr, ErrType, MissingRequiredField
 import random
 
 class MedfordValidator(object):

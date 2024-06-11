@@ -1,8 +1,8 @@
 
 from enum import Enum
 from typing import List, Dict, Tuple, Optional
-from .lines import AtAtLine, Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
-from .linecollections import AtAt, Macro, Block, Detail
+from MEDFORD.objs.lines import AtAtLine, Line, MacroLine, NovelDetailLine, ContinueLine, CommentLine
+from MEDFORD.objs.linecollections import AtAt, Macro, Block, Detail
 
 class LineCollector() :
     defined_macros: Dict[str, Macro]

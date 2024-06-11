@@ -54,7 +54,7 @@ class MissingDescError(MFDErr) :
     def __init__(self, detailobj) :
         self.errtype = ErrType.SYNTAX
 
-        from objs.linecollections import Detail
+        from MEDFORD.objs.linecollections import Detail
 
         if not isinstance(detailobj, Detail) :
             raise ValueError("Attempted to create a MissingDescError without a Detail.")
@@ -92,7 +92,7 @@ class MissingContent(MFDErr) :
     def __init__(self, detailobj) :
         self.errtype = ErrType.MISSING_CONTENT
 
-        from objs.linecollections import Detail
+        from MEDFORD.objs.linecollections import Detail
         
         if not isinstance(detailobj, Detail) :
             raise ValueError("Attempted to create a MissingContentError without a Detail.")
@@ -131,7 +131,7 @@ class MaxMacroDepthExceeded(MFDErr) :
     def __init__(self, macroobjs: List) :
         self.errtype = ErrType.OTHER
 
-        from objs.linecollections import Macro
+        from MEDFORD.objs.linecollections import Macro
 
         for (idx, mo) in enumerate(macroobjs) :
             if not isinstance(mo, Macro) :
@@ -179,7 +179,7 @@ class MissingRequiredField(MFDErr) :
     def __init__(self, block_inp, missing_token:str) :
         self.errtype = ErrType.PYDANTIC
 
-        from objs.linecollections import Block
+        from MEDFORD.objs.linecollections import Block
         
         if not isinstance(block_inp, Block) :
             raise ValueError("Attempted to create a MissingRequiredFieldError without a Block.")
@@ -234,7 +234,7 @@ class InvalidValue(MFDErr) :
     def __init__(self, block_inp, incorrect_token:str, content:str) :
         self.errtype = ErrType.PYDANTIC
 
-        from objs.linecollections import Block
+        from MEDFORD.objs.linecollections import Block
         
         if not isinstance(block_inp, Block) :
             raise ValueError("Attempted to create an InvalidValue error without a Block.")
@@ -305,7 +305,7 @@ class AtAtReferencedDoesNotExist(MFDErr) :
     def __init__(self, atat_inp, referenced_name: str, named_blocks: List[str]) :
         self.errtype = ErrType.MALFORMED_CONTENT
 
-        from objs.linecollections import AtAt
+        from MEDFORD.objs.linecollections import AtAt
         
         if not isinstance(atat_inp, AtAt) :
             raise ValueError("Attempted to create an AtAtReferencedDoesNotExist without a Detail.")

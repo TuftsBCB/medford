@@ -9,12 +9,12 @@ import json
 from enum import Enum
 from pathlib import PurePath #?
 
-from objs.linereader import LineReader, Line
-from objs.linecollector import LineCollector, Macro, Block
-from objs.dictionizer import Dictionizer
-from models.generics import Entity
+from MEDFORD.objs.linereader import LineReader, Line
+from MEDFORD.objs.linecollector import LineCollector, Macro, Block
+from MEDFORD.objs.dictionizer import Dictionizer
+from MEDFORD.models.generics import Entity
 
-import mfdglobals
+import MEDFORD.mfdglobals as mfdglobals
 
 # order of ops:
 # 1. open file
