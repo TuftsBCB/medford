@@ -1,0 +1,3 @@
+import mfdglobals
+
+mfdglobals.init()

@@ -7,3 +7,5 @@ __pycache__/*
 samples/pshpil_rnaseq_example/pshpil_rnaseq.mfd
 dist/*
 src/*.egg-info
+src/HelperScripts
+problematic_examples.txt

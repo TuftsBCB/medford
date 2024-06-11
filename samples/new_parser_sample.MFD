@@ -1,0 +1,17 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Data_Ref Reef Genomics Pocillopora damicornis 
+@Data_Ref-URI http://pdam.reefgenomics.org 
+@Data_Ref-Type Website 
+
+@Contributor Ross Cunning 
+@Contributor-Association Department of Marine Biology and Ecology, University of Miami Rosenstiel School of Marine and Atmospheric Science, Miami, FL, USA; Daniel P. Haerther Center for Conservation and Research, John G. Shedd Aquarium, Chicago, IL, USA. 
+@Contributor-Role First Author, Corresponding Author
+@Contributor-Email ross.cunning@gmail.com 
+
+@Project Some Project Here
+
+@Expedition Coral cruise
+@Expedition-ShipName Ship
+@Expedition-CruiseID 39849
