@@ -208,9 +208,10 @@ class MFD() :
 # syntax check -> get back both line objects & errors
 
 # want full API call to include all minor api calls; return dict w/ string indices?
-
-if __name__ == "__main__" :
+def parse_args_and_go() :
     args = ap.parse_args()
-    #print(args.mode)
     mfd = MFD(PurePath(args.file))
     mfd.run_medford()
+
+if __name__ == "__main__" :
+    parse_args_and_go()
