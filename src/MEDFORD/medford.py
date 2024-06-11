@@ -9,7 +9,6 @@ import json
 from enum import Enum
 from pathlib import PurePath #?
 
-from pydantic import ValidationError
 from objs.linereader import LineReader, Line
 from objs.linecollector import LineCollector, Macro, Block
 from objs.dictionizer import Dictionizer
@@ -128,6 +127,7 @@ class MFD() :
         # stop here and check for syntax errors
         if mfdglobals.mv.instance().has_syntax_err() :
             print(f"Syntax errors found! : {mfdglobals.mv.instance().n_syntax_errs()} errors")
+            mfdglobals.mv.instance().print_syntax_errs()
             sys.exit(1)
             # TODO : enter error mode
 

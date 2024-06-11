@@ -55,6 +55,11 @@ class MedfordValidator(object):
     def has_syntax_err(self) :
         return len(self._syntax_err_coll) > 0 
     
+    def print_syntax_errs(self) :
+        for line,errs in self._syntax_err_coll.items() :
+            for err in errs :
+                print(f"line {line}: {err.msg}")
+
     def n_syntax_errs(self) :
         n = 0
         for k,v in self._syntax_err_coll.items() :

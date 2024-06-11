@@ -132,10 +132,12 @@ class LineCollector() :
                     extralines = line_collection[1:]
                 a = AtAt(headline, extralines)
                 detail_collection.append(a)
+
             line_collection = []
 
         if (final and (detail_collection is not None) and len(detail_collection) > 0) or \
-                (state == "detail" and not (isinstance(line, NovelDetailLine) or isinstance(line, ContinueLine))) :
+                (state == "detail" and not (isinstance(line, NovelDetailLine) or isinstance(line, ContinueLine) or \
+                                            isinstance(line, CommentLine))) :
             bs = self._generate_blocks(detail_collection)
             for b in bs :
                 major = b.get_str_major()
