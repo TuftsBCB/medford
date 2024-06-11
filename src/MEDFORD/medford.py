@@ -145,16 +145,20 @@ class MFD() :
         # me to use Dict[str, Any] instead of Dict[str, Dict[...]]...
         # maybe in the future look into fixing this?
         #   The problem is that Blocks aren't Dicts.
-        try:
-            self.pydantic_version = Entity(**self.dict_data)
-            print(self.pydantic_version.dict())
-        except ValidationError as e:
-            if(len(e.errors()) != mfdglobals.mv.instance().n_pydantic_errs()) :
-                print("ERROR: Validation errors are not all being accounted for by the validator.")
-                raise Exception("Missing validation errors")
-            else :
-                if mfdglobals.mv.instance().has_pydantic_err() :
-                    mfdglobals.mv.instance().print_pydantic_errs()
+        self.pydantic_version = Entity(**self.dict_data)
+        if mfdglobals.mv.instance().has_pydantic_err() :
+            mfdglobals.mv.instance().print_pydantic_errs()
+        
+        #try:
+        #    self.pydantic_version = Entity(**self.dict_data)
+        #    print(self.pydantic_version.dict())
+        #except ValidationError as e:
+        #    if(len(e.errors()) != mfdglobals.mv.instance().n_pydantic_errs()) :
+        #        print("ERROR: Validation errors are not all being accounted for by the validator.")
+        #        raise Exception("Missing validation errors")
+        #    else :
+        #        if mfdglobals.mv.instance().has_pydantic_err() :
+        #            mfdglobals.mv.instance().print_pydantic_errs()
 
         # TODO: export to json, bag
         # TODO: implement all of the old models

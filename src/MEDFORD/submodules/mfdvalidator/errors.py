@@ -220,6 +220,52 @@ class MissingRequiredFieldbcofLogic(MissingRequiredField) :
         self._overwrite_msg(message)
         self._overwrite_helpmsg(helpmsg)
 
+class InvalidValue(MFDErr) :
+    major_token: str
+    minor_token: str
+    content: str
+
+    name: str
+
+    lineno_head: int
+    lineno_range: Tuple[int, int]
+    lineno_all: List[int]
+
+    def __init__(self, block_inp, incorrect_token:str, content:str) :
+        self.errtype = ErrType.PYDANTIC
+
+        from objs.linecollections import Block
+        
+        if not isinstance(block_inp, Block) :
+            raise ValueError("Attempted to create an InvalidValue error without a Block.")
+        
+        block_typed : Block = block_inp
+        self.block : Block = block_typed
+
+        self.major_token = block_typed.get_str_major()
+        self.minor_token = incorrect_token
+        self.name = block_typed.name
+        self.content = content
+
+        message: str = f"Block for major token {self.major_token} named {self.name} has an invalid value for the minor token {self.minor_token} : {self.content}"
+        helpmsg: str = message
+        #TODO: make helpmsg more useful than msg
+
+        super(InvalidValue, self).__init__(type(self).__name__, message, helpmsg)
+    def get_head_lineno(self) -> int:
+        if self.block is not None :
+            return self.block.get_linenos()[0]
+        else :
+            raise ValueError("Attempted to get a head lineno of a {self.__name__} error that does not have a Block.")
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        if self.block is not None :
+            temp_lines: List[int] = self.block.get_linenos()
+            return (temp_lines[0], temp_lines[-1])
+        else :
+            raise ValueError("Attempted to get a lineno range of a {self.__name__} error that does not have a Block.")
+    pass
+
 
 class MissingAtAtName(MFDErr) :
     major_token: str

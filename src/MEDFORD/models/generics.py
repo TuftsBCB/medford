@@ -12,7 +12,7 @@ from pydantic import model_validator, computed_field
 from objs.linecollections import Block, Detail
 
 from submodules.mfdvalidator.validator import MedfordValidator as mv
-from submodules.mfdvalidator.errors import MissingRequiredFieldbcofLogic
+from submodules.mfdvalidator.errors import InvalidValue, MissingRequiredFieldbcofLogic
 #############################################
 # Building Blocks                           #
 #############################################
@@ -78,19 +78,20 @@ class MEDFORDmdl(BlockModel) :
     name: MinorT[str]
     Version: MinorsT[str] # TODO: a way to make this singular?
 
-    @field_validator('Version')
+    @model_validator(mode='after')
     @classmethod
     def check_version(cls, values) :
         """Ensures that the version described in this entry is a valid MEDFORD version."""
         # TODO: make this a more generic version checker, e.g. right
         #       regex format.
-        if values == [] :
+        if values.Version == [] :
             raise ValueError("Need to define a custom error for missing data.")
         
-        version_tuple = values[0]
+        version_tuple = values.Version[0]
         version = version_tuple[1]
         if version not in all_versions :
-            raise ValueError(f"Version {version} not a valid Version number.")
+            mv.instance().add_error(InvalidValue(values.Block, 'Version', version))
+#            raise ValueError(f"Version {version} not a valid Version number.")
 
         return values
     
