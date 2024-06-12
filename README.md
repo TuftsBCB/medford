@@ -23,3 +23,22 @@ Polina Shpilker (polina.shpilker@tufts.edu), John Freeman, Hailey McKelvie, Jill
 Please contact Polina, Lenore, Alva, or Noah with any questions.
 
 Thank you to initial seed funding from: NSF grant OAC-1939263.
+
+## Example Testing Environments
+
+For future reference, since this has personally taken a lot of my time to resolve, I have attached below an example debugging configuration for debugging the medford parser module using VSCode. Importantly, the parser must be tested as a module, not a script, such that imports properly resolve both when debugging and when compiling as a package for pypi.
+
+```javascript
+    "configurations": [
+        {
+            "name": "Python Debugger: Module",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "MEDFORD.medford",
+            "args": [
+                "validate",
+                "../samples/pdam_cunning.MFD"
+            ],
+            "cwd": "${workspaceFolder}/medford/src"
+        },
+```
