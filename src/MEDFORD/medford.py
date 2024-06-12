@@ -52,40 +52,13 @@ class OutputMode(Enum):
         return None
 
 
-ap = argparse.ArgumentParser(prog="MEDFORD parser")
-# basic arguments
-ap.add_argument("--version", action="version", version='%(prog)s v2.0')
-ap.add_argument("action", type=ParserMode, choices=list(ParserMode),
-                help="Whether to run the MEDFORD parser in Validation or Compilation mode. (Compilation creates a novel output file.)")
-ap.add_argument("file", type=str,
-                help="Input MEDFORD file to validate or compile.")
-ap.add_argument("-m", "--mode", type=OutputMode, choices=list(OutputMode), default=OutputMode.OTHER,
-                help="The output mode of the MEDFORD parser; what format should be validated against or compiled to.")
-
-# argument for base directory of files for BagIT
-ap.add_argument("--dir", type=str,
-                help="Base directory of files described in the given Medford file for BagIt compression.")
-# argument for "permissible" mode
-ap.add_argument("--permissible", action="store_true", default=False,
-                help="Enables permissible mode for the MEDFORD parser. This disables a significant number of the parser's validation features. (not implemented)")
-
-# debug arguments
-# TODO: Implement
-ap.add_argument("--write_json", action="store_true", default=False,
-                help="FOR DEBUG: Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
-# TODO: Implement
-ap.add_argument("-d", "--debug", action="store_true", default=False,
-                help="FOR DEBUG: Enable DEBUG mode for MEDFORD, enabling a significant amount of intermediate stdout output. (currently unimplemented.)")
-
 class MFD() :
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
 
     # TODO : ? is this the right way to implement this?
     @classmethod
     def get_version(cls) -> str :
-        """Returns the current MEDFORD parser version."""
-        return "2.0.0"
-
+        return mfdglobals.version
 
     mfdglobals.init()
 
@@ -201,6 +174,31 @@ class MFD() :
     def _get_dictionizer(cls, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]) -> Dictionizer :
         return Dictionizer(macro_definitions, name_dictionary)
 
+
+ap = argparse.ArgumentParser(prog="MEDFORD parser")
+# basic arguments
+ap.add_argument("action", type=ParserMode, choices=list(ParserMode),
+                help="Whether to run the MEDFORD parser in Validation or Compilation mode. (Compilation creates a novel output file.)")
+ap.add_argument("file", type=str,
+                help="Input MEDFORD file to validate or compile.")
+ap.add_argument("-m", "--mode", type=OutputMode, choices=list(OutputMode), default=OutputMode.OTHER,
+                help="The output mode of the MEDFORD parser; what format should be validated against or compiled to.")
+
+# argument for base directory of files for BagIT
+ap.add_argument("--dir", type=str,
+                help="Base directory of files described in the given Medford file for BagIt compression.")
+# argument for "permissible" mode
+ap.add_argument("--permissible", action="store_true", default=False,
+                help="Enables permissible mode for the MEDFORD parser. This disables a significant number of the parser's validation features. (not implemented)")
+
+# debug arguments
+# TODO: Implement
+ap.add_argument("--write_json", action="store_true", default=False,
+                help="FOR DEBUG: Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
+# TODO: Implement
+ap.add_argument("-d", "--debug", action="store_true", default=False,
+                help="FOR DEBUG: Enable DEBUG mode for MEDFORD, enabling a significant amount of intermediate stdout output. (currently unimplemented.)")
+ap.add_argument("-v", "--version", action='version', version='%(prog)s {version}'.format(version=MFD.get_version()))
 
 # wants to: ask parser what major/minor tokens it understands
 # -> dumping schema of Entity & parsing manually
