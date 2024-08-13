@@ -1,7 +1,7 @@
 """Module containing the MEDFORD parser, which can validate and compile MEDFORD metadata files."""
 
 import sys
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import argparse
 import json
@@ -143,13 +143,25 @@ class MFD() :
                     json.dump(self.dict_data, f, indent=2)
 
     @classmethod
-    def _get_line_objects(cls, filename: str) -> List[Line] :
+    def _get_line_objs_from_file(cls, filename: str) -> List[Line] :
+        # TODO : in the future, possibly implement streaming?
+        #           for now, we're working with hand-written files;
+        #           there's no shot it'll be too big to put all in mem
+
+        line_tuples = []
+        with open(filename, 'r', encoding="utf-8") as f:
+            for idx, line in enumerate(f.readlines()) :
+                line_tuples.append((line, idx))
+
+        return MFD._get_line_objects(line_tuples)
+
+    @classmethod
+    def _get_line_objects(cls, line_tuples: List[Tuple[str, int]]) -> List[Line] :
         object_lines = []
-        with open(filename, 'r', encoding="utf-8") as f :
-            for idx,line in enumerate(f.readlines()) :
-                p_line = LineReader.process_line(line, idx)
-                if p_line is not None :
-                    object_lines.append(p_line)
+        for line, idx in line_tuples :
+            p_line = LineReader.process_line(line, idx)
+            if p_line is not None :
+                object_lines.append(p_line)
 
         return object_lines
     

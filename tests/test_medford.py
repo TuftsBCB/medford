@@ -16,3 +16,13 @@ def test_OutputModeEnum() :
 # sanity check to make sure devs check that all versions were properly incremented.
 def test_get_version() :
     assert MFD.get_version() == "2.0.0"
+
+def test_get_line_objects() :
+    from MEDFORD.objs.lines import NovelDetailLine
+    test_line = ["@Major content"]
+    test_idx = range(0,len(test_line))
+    test_list = zip(test_line, test_idx)
+
+    res_obj_list = MFD._get_line_objects(test_list)
+    
+    assert isinstance(res_obj_list[0], NovelDetailLine)
