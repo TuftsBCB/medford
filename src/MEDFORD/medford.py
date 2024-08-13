@@ -32,7 +32,7 @@ class ParserMode(Enum) :
     def __str__(self) :
         return self.value
 
-class OutputMode(Enum):
+class OutputMode(str, Enum):
     """Enum storing possible outout types of the MEDFORD parser."""
     OTHER = 'OTHER'
     BCODMO = 'BCODMO'
@@ -46,8 +46,9 @@ class OutputMode(Enum):
 
     @classmethod
     def _missing_(cls, value: str):
+        value = value.lower()
         for member in cls :
-            if member.name.lower() == value.lower() :
+            if member.lower() == value :
                 return member
         return None
 
@@ -81,10 +82,10 @@ class MFD() :
         self.filename = filename
         self.write_json = write_json
         self.output_path = output_path
+        self.em_inst = mfdglobals.validator # this is just for debug purposes
 
     def run_medford(self):
         """Main function that runs MEDFORD compilation from start to finish."""
-        self.em_inst = mfdglobals.validator # this is just for debug purposes
         
         # TODO: way to avoid putting all lines into memory?
         # TODO: make LineProcessor take all of the strs/filename and do the work itself?
