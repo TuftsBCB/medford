@@ -1,4 +1,4 @@
-from medford import MFD
+from MEDFORD.medford import MFD
 from MEDFORD.models.generics import Entity
 import pytest 
 
