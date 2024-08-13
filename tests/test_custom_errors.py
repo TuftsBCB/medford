@@ -1,4 +1,4 @@
-from MEDFORD.submodules.medforderrors.errors import *
+from MEDFORD.submodules.mfdvalidator.errors import *
 
 import MEDFORD.mfdglobals as mfdglobals
 from MEDFORD.objs.linecollections import Detail, Macro
