@@ -2,6 +2,7 @@ from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as mv
 
 validator: mv
 version: str
+debug: bool
 
 def init() :
     global version

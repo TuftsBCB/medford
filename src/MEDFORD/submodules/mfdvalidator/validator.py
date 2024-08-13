@@ -1,6 +1,7 @@
 from typing import Dict, List
 from MEDFORD.submodules.mfdvalidator.errors import MFDErr, ErrType, MissingRequiredField
 import random
+import MEDFORD.mfdglobals as mfdglobals
 
 class MedfordValidator(object):
     _instance = None
@@ -17,7 +18,8 @@ class MedfordValidator(object):
     
     @classmethod
     def init(cls) -> 'MedfordValidator': 
-        print('Creating new MedfordErrorManager instance.')
+        if (mfdglobals.debug) : 
+            print('Creating new MedfordErrorManager instance.')
         MedfordValidator._instance = super(MedfordValidator, cls).__new__(cls)
 
         MedfordValidator._instance._syntax_err_coll = {}

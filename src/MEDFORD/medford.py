@@ -195,7 +195,6 @@ ap.add_argument("--permissible", action="store_true", default=False,
 # TODO: Implement
 ap.add_argument("--write_json", action="store_true", default=False,
                 help="FOR DEBUG: Write a JSON file of the internal representation of the MEDFORD file beside the input MEDFORD file.")
-# TODO: Implement
 ap.add_argument("-d", "--debug", action="store_true", default=False,
                 help="FOR DEBUG: Enable DEBUG mode for MEDFORD, enabling a significant amount of intermediate stdout output. (currently unimplemented.)")
 ap.add_argument("-v", "--version", action='version', version='%(prog)s {version}'.format(version=MFD.get_version()))
@@ -208,6 +207,7 @@ ap.add_argument("-v", "--version", action='version', version='%(prog)s {version}
 # want full API call to include all minor api calls; return dict w/ string indices?
 def parse_args_and_go() :
     args = ap.parse_args()
+    mfdglobals.debug = args.debug
     mfd = MFD(PurePath(args.file))
     mfd.run_medford()
 
