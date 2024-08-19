@@ -62,18 +62,20 @@ class MFD() :
 
     mfdglobals.init()
 
-    filename: str
-    object_lines: List[Line]
+    # functional objects
     line_collector: LineCollector
     dictionizer: Dictionizer
 
+    # parameters
+    filename: str
     write_json: bool
     output_path: str
 
+    # compiled/created objects
+    object_lines: List[Line]
     macro_definitions: Dict[str, Macro]
-    blocks: List[Block]
+    blocks: List[Block] # TODO: dump blocks after we get named_blocks?
     named_blocks: Dict[str, Block]
-
     dict_data = None
     pydantic_version = None
 

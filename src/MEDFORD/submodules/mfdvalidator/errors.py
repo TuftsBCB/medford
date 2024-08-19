@@ -267,17 +267,41 @@ class InvalidValue(MFDErr) :
     pass
 
 
-class MissingAtAtName(MFDErr) :
+# class MissingAtAtName(MFDErr) :
+#     major_token: str
+#     referenced_major: str
+
+#     lineno_head: int
+#     lineno_range: Tuple[int, int]
+
+#     def __init__(self, major_token: str, referenced_major: str, lineno: int) :
+#         self.errtype = ErrType.MISSING_CONTENT
+
+#         self.major_token = major_token
+#         self.referenced_major = referenced_major
+#         self.lineno_head = lineno
+#         self.lineno_range = (lineno, lineno)
+#         # TODO: add msg, helpmsg, super call
+
+#     def get_head_lineno(self) -> int:
+#         return self.lineno_head
+    
+#     def get_lineno_range(self) -> Tuple[int, int]:
+#         return self.lineno_range
+
+class MissingReferenceName(MFDErr) :
     major_token: str
-    referenced_major: str
+    minor_token: str
+    referenced_major:str
 
     lineno_head: int
     lineno_range: Tuple[int, int]
 
-    def __init__(self, major_token: str, referenced_major: str, lineno: int) :
+    def __init__(self, major_token: str, minor_token: str, referenced_major: str, lineno: int) :
         self.errtype = ErrType.MISSING_CONTENT
 
         self.major_token = major_token
+        self.minor_token = minor_token
         self.referenced_major = referenced_major
         self.lineno_head = lineno
         self.lineno_range = (lineno, lineno)

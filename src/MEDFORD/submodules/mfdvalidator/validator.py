@@ -17,8 +17,8 @@ class MedfordValidator(object):
     #   - verbosity (errors, warnings)
     
     @classmethod
-    def init(cls) -> 'MedfordValidator': 
-        if (mfdglobals.debug) : 
+    def init(cls, debug) -> 'MedfordValidator': 
+        if (debug) : 
             print('Creating new MedfordErrorManager instance.')
         MedfordValidator._instance = super(MedfordValidator, cls).__new__(cls)
 
@@ -34,7 +34,7 @@ class MedfordValidator(object):
         # TODO: change into proper error?
         if MedfordValidator._instance is None :
             print('Warning: had to create error manager in instance call.')
-            return MedfordValidator.init()
+            return MedfordValidator.init(mfdglobals.debug)
             
         return MedfordValidator._instance
 

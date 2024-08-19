@@ -5,7 +5,7 @@ in a line. Eventually returns Line objects."""
 
 import re
 from typing import Tuple, List, Optional
-from MEDFORD.submodules.mfdvalidator.errors import MissingAtAtName
+from MEDFORD.submodules.mfdvalidator.errors import MissingReferenceName
 from MEDFORD.objs.lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
 
 import MEDFORD.mfdglobals as mfdglobals
@@ -13,6 +13,7 @@ import MEDFORD.mfdglobals as mfdglobals
 Macro = Tuple[int, int, str]
 Tex = Tuple[int, int]
 
+# tree sitter implementation: https://github.com/msayers1/tree-sitter-MEDFORD/blob/88fb6c9a9c00006939634d02c1182b288a991cf6/grammar.js
 class DetailStatics():
     """Class that contains various static markers for reference across different functions in LineReader.
     Contains symbols such as the macro header symbol, which is used to determine whether a macro is being used and/or defined."""
@@ -22,16 +23,25 @@ class DetailStatics():
     _latex_marker:str = "$$"
     escaped_lm:str = re.escape(_latex_marker) # ensures that the LaTeX symbol is parsed by regex correctly.
 
+    valid_maj_token:str = "[A-Za-z_]+"
+    valid_min_token:str = "[A-Za-z]+"
+    valid_macro:str = "[a-zA-Z0-9_-]+"
+
     # TODO : need to turn into f-strings carefully;
     #       have to check if I need to use f or fr to make sure \ work properly
     #       also, need to double all {} for them to be taken literally.
-    major_minor_reg:str = "{}(?P<major>[A-Za-z_]+)(-(?P<minor>[A-Za-z]+))?\\s".format(token_header)
+    major_minor_reg:str = "{}(?P<major>{})(-(?P<minor>{}))?\\s".format(token_header,valid_maj_token,valid_min_token)
 
     # TODO: make macro name regex reusable
-    macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$|\\}}))".format(macro_header, macro_header)
+    # TODO : why did mname_open not accept underscores previously?
+    # TODO : make this less of an abomination
+    macro_use_regex:str = "((?P<r1>{}\\{{(?P<mname_closed>{})\\}})|(?P<r2>{}(?P<mname_open>{}))(\\s|$|\\}}))".format(macro_header, valid_macro, macro_header, valid_macro)
     comment_use_regex:str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex:str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
-    atat_use_regex:str = "{}(?P<major>[A-Za-z_]+)-{}(?P<referenced>[A-Za-z_]+)(\\s(?P<name>.+))?$".format(token_header, token_header)
+    # ref_use_regex:str = "{}(?P<major>{})\\s(?P<name>[^\\s]+)".format(token_header, valid_maj_token)
+    # atat_use_regex:str = "{}(?P<major>[A-Za-z_]+)-{}(?P<referenced>[A-Za-z_]+)(\\s(?P<name>.+))?$".format(token_header, token_header)
+
+    ref_use_regex:str = "{}(?P<ref_major>{})(\\s(?P<ref_name>.+))?$".format(token_header,valid_maj_token)
 
 class LineReader :
     """Class that is used to identify line type, process strings, and return Line objects.
@@ -55,11 +65,6 @@ class LineReader :
         return re.match(f"{DetailStatics.macro_header}[A-Za-z]", line) is not None
 
     @staticmethod
-    def is_atat_line(line:str) -> bool :
-        """Returns True if the provided string is an At-At line."""
-        return re.match(DetailStatics.atat_use_regex, line) is not None
-
-    @staticmethod
     def find_macro_name_body(line:str) -> Tuple[str, str] :
         """Given a string, attempts to identify a macro name and its macro definition. If successful, returns them as a tuple."""
         m = re.match(f"{DetailStatics.macro_header}(?P<mname>[A-Za-z0-9_]+)\\s(?P<mbody>.+)$", line)
@@ -67,6 +72,29 @@ class LineReader :
             return (m.group('mname'), m.group('mbody'))
 
         raise ValueError(f"Attempted to find macro name and body on an invalid string: {line}")
+    
+    @staticmethod
+    def is_reference_line(line:str, lineno:int) -> bool :
+        """Returns whether the line is a reference line -- e.g., links an attribute of an object to another existing object.
+        Generally, the syntax for a reference line looks as follows:
+        `@Major-minor @ReferentialMajor Referential Name`
+
+        :param line: String containing the entirety of the MEDFORD line.
+        :type line: str
+        :raises NotImplementedError: _description_
+        :raises ValueError: _description_
+        :return: _description_
+        :rtype: bool
+        """
+        res = re.match(DetailStatics.major_minor_reg + DetailStatics.ref_use_regex, line)
+
+        if res is None :
+            return False
+        elif res.groupdict()["ref_name"] is None :
+            groups = res.groupdict()
+            # TODO : fix lineno
+            mfdglobals.mv.instance().add_error(MissingReferenceName(groups["major"],groups["minor"],groups["ref_major"],lineno))
+        return True
 
     @staticmethod
     def is_novel_token_line(line:str) -> bool :
@@ -94,24 +122,24 @@ class LineReader :
             rest_of_line = line[mm_match_res.end():]
             return(major_res, minor_res, rest_of_line)
 
-    @staticmethod
-    def get_atat_attr(line:str, lineno:int) -> Optional[Tuple[List[str], List[str], str]] :
-        """Given a line and its line number, attempts to identify at-at attributes.
+    # @staticmethod
+    # def get_atat_attr(line:str, lineno:int) -> Optional[Tuple[List[str], List[str], str]] :
+    #     """Given a line and its line number, attempts to identify at-at attributes.
         
-        DEPRECIATED, At-At is currently being reworked."""
-        aa_res: Optional[re.Match] = re.match(DetailStatics.atat_use_regex, line)
-        if aa_res is None :
-            raise ValueError("Attempted to get @-@ attributes on a line that does not contain @-@ use.")
-        else :
-            aa_match_res : re.Match = aa_res
-            match_grps = aa_match_res.groupdict()
-            if match_grps['name'] is None :
-                mfdglobals.validator.add_error(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
-                return None
+    #     DEPRECIATED, At-At is currently being reworked."""
+    #     aa_res: Optional[re.Match] = re.match(DetailStatics.atat_use_regex, line)
+    #     if aa_res is None :
+    #         raise ValueError("Attempted to get @-@ attributes on a line that does not contain @-@ use.")
+    #     else :
+    #         aa_match_res : re.Match = aa_res
+    #         match_grps = aa_match_res.groupdict()
+    #         if match_grps['name'] is None :
+    #             mfdglobals.validator.add_error(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
+    #             return None
 
-            major_res = match_grps['major'].split("_")
-            referenced_res = match_grps['referenced'].split("_")
-            return (major_res, referenced_res, match_grps['name'])
+    #         major_res = match_grps['major'].split("_")
+    #         referenced_res = match_grps['referenced'].split("_")
+    #         return (major_res, referenced_res, match_grps['name'])
 
     ## Methods to describe line attributes:
     # + Contains comment
@@ -192,8 +220,8 @@ class LineReader :
             return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
 
         # atat is currently being redefined.
-        if LineReader.is_atat_line(line) :
-            return None
+        # if LineReader.is_atat_line(line) :
+        #    return None
         #    res = LineReader.get_atat_attr(line, lineno)
         #    if res is not None :
         #        majors, referenced_major, referenced_name = res
