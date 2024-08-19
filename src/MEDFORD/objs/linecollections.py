@@ -7,7 +7,7 @@ is defined as a MacroLine followed by 0 or more ContinueLines.)
 """
 
 from typing import Optional, List, Dict, Tuple, Union
-from MEDFORD.objs.lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
+from MEDFORD.objs.lines import ContinueLine, MacroLine, NovelDetailLine
 
 from MEDFORD.submodules.mfdvalidator.errors import MissingDescError, MaxMacroDepthExceeded, AtAtReferencedDoesNotExist, MissingContent
 
@@ -28,13 +28,14 @@ class LineCollection() :
     the names of the macros that are used (used_macro_names) for easy
     management and validation later.
     """
-    headline: Union[MacroLine, NovelDetailLine, AtAtLine]
+    headline: Union[MacroLine, NovelDetailLine]#, AtAtLine]
     extralines: Optional[List[ContinueLine]]
 
     has_macros: bool = False
     used_macro_names: Optional[List[str]] = None
 
-    def __init__(self, headline: Union[MacroLine, NovelDetailLine, AtAtLine], extralines: Optional[List[ContinueLine]]) :
+    def __init__(self, headline: Union[MacroLine, NovelDetailLine], extralines: Optional[List[ContinueLine]]) :
+    #def __init__(self, headline: Union[MacroLine, NovelDetailLine, AtAtLine], extralines: Optional[List[ContinueLine]]) :
         self.headline = headline
         self.extralines = extralines
 
@@ -313,36 +314,37 @@ class Detail(LineCollection) :
 
         return False
 
-class AtAt(Detail) :
-    """DEPRECIATED.
-    
-    (Used to) represent a detail that contains a reference to a block."""
+class Reference(Detail) :
     major_tokens: List[str]
     minor_token: str
-    referenced_majors: List[str]
-    is_header: bool = False
+    referenced_major: str # TODO: fuck. Have we decided that majors are ALWAYS 1 deep and that compound majors should be treated as 1 str?
+    referenced_name: str
+    is_header: bool = False #tf is this again
 
-    def __init__(self, headline: AtAtLine, extralines: Optional[List[ContinueLine]]):
-        super(Detail, self).__init__(headline, extralines)
-        self.major_tokens = headline.major_tokens
-        self.referenced_majors = headline.referenced_majors
-        self.minor_token = "_".join(headline.referenced_majors)
+# class AtAt(Detail) :
+#     """DEPRECIATED.
+    
+#     (Used to) represent a detail that contains a reference to a block."""
+#     major_tokens: List[str]
+#     minor_token: str
+#     referenced_majors: List[str]
+#     is_header: bool = False
 
-    def get_referenced_str_majors(self) -> str :
-        return "_".join(self.referenced_majors)
+#     def __init__(self, headline: AtAtLine, extralines: Optional[List[ContinueLine]]):
+#         super(Detail, self).__init__(headline, extralines)
+#         self.major_tokens = headline.major_tokens
+#         self.referenced_majors = headline.referenced_majors
+#         self.minor_token = "_".join(headline.referenced_majors)
 
-    def _get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
-        temp_name = self.minor_token + "@" + self.headline.get_content(macro_defs)
-        if self.extralines is not None :
-            for line in self.extralines :
-                temp_name += line.get_content(macro_defs)
-        return temp_name
+#     def get_referenced_str_majors(self) -> str :
+#         return "_".join(self.referenced_majors)
 
-    def validate_atat(self, macro_defs: Dict[str, str], named_blocks: List[str]) -> bool:
-        referenced_name = self._get_referenced_name(macro_defs)
-        if referenced_name not in named_blocks :
-            mfdglobals.validator.add_error(AtAtReferencedDoesNotExist(self, referenced_name, named_blocks))
-        return self._get_referenced_name(macro_defs) in named_blocks
+#     def _get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
+#         temp_name = self.minor_token + "@" + self.headline.get_content(macro_defs)
+#         if self.extralines is not None :
+#             for line in self.extralines :
+#                 temp_name += line.get_content(macro_defs)
+#         return temp_name
 
 class Block() :
     """
@@ -449,21 +451,3 @@ class Block() :
         for d in self.details :
             tmp_linenos.extend(d.get_linenos())
         return tmp_linenos
-
-    def validate_atat(self, macro_defs: Dict[str, str], named_blocks : Dict[str, 'Block']) -> bool :
-        """DEPRECIATED.
-        """
-        block_names_only = []
-        block_names_only.extend(named_blocks.keys())
-
-        for d in self.details :
-            if isinstance(d, AtAt) :
-                d_atat : AtAt = d
-                if not d.validate_atat(macro_defs, block_names_only) :
-                    return False
-
-            if not d.validate_atat(macro_defs, block_names_only) :
-                return False
-
-        return True
-

@@ -181,15 +181,7 @@ class TestReferenceRegex:
         assert "ref_name" in groups.keys()
         assert groups["ref_name"] is not None
         assert groups["ref_name"] == "ref major name"
-
-        # assert "major" in groups.keys()
-        # assert groups["major"] is not None
-        # assert groups["major"] == "Major"
-
-        # assert "minor" in groups.keys()
-        # assert groups["minor"] is not None
-        # assert groups["minor"] == "minor"
-
+        
     def test_case_noname(self) :
         # test that it still captures if there's no name, so we can throw a smart error
         test_str = "@Major-minor @RefMajor"
@@ -213,7 +205,9 @@ class TestReferenceMethods:
     import mfdglobals
     def test_is_reference_method_1(self) :
         test_str = "@Major-minor @RefMajor ref major name"
-        assert LineReader.is_reference_line(test_str,0) is True
+        is_ref, ref_err = LineReader.is_reference_line(test_str, 0)
+        assert is_ref
+        assert ref_err is None
 
     def test_is_reference_method_no_name(self) :
         from MEDFORD.submodules.mfdvalidator.errors import MissingReferenceName
@@ -223,10 +217,7 @@ class TestReferenceMethods:
         #   add an error to the validator to show to the user later.
         self.mfdglobals.init()
         test_str = "@Major-minor @RefMajor"
-        assert LineReader.is_reference_line(test_str,0) is True
-        assert self.mfdglobals.mv.instance().has_other_err() is True
-        assert self.mfdglobals.mv.instance().n_other_errs() == 1
-        
-        # TODO : I shouldn't have to manually know the keys, add fxns to MedfordValidator
-        #   that provide access to these collections & add unit tests for those fxns
-        assert isinstance(self.mfdglobals.mv.instance()._other_err_coll[0][0], MissingReferenceName)
+
+        is_ref, ref_err = LineReader.is_reference_line(test_str, 0)
+        assert is_ref is True
+        assert isinstance(ref_err, MissingReferenceName)

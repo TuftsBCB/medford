@@ -1,4 +1,5 @@
 from typing import List, Tuple, Dict
+import MEDFORD.mfdglobals
 
 # new plan:
 # three ABCs, Line, Content, and Templateable
@@ -222,7 +223,7 @@ class Line() :
         self.line = line
     
     def __eq__(self, other) -> bool :
-        if type(self) == type(other) :
+        if type(self) is type(other) :
             return self.line == other.line and self.lineno == other.lineno
         
         return False
@@ -250,12 +251,11 @@ class MacroLine(ContentMixin, Line) :
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro[1:])
     
     def __eq__(self, other) -> bool:
-        if type(self) == type(other) and self.macro_name == other.macro_name and \
+        if type(self) is type(other) and self.macro_name == other.macro_name and \
             self.raw_content == other.raw_content :
             return super(MacroLine, self).__eq__(other)
         
         return False
-
 
 class NovelDetailLine(ContentMixin, Line) :
     major_tokens: List[str]
@@ -271,23 +271,36 @@ class NovelDetailLine(ContentMixin, Line) :
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
     def __eq__(self, other) -> bool :
-        if type(self) == type(other) and self.major_tokens == other.major_tokens and \
+        if type(self) is type(other) and self.major_tokens == other.major_tokens and \
             self.minor_token == other.minor_token and self.raw_content == other.raw_content :
             return super(NovelDetailLine, self).__eq__(other)
         
         return False
 
-class AtAtLine(NovelDetailLine) :
-    major_tokens: List[str]
+class ReferenceLine(NovelDetailLine) :
     referenced_majors: List[str]
+    referenced_name: str
 
-    def __init__(self, lineno: int, line: str, majors: List[str], referenced_majors: List[str], referenced_name: str, poss_inline, poss_tex, poss_macro):
+    # TODO: do we ever want to allow LaTeX or Macros in references??
+    #       Executive decision: no. Nope. Nuh uh. Maybe later, for now, absolutely not.
+    #       We're nearing turing-complete territory and we'd have to actually make a proper
+    #       language spec if we do that.
+    # TODO : does that mean we should straight up overwrite the deconvolution functions for efficiency?
+    #       I don't think yet -- we're not running into any performance issues yet.
+    #       Moment we run into performance issues I'm probably rewriting all of this in Rust. :)
+    def __init__(self, lineno: int, line:str, majors: List[str], minor:str, referenced_majors: List[str], referenced_name: str, poss_inline):
         self.referenced_majors = referenced_majors
-        pseudo_minor = "_".join(referenced_majors)
-        super(AtAtLine, self).__init__(lineno, line, majors, pseudo_minor, referenced_name, poss_inline, poss_tex, poss_macro)
+        self.referenced_name = referenced_name
 
-    def get_referenced_name(self, macro_defs: Dict[str, str]) -> str :
-        return self.get_content(macro_defs)
+        # TODO: this is absurd.
+        content = "@" + "_".join(referenced_majors) + " " + referenced_name
+        super(ReferenceLine, self).__init__(lineno, line, majors, minor, content, poss_inline, [], [])
+    
+    def get_referenced_name(self) -> str:
+        # AtAt implementation took the macro definitions; because we've decided
+        # that we're not allowing macros, we won't need it, I think.
+        # TODO : make macro_defs optional so we don't have to waste space on empty dicts?
+        return self.get_content({})
 
 class ContinueLine(ContentMixin, Line) :
     # TODO : complete
@@ -298,7 +311,7 @@ class ContinueLine(ContentMixin, Line) :
         self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
     def __eq__(self, other) -> bool :
-        if type(self) == type(other) and self.raw_content == other.raw_content :
+        if type(self) is type(other) and self.raw_content == other.raw_content :
             return super(ContinueLine, self).__eq__(other)
         
         return False
