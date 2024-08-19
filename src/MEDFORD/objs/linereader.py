@@ -5,7 +5,7 @@ in a line. Eventually returns Line objects."""
 
 import re
 from typing import Tuple, List, Optional
-from MEDFORD.submodules.mfdvalidator.errors import MissingReferenceName
+from MEDFORD.submodules.mfdvalidator.errors import MissingReferenceName, MFDErr
 from MEDFORD.objs.lines import Line, MacroLine, CommentLine, NovelDetailLine, ContinueLine
 
 import MEDFORD.mfdglobals as mfdglobals
@@ -74,27 +74,62 @@ class LineReader :
         raise ValueError(f"Attempted to find macro name and body on an invalid string: {line}")
     
     @staticmethod
-    def is_reference_line(line:str, lineno:int) -> bool :
+    def is_reference_line(line:str, lineno:int) -> Tuple[bool, Optional[MFDErr]] :
         """Returns whether the line is a reference line -- e.g., links an attribute of an object to another existing object.
         Generally, the syntax for a reference line looks as follows:
         `@Major-minor @ReferentialMajor Referential Name`
 
+        Side effect is if a reference without a name is found, the global medford validator instance is given a `MissingReferenceName` error.
+
         :param line: String containing the entirety of the MEDFORD line.
         :type line: str
-        :raises NotImplementedError: _description_
-        :raises ValueError: _description_
-        :return: _description_
+        :return: `True` if the line fulfills requirements to be considered a reference line, `False` otherwise.
         :rtype: bool
         """
         res = re.match(DetailStatics.major_minor_reg + DetailStatics.ref_use_regex, line)
+        err = None
 
         if res is None :
-            return False
+            return (False, err)
         elif res.groupdict()["ref_name"] is None :
             groups = res.groupdict()
-            # TODO : fix lineno
-            mfdglobals.mv.instance().add_error(MissingReferenceName(groups["major"],groups["minor"],groups["ref_major"],lineno))
-        return True
+            err = MissingReferenceName(groups["major"],groups["minor"],groups["ref_major"],lineno)
+            mfdglobals.mv.instance().add_error(err)
+        return (True, err)
+
+    @staticmethod
+    def get_reference_info(line:str, lineno:int) -> Tuple[List[str], str, str, str] :
+        """Obtains relevant Reference Line information from the provided line and linenumber.
+
+        Example:
+        ```
+        @Major-minor @RefMajor Ref Name
+        (["Major"], "minor", "RefMajor", "Ref Name")
+        ```
+
+        :param line: String representation of the MEDFORD line to pull information from.
+        :type line: str
+        :param lineno: Line number of the provided line in the original MEDFORD file.
+        :type lineno: int
+        :raises ValueError: Error when no reference information was found despite being called.
+        :return: A tuple containing a list of major tokens, the minor token, the reference's major token, and the referenced object's name.
+        :rtype: Tuple[List[str], str, str, str]
+        """
+        # reuse get_major_minor to get major and minor tokens
+        Majors, minor, content = LineReader.get_major_minor(line)
+        ref_res = re.match(DetailStatics.ref_use_regex, content)
+
+        if ref_res is None :
+            raise ValueError("NANI")
+        
+        # Shouldn't have to check if ref_name is none; should never be called
+        #   if is_reference_line raises that error.
+        # ....unless?
+        
+        ref_grps = ref_res.groupdict()
+        ref_major, ref_name = ref_grps["ref_major"], ref_grps["ref_name"]
+
+        return (Majors, minor, ref_major, ref_name)
 
     @staticmethod
     def is_novel_token_line(line:str) -> bool :
@@ -121,25 +156,6 @@ class LineReader :
 
             rest_of_line = line[mm_match_res.end():]
             return(major_res, minor_res, rest_of_line)
-
-    # @staticmethod
-    # def get_atat_attr(line:str, lineno:int) -> Optional[Tuple[List[str], List[str], str]] :
-    #     """Given a line and its line number, attempts to identify at-at attributes.
-        
-    #     DEPRECIATED, At-At is currently being reworked."""
-    #     aa_res: Optional[re.Match] = re.match(DetailStatics.atat_use_regex, line)
-    #     if aa_res is None :
-    #         raise ValueError("Attempted to get @-@ attributes on a line that does not contain @-@ use.")
-    #     else :
-    #         aa_match_res : re.Match = aa_res
-    #         match_grps = aa_match_res.groupdict()
-    #         if match_grps['name'] is None :
-    #             mfdglobals.validator.add_error(MissingAtAtName(match_grps['major'], match_grps['referenced'], lineno))
-    #             return None
-
-    #         major_res = match_grps['major'].split("_")
-    #         referenced_res = match_grps['referenced'].split("_")
-    #         return (major_res, referenced_res, match_grps['name'])
 
     ## Methods to describe line attributes:
     # + Contains comment
@@ -218,16 +234,15 @@ class LineReader :
         if LineReader.is_macro_def_line(line) :
             mname, mbody = LineReader.find_macro_name_body(line)
             return MacroLine(lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro)
-
-        # atat is currently being redefined.
-        # if LineReader.is_atat_line(line) :
-        #    return None
-        #    res = LineReader.get_atat_attr(line, lineno)
-        #    if res is not None :
-        #        majors, referenced_major, referenced_name = res
-        #        return AtAtLine(lineno, line, majors, referenced_major, referenced_name, poss_inline, poss_tex, poss_macro)
-        #    else :
-        #        return None
+        
+        # TODO: checking if it's a reference line involves finding all
+        #   the regex groups anyways; is it worth having 2 separate fxns?
+        #   -> yes.
+        is_ref_line, ref_err = LineReader.is_reference_line(line, lineno)
+        if is_ref_line :
+            if not ref_err : 
+                majors, minors, ref_major, ref_name = LineReader.get_reference_info(line, lineno)
+                # TODO : //bites table
 
         if LineReader.is_novel_token_line(line) :
             major_str, minor_str, rest_of_line = LineReader.get_major_minor(line)
