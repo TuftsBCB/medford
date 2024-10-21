@@ -130,7 +130,7 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         assert len(errs) == 1
         assert isinstance(errs[0], MaxMacroDepthExceeded)
         err: MaxMacroDepthExceeded = errs[0]
-        assert err.errtype == "MaxMacroDepthExceeded"
+        assert err.errname == "MaxMacroDepthExceeded"
         assert err.macros[0].name == "Macro11"
         assert err.macros[0].get_raw_content() == "`@Macro10"
 
@@ -163,7 +163,7 @@ class TestMaxMacroDepthErr(ProcessToMacros) :
         assert len(errs) == 1
         assert isinstance(errs[0], MaxMacroDepthExceeded)
         err: MaxMacroDepthExceeded = errs[0]
-        assert err.errtype == "MaxMacroDepthExceeded"
+        assert err.errname == "MaxMacroDepthExceeded"
         assert err.macros[0].name == "Macro11"
         assert err.macros[0].get_raw_content() == "`@Macro10"
 

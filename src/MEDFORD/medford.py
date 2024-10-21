@@ -143,6 +143,16 @@ class MFD() :
                     json.dump(self.dict_data, f, indent=2)
 
     @classmethod
+    def _get_line_objects(cls, line_tuples: List[Tuple[str, int]]) -> List[Line] :
+        object_lines = []
+        for line, idx in line_tuples :
+            p_line = LineReader.process_line(line, idx)
+            if p_line is not None :
+                object_lines.append(p_line)
+
+        return object_lines
+    
+    @classmethod
     def _get_line_objs_from_file(cls, filename: str) -> List[Line] :
         # TODO : in the future, possibly implement streaming?
         #           for now, we're working with hand-written files;
@@ -155,16 +165,6 @@ class MFD() :
 
         return MFD._get_line_objects(line_tuples)
 
-    @classmethod
-    def _get_line_objects(cls, line_tuples: List[Tuple[str, int]]) -> List[Line] :
-        object_lines = []
-        for line, idx in line_tuples :
-            p_line = LineReader.process_line(line, idx)
-            if p_line is not None :
-                object_lines.append(p_line)
-
-        return object_lines
-    
     # for testing purposes in model unit tests
     @classmethod
     def _get_unvalidated_blocks(cls, input: str)-> List[Block] :
