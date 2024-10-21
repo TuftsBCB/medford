@@ -1,7 +1,7 @@
 import pytest
 from MEDFORD.objs.lines import AtAtLine, CommentLine,MacroLine,NovelDetailLine,ContinueLine
 from MEDFORD.objs.linereader import LineReader
-#from submodules.mfdvalidator.validator import MedfordValidator as em
+from submodules.mfdvalidator.validator import MedfordValidator as em
 from MEDFORD.submodules.mfdvalidator.errors import MissingAtAtName
 
 #################################
