@@ -84,6 +84,13 @@ class RoleOpts(Flag):
 # Attributes                                #
 #############################################
 
+class MEDFORDMDL(BlockModel):
+    """Model to store MEDFORD metadata describing the MEDFORD file itself,
+     such as MEDFORD file colloqiual name and the version of MEDFORD used
+     to write this file."""
+    name: MinorT[str]
+    Version: MinorsT[str] # TODO: a way to make this singular?
+
 
 class MEDFORDmdl(BlockModel):
     """Model to store MEDFORD metadata describing the MEDFORD file itself,
@@ -111,7 +118,7 @@ class MEDFORDmdl(BlockModel):
         return values
 
 
-class Journal(BlockModel):
+class JournalMDL(BlockModel):
     name: MinorT[str]
     # TODO: Validation? Do we care about proper format for this?
     Volume: OptMinorT[str]
@@ -119,41 +126,12 @@ class Journal(BlockModel):
     Pages: OptMinorT[str]
 
 
-class Date(BlockModel):
+class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
 
-    @model_validator(mode="after")
-    @classmethod
-    def check_date_minor(cls, v):
-        expected_tokens = ["Note"]
-        has_tokens = all(hasattr(v, t) for t in expected_tokens)
-        if not has_tokens:
-            raise ValueError(f"Paper missing required fields: ")
-        #     mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Date", "Date requires"))
-        return v
 
-
-class PaperMDL(BlockModel):
-    name: MinorT[str]
-    Link: OptMinorT[str]  # instead of str does it have to be link?
-    PMID: OptMinorT[str]
-    DOI: OptMinorT[str]
-
-
-# dont really understand what the file thing is about
-#     @model_validator(mode='after')
-#     @classmethod
-#     def check_file(cls, v) :
-#         if v.File is not None:
-#             required_file_tokens = ["File"]
-#             missing_file_tokens = [t for t in required_file_tokens if not hasattr(v, t)]
-#             if missing_file_tokens:
-#                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
-#         return v
-
-
-class Contributor(BlockModel):
+class ContributorMDL(BlockModel):
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
@@ -202,12 +180,12 @@ class Contributor(BlockModel):
         return cur_flags
 
 
-class Funding(BlockModel):
+class FundingMDL(BlockModel):
     ID: OptMinorT[str]
     # TODO: research possible funding IDs so we can implement validation
 
 
-class Keyword(BlockModel):
+class KeywordMDL(BlockModel):
     pass
 
 
@@ -215,7 +193,6 @@ class Keyword(BlockModel):
 # File-Wide Validation                      #
 #############################################
 
-
 class Entity(BaseModel):
-    MEDFORD: MajorsT[MEDFORDmdl]
-    Contributor: OptMajorT[Contributor]
+    MEDFORD: MajorsT[MEDFORDMDL]
+    Contributor: OptMajorT[ContributorMDL] = None
