@@ -597,3 +597,49 @@ class TestLineCollection:
         assert lc.named_blocks["Contributor"]["Kiki Shpilker"] == block_2
 
         assert lc.comments == [comment_1, comment_2, comment_3]
+
+    #############################
+    # Test get_content features #
+    #############################
+
+    def test_twoline_spacing(self) :
+        test_lines = ["@Contributor Polina Shpilker","@Contributor-Association Tufts ", " University"]
+        test_Lines : List[Optional[Line]] = []
+
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+
+        assert list(lc.named_blocks.keys()) == ["Contributor"]
+        assert list(lc.named_blocks['Contributor'].keys()) == ["Polina Shpilker"]
+
+        ex_block:Block = lc.named_blocks['Contributor']['Polina Shpilker']
+        ex_detail:Detail = ex_block.details[1]
+        assert ex_detail.get_raw_content() == "Tufts University"
+
+    def test_twoline_tab_spacing(self) :
+        test_lines = ["@Contributor Polina Shpilker","\t@Contributor-Association\t Tufts ", " University"]
+        test_Lines : List[Optional[Line]] = []
+
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+
+        assert list(lc.named_blocks.keys()) == ["Contributor"]
+        assert list(lc.named_blocks['Contributor'].keys()) == ["Polina Shpilker"]
+
+        ex_block:Block = lc.named_blocks['Contributor']['Polina Shpilker']
+        ex_detail:Detail = ex_block.details[1]
+        assert ex_detail.get_raw_content() == "Tufts University"
