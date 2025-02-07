@@ -64,7 +64,8 @@ class LineReader:
     # Novel token
     @staticmethod
     def is_comment_line(line: str) -> bool:
-        """Returns True if the provided string is a comment line."""
+        """Returns True if the provided string is a comment line. Ignores leading spaces."""
+        line = line.strip()
         return re.match(f"{DetailStatics.comment_header}", line) is not None
 
     @staticmethod
@@ -219,7 +220,7 @@ class LineReader:
         
         line = line.strip()
 
-        if LineReader.is_comment_line(line):
+        if LineReader.is_comment_line(line) :
             return CommentLine(lineno, line)
 
         poss_inline = LineReader.find_possible_inline_comments(line)

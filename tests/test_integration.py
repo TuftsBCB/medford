@@ -1,4 +1,5 @@
 from MEDFORD.medford import provide_args_and_go, ParserMode, OutputMode
+import pytest
 
 # example error case:
 # no Contributor tag -> crash
@@ -21,7 +22,7 @@ def test_no_contributor(tmp_path) :
     provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
     return
 
-def test_lead_spacing_ignored(tmp_path) :
+def test_lead_spacing_not_ignored(tmp_path) :
     example_content = "\
         @MEDFORD asdf\n\
         @MEDFORD-Version 2.0\n\
@@ -34,5 +35,6 @@ def test_lead_spacing_ignored(tmp_path) :
     tmpfile = d / "only_MEDFORD.mfd"
     tmpfile.write_text(example_content, encoding="utf-8")
 
-    provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
+    with pytest.raises(ValueError) :
+        provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
     return
