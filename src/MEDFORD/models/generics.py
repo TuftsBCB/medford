@@ -5,6 +5,7 @@ as well as some that are expected for our initial use case tests.
 These Models are defined for use with Pydantic, and contain custom data types and type validation."""
 
 import datetime
+import sys
 from enum import Flag, auto
 from typing import TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
@@ -106,7 +107,66 @@ class JournalMDL(BlockModel):
 class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
+    @model_validator(mode='after')
+    @classmethod
+    def check_date_minor(cls, v) :
+        expected_tokens = ["Note"]
+        has_tokens = all(hasattr(v, t) for t in expected_tokens)
+        if not has_tokens:
+            raise ValueError(f"Paper missing required fields: ")
+        #     mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Date", "Date requires"))
+        return v
+
+class PaperMDL(BlockModel):
+    print("PaperMDL class is being loaded")
+    name: MinorT[str]
+    Link: OptMinorT[str] #instead of str does it have to be link?
+    PMID: OptMinorT[str]
+    DOI: OptMinorT[str] 
+
+# dont really understand what the file thing is about
+#     @model_validator(mode='after')
+#     @classmethod
+#     def check_file(cls, v) :
+#         if v.File is not None:
+#             required_file_tokens = ["File"]
+#             missing_file_tokens = [t for t in required_file_tokens if not hasattr(v, t)]
+#             if missing_file_tokens:
+#                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
+#         return v
     
+    @model_validator(mode='after')
+    @classmethod
+    def check_paper_minor(cls, v):
+        print("\nPaper validator running:", file=sys.stderr)
+        print(f"Paper value type: {type(v)}", file=sys.stderr)
+        print(f"Paper value content: {v}", file=sys.stderr)
+    
+        expected_tokens = ["Link", "PMID", "DOI"]
+        for token in expected_tokens:
+            print(f"Checking token {token}: {hasattr(v, token)}", file=sys.stderr)
+            if hasattr(v, token):
+                print(f"Value of {token}: {getattr(v, token)}", file=sys.stderr)
+    
+        missing_tokens = [t for t in expected_tokens if not hasattr(v, t) or getattr(v, t) is None]
+        print(f"Found missing tokens: {missing_tokens}", file=sys.stderr)
+    
+        if missing_tokens:
+            print("Adding error to validator", file=sys.stderr)
+            mv.instance().add_error(MissingRequiredFieldbcofLogic(
+                v.Block, 
+                "Paper", 
+                f"Paper requires {', '.join(missing_tokens)}"
+            ))
+            print("Error added", file=sys.stderr)
+        
+        # Let's also check the validator state
+        validator = mv.instance()
+        print(f"Validator has errors: {validator.has_pydantic_err()}", file=sys.stderr)
+        print(f"Number of errors: {validator.n_pydantic_errs()}", file=sys.stderr)
+    
+        return v
+
 class ContributorMDL(BlockModel) :
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
@@ -114,6 +174,7 @@ class ContributorMDL(BlockModel) :
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
 
+    
     @model_validator(mode='after')
     @classmethod
     def check_corresponding_has_email(cls, v) :
@@ -166,5 +227,7 @@ class KeywordMDL(BlockModel):
 #############################################
 
 class Entity(BaseModel) :
+    print("Entity class is being loaded", file=sys.stderr)
     MEDFORD: MajorsT[MEDFORDMDL]
     Contributor: OptMajorT[ContributorMDL] = None
+    Paper: OptMajorT[PaperMDL]
