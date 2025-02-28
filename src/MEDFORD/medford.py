@@ -13,6 +13,7 @@ from MEDFORD.objs.linereader import LineReader, Line
 from MEDFORD.objs.linecollector import LineCollector, Macro, Block
 from MEDFORD.objs.dictionizer import Dictionizer
 from MEDFORD.models.generics import Entity
+from MEDFORD.objs.linecollections import Detail
 
 import MEDFORD.mfdglobals as mfdglobals
 
@@ -51,7 +52,18 @@ class OutputMode(Enum):
                 return member
         return None
 
-
+class MedfordEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # Try to convert any object to a dictionary
+        try:
+            return obj.__dict__
+        except AttributeError:
+            # If that fails, try to make it a string
+            try:
+                return str(obj)
+            except:
+                return f"<Unserializable object of type {type(obj).__name__}>"
+    
 class MFD() :
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
 
@@ -77,12 +89,13 @@ class MFD() :
     dict_data = None
     pydantic_version = None
 
-    def __init__(self, filename, write_json:bool=False, output_path:str=".") :
+    def __init__(self, filename, write_json:bool=True, output_path:str=".") :
         self.filename = filename
         self.write_json = write_json
         self.output_path = output_path
 
     def run_medford(self):
+        print("Starting MEDFORD validation", file=sys.stderr)
         """Main function that runs MEDFORD compilation from start to finish."""
         self.em_inst = mfdglobals.validator # this is just for debug purposes
         
@@ -139,7 +152,9 @@ class MFD() :
         if self.write_json :
             if self.output_path == "." :
                 with open("medford_output.json", 'w', encoding="utf-8") as f:
-                    json.dump(self.dict_data, f, indent=2)
+                    json.dump(self.dict_data, f, indent=2, cls=MedfordEncoder)
+
+                #     json.dump(self.dict_data, f, indent=2)
 
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line] :

@@ -1,0 +1,330 @@
+{
+  "MEDFORD": [
+    {
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 0,
+              "line": "@MEDFORD description\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": null,
+              "raw_content": "description\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "MEDFORD"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "description",
+        "minor_tokens": [
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 1,
+                "line": "@MEDFORD-Version 1.0\n",
+                "major_tokens": [
+                  "MEDFORD"
+                ],
+                "minor_token": "Version",
+                "raw_content": "1.0\n",
+                "offset": 17
+              },
+              "extralines": null,
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "description"
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "1.0"
+        ]
+      ]
+    }
+  ],
+  "Software": [
+    {
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 3,
+              "line": "@Software software\n",
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": null,
+              "raw_content": "software\n",
+              "offset": 10
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Software-Type software-type\n",
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": "Type",
+              "raw_content": "software-type\n",
+              "offset": 15
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": "Type",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Software-Version software-version\n",
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": "Version",
+              "raw_content": "software-version\n",
+              "offset": 18
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "Software"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 3,
+            "line": "@Software software\n",
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": null,
+            "raw_content": "software\n",
+            "offset": 10
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Software"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "software",
+        "minor_tokens": [
+          [
+            "Type",
+            {
+              "headline": {
+                "lineno": 4,
+                "line": "@Software-Type software-type\n",
+                "major_tokens": [
+                  "Software"
+                ],
+                "minor_token": "Type",
+                "raw_content": "software-type\n",
+                "offset": 15
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": "Type",
+              "is_header": false
+            }
+          ],
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 5,
+                "line": "@Software-Version software-version\n",
+                "major_tokens": [
+                  "Software"
+                ],
+                "minor_token": "Version",
+                "raw_content": "software-version\n",
+                "offset": 18
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 3,
+            "line": "@Software software\n",
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": null,
+            "raw_content": "software\n",
+            "offset": 10
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Software"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "software"
+      ],
+      "Type": [
+        [
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Software-Type software-type\n",
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": "Type",
+              "raw_content": "software-type\n",
+              "offset": 15
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": "Type",
+            "is_header": false
+          },
+          "software-type"
+        ]
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Software-Version software-version\n",
+              "major_tokens": [
+                "Software"
+              ],
+              "minor_token": "Version",
+              "raw_content": "software-version\n",
+              "offset": 18
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Software"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "software-version"
+        ]
+      ]
+    }
+  ]
+}

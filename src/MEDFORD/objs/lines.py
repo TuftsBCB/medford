@@ -1,4 +1,5 @@
 from typing import List, Tuple, Dict
+import sys
 
 # new plan:
 # three ABCs, Line, Content, and Templateable
@@ -220,6 +221,9 @@ class Line() :
     def __init__(self, lineno : int, line : str) :
         self.lineno = lineno
         self.line = line
+        print(f"/n Inside Line's init")
+        print(f"lineno is {lineno}")
+        print(f"line is {line}")
     
     def __eq__(self, other) -> bool :
         if type(self) == type(other) :

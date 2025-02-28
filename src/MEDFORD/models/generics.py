@@ -5,6 +5,7 @@ as well as some that are expected for our initial use case tests.
 These Models are defined for use with Pydantic, and contain custom data types and type validation."""
 
 import datetime
+import sys
 from enum import Flag, auto
 from typing import TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
@@ -106,6 +107,33 @@ class Journal(BlockModel):
 class Date(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
+    @model_validator(mode='after')
+    @classmethod
+    def check_date_minor(cls, v) :
+        expected_tokens = ["Note"]
+        has_tokens = all(hasattr(v, t) for t in expected_tokens)
+        if not has_tokens:
+            raise ValueError(f"Paper missing required fields: ")
+        #     mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Date", "Date requires"))
+        return v
+
+class PaperMDL(BlockModel):
+    print("PaperMDL class is being loaded")
+    name: MinorT[str]
+    Link: OptMinorT[str] #instead of str does it have to be link?
+    PMID: OptMinorT[str]
+    DOI: OptMinorT[str] 
+
+# dont really understand what the file thing is about
+#     @model_validator(mode='after')
+#     @classmethod
+#     def check_file(cls, v) :
+#         if v.File is not None:
+#             required_file_tokens = ["File"]
+#             missing_file_tokens = [t for t in required_file_tokens if not hasattr(v, t)]
+#             if missing_file_tokens:
+#                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
+#         return v
     
 class Contributor(BlockModel) :
     name: MinorT[str]
@@ -114,6 +142,7 @@ class Contributor(BlockModel) :
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
 
+    
     @model_validator(mode='after')
     @classmethod
     def check_corresponding_has_email(cls, v) :
