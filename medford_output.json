@@ -1,6 +1,7 @@
 {
   "MEDFORD": [
     {
+<<<<<<< HEAD
       "value": "description",
       "Version": [
         "1.0"
@@ -19,3 +20,6 @@
     }
   ]
 }
+=======
+      "Block": 
+>>>>>>> 6fcac6c (with test suite)

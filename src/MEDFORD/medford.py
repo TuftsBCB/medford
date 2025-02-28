@@ -94,8 +94,24 @@ class OutputMode(Enum):
                 return member
         return None
 
+<<<<<<< HEAD
 
 class MFD:
+=======
+class MedfordEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # Try to convert any object to a dictionary
+        try:
+            return obj.__dict__
+        except AttributeError:
+            # If that fails, try to make it a string
+            try:
+                return str(obj)
+            except:
+                return f"<Unserializable object of type {type(obj).__name__}>"
+    
+class MFD() :
+>>>>>>> 6fcac6c (with test suite)
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
 
     # TODO : ? is this the right way to implement this?
@@ -120,7 +136,11 @@ class MFD:
     dict_data = None
     pydantic_version = None
 
+<<<<<<< HEAD
     def __init__(self, filename, write_json: bool = False, output_path: str = "."):
+=======
+    def __init__(self, filename, write_json:bool=True, output_path:str=".") :
+>>>>>>> 6fcac6c (with test suite)
         self.filename = filename
         self.write_json = write_json
         self.output_path = output_path
@@ -186,12 +206,19 @@ class MFD:
         # TODO: export to json, bag
         # TODO: implement all of the old models
 
+<<<<<<< HEAD
         if self.write_json:
             if self.output_path == ".":
                 with open("medford_output.json", "w", encoding="utf-8") as f:
                     combined_data = process_blocks_to_dict(self.blocks)
                     #     print(combined_data)
                     json.dump(combined_data, f, indent=2)
+=======
+        if self.write_json :
+            if self.output_path == "." :
+                with open("medford_output.json", 'w', encoding="utf-8") as f:
+                    json.dump(self.dict_data, f, indent=2, cls=MedfordEncoder)
+>>>>>>> 6fcac6c (with test suite)
 
                 #     json.dump(self.dict_data, f, indent=2)
 

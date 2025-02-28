@@ -1,14 +1,146 @@
 {
   "MEDFORD": [
     {
+<<<<<<< HEAD
       "value": "description",
       "Version": [
         "1.0"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 0,
+              "line": "@MEDFORD description\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": null,
+              "raw_content": "description\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "MEDFORD"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "description",
+        "minor_tokens": [
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 1,
+                "line": "@MEDFORD-Version 1.0\n",
+                "major_tokens": [
+                  "MEDFORD"
+                ],
+                "minor_token": "Version",
+                "raw_content": "1.0\n",
+                "offset": 17
+              },
+              "extralines": null,
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "description"
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "1.0"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ],
   "Expedition": [
     {
+<<<<<<< HEAD
       "value": "expedition",
       "ShipName": [
         "expedition-shipname"
@@ -24,6 +156,384 @@
       ],
       "Synonyms": [
         "expedition-synonyms"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 3,
+              "line": "@Expedition expedition\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": null,
+              "raw_content": "expedition\n",
+              "offset": 12
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Expedition-ShipName expedition-shipname\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "ShipName",
+              "raw_content": "expedition-shipname\n",
+              "offset": 21
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "ShipName",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Expedition-CruiseID expedition-cruiseID\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "CruiseID",
+              "raw_content": "expedition-cruiseID\n",
+              "offset": 21
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "CruiseID",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 6,
+              "line": "@Expedition-MooringID expedition-mooringID\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "MooringID",
+              "raw_content": "expedition-mooringID\n",
+              "offset": 22
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "MooringID",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 7,
+              "line": "@Expedition-DiveNumber expedition-divenumber\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "DiveNumber",
+              "raw_content": "expedition-divenumber\n",
+              "offset": 23
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "DiveNumber",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 8,
+              "line": "@Expedition-Synonyms expedition-synonyms",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "Synonyms",
+              "raw_content": "expedition-synonyms",
+              "offset": 21
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "Synonyms",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "Expedition"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 3,
+            "line": "@Expedition expedition\n",
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": null,
+            "raw_content": "expedition\n",
+            "offset": 12
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Expedition"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "expedition",
+        "minor_tokens": [
+          [
+            "ShipName",
+            {
+              "headline": {
+                "lineno": 4,
+                "line": "@Expedition-ShipName expedition-shipname\n",
+                "major_tokens": [
+                  "Expedition"
+                ],
+                "minor_token": "ShipName",
+                "raw_content": "expedition-shipname\n",
+                "offset": 21
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "ShipName",
+              "is_header": false
+            }
+          ],
+          [
+            "CruiseID",
+            {
+              "headline": {
+                "lineno": 5,
+                "line": "@Expedition-CruiseID expedition-cruiseID\n",
+                "major_tokens": [
+                  "Expedition"
+                ],
+                "minor_token": "CruiseID",
+                "raw_content": "expedition-cruiseID\n",
+                "offset": 21
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "CruiseID",
+              "is_header": false
+            }
+          ],
+          [
+            "MooringID",
+            {
+              "headline": {
+                "lineno": 6,
+                "line": "@Expedition-MooringID expedition-mooringID\n",
+                "major_tokens": [
+                  "Expedition"
+                ],
+                "minor_token": "MooringID",
+                "raw_content": "expedition-mooringID\n",
+                "offset": 22
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "MooringID",
+              "is_header": false
+            }
+          ],
+          [
+            "DiveNumber",
+            {
+              "headline": {
+                "lineno": 7,
+                "line": "@Expedition-DiveNumber expedition-divenumber\n",
+                "major_tokens": [
+                  "Expedition"
+                ],
+                "minor_token": "DiveNumber",
+                "raw_content": "expedition-divenumber\n",
+                "offset": 23
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "DiveNumber",
+              "is_header": false
+            }
+          ],
+          [
+            "Synonyms",
+            {
+              "headline": {
+                "lineno": 8,
+                "line": "@Expedition-Synonyms expedition-synonyms",
+                "major_tokens": [
+                  "Expedition"
+                ],
+                "minor_token": "Synonyms",
+                "raw_content": "expedition-synonyms",
+                "offset": 21
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "Synonyms",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 3,
+            "line": "@Expedition expedition\n",
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": null,
+            "raw_content": "expedition\n",
+            "offset": 12
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Expedition"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "expedition"
+      ],
+      "ShipName": [
+        [
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Expedition-ShipName expedition-shipname\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "ShipName",
+              "raw_content": "expedition-shipname\n",
+              "offset": 21
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "ShipName",
+            "is_header": false
+          },
+          "expedition-shipname"
+        ]
+      ],
+      "CruiseID": [
+        [
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Expedition-CruiseID expedition-cruiseID\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "CruiseID",
+              "raw_content": "expedition-cruiseID\n",
+              "offset": 21
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "CruiseID",
+            "is_header": false
+          },
+          "expedition-cruiseID"
+        ]
+      ],
+      "MooringID": [
+        [
+          {
+            "headline": {
+              "lineno": 6,
+              "line": "@Expedition-MooringID expedition-mooringID\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "MooringID",
+              "raw_content": "expedition-mooringID\n",
+              "offset": 22
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "MooringID",
+            "is_header": false
+          },
+          "expedition-mooringID"
+        ]
+      ],
+      "DiveNumber": [
+        [
+          {
+            "headline": {
+              "lineno": 7,
+              "line": "@Expedition-DiveNumber expedition-divenumber\n",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "DiveNumber",
+              "raw_content": "expedition-divenumber\n",
+              "offset": 23
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "DiveNumber",
+            "is_header": false
+          },
+          "expedition-divenumber"
+        ]
+      ],
+      "Synonyms": [
+        [
+          {
+            "headline": {
+              "lineno": 8,
+              "line": "@Expedition-Synonyms expedition-synonyms",
+              "major_tokens": [
+                "Expedition"
+              ],
+              "minor_token": "Synonyms",
+              "raw_content": "expedition-synonyms",
+              "offset": 21
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Expedition"
+            ],
+            "minor_token": "Synonyms",
+            "is_header": false
+          },
+          "expedition-synonyms"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ]

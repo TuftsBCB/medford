@@ -1,15 +1,215 @@
 {
   "MEDFORD": [
     {
+<<<<<<< HEAD
       "value": "description",
       "Version": [
         "1.0"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 0,
+              "line": "@MEDFORD description\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": null,
+              "raw_content": "description\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "MEDFORD"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "description",
+        "minor_tokens": [
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 1,
+                "line": "@MEDFORD-Version 1.0\n",
+                "major_tokens": [
+                  "MEDFORD"
+                ],
+                "minor_token": "Version",
+                "raw_content": "1.0\n",
+                "offset": 17
+              },
+              "extralines": null,
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "description"
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "1.0"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ],
   "Keyword": [
     {
+<<<<<<< HEAD
       "value": "keyword"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 3,
+              "line": "@Keyword keyword\n",
+              "major_tokens": [
+                "Keyword"
+              ],
+              "minor_token": null,
+              "raw_content": "keyword\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Keyword"
+            ],
+            "minor_token": null,
+            "is_header": true
+          }
+        ],
+        "major_tokens": [
+          "Keyword"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 3,
+            "line": "@Keyword keyword\n",
+            "major_tokens": [
+              "Keyword"
+            ],
+            "minor_token": null,
+            "raw_content": "keyword\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Keyword"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "keyword",
+        "minor_tokens": []
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 3,
+            "line": "@Keyword keyword\n",
+            "major_tokens": [
+              "Keyword"
+            ],
+            "minor_token": null,
+            "raw_content": "keyword\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Keyword"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "keyword"
+      ]
+>>>>>>> 6fcac6c (with test suite)
     }
   ]
 }

@@ -1,6 +1,7 @@
 {
   "MEDFORD": [
     {
+<<<<<<< HEAD
       "value": "description",
       "Version": [
         "1.0"
@@ -18,6 +19,602 @@
       ],
       "Filename": [
         "data_ref filename"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 0,
+              "line": "@MEDFORD description\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": null,
+              "raw_content": "description\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "MEDFORD"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "description",
+        "minor_tokens": [
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 1,
+                "line": "@MEDFORD-Version 1.0\n",
+                "major_tokens": [
+                  "MEDFORD"
+                ],
+                "minor_token": "Version",
+                "raw_content": "1.0\n",
+                "offset": 17
+              },
+              "extralines": null,
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "description"
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "1.0"
+        ]
+      ]
+    }
+  ],
+  "Data": [
+    {
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 3,
+              "line": "@Data_Ref data_ref name\n",
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": null,
+              "raw_content": "data_ref name\n",
+              "offset": 10
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Data",
+              "Ref"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Data_Ref-Type data_ref type\n",
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": "Type",
+              "raw_content": "data_ref type\n",
+              "offset": 15
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Data",
+              "Ref"
+            ],
+            "minor_token": "Type",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Data_Ref-URI data_ref uri\n",
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": "URI",
+              "raw_content": "data_ref uri\n",
+              "offset": 14
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Data",
+              "Ref"
+            ],
+            "minor_token": "URI",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 6,
+              "line": "@Data_Ref-Filename data_ref filename",
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": "Filename",
+              "raw_content": "data_ref filename",
+              "offset": 19
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Data",
+              "Ref"
+            ],
+            "minor_token": "Filename",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "Data",
+          "Ref"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 3,
+            "line": "@Data_Ref data_ref name\n",
+            "major_tokens": [
+              "Data",
+              "Ref"
+            ],
+            "minor_token": null,
+            "raw_content": "data_ref name\n",
+            "offset": 10
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Data",
+            "Ref"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "data_ref name",
+        "minor_tokens": [
+          [
+            "Type",
+            {
+              "headline": {
+                "lineno": 4,
+                "line": "@Data_Ref-Type data_ref type\n",
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "Type",
+                "raw_content": "data_ref type\n",
+                "offset": 15
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": "Type",
+              "is_header": false
+            }
+          ],
+          [
+            "URI",
+            {
+              "headline": {
+                "lineno": 5,
+                "line": "@Data_Ref-URI data_ref uri\n",
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "URI",
+                "raw_content": "data_ref uri\n",
+                "offset": 14
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": "URI",
+              "is_header": false
+            }
+          ],
+          [
+            "Filename",
+            {
+              "headline": {
+                "lineno": 6,
+                "line": "@Data_Ref-Filename data_ref filename",
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "Filename",
+                "raw_content": "data_ref filename",
+                "offset": 19
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": "Filename",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "Ref": [
+        {
+          "Block": {
+            "details": [
+              {
+                "headline": {
+                  "lineno": 3,
+                  "line": "@Data_Ref data_ref name\n",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": null,
+                  "raw_content": "data_ref name\n",
+                  "offset": 10
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": null,
+                "is_header": true
+              },
+              {
+                "headline": {
+                  "lineno": 4,
+                  "line": "@Data_Ref-Type data_ref type\n",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "Type",
+                  "raw_content": "data_ref type\n",
+                  "offset": 15
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "Type",
+                "is_header": false
+              },
+              {
+                "headline": {
+                  "lineno": 5,
+                  "line": "@Data_Ref-URI data_ref uri\n",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "URI",
+                  "raw_content": "data_ref uri\n",
+                  "offset": 14
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "URI",
+                "is_header": false
+              },
+              {
+                "headline": {
+                  "lineno": 6,
+                  "line": "@Data_Ref-Filename data_ref filename",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "Filename",
+                  "raw_content": "data_ref filename",
+                  "offset": 19
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "Filename",
+                "is_header": false
+              }
+            ],
+            "major_tokens": [
+              "Data",
+              "Ref"
+            ],
+            "head_detail": {
+              "headline": {
+                "lineno": 3,
+                "line": "@Data_Ref data_ref name\n",
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": null,
+                "raw_content": "data_ref name\n",
+                "offset": 10
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": null,
+              "is_header": true
+            },
+            "name": "data_ref name",
+            "minor_tokens": [
+              [
+                "Type",
+                {
+                  "headline": {
+                    "lineno": 4,
+                    "line": "@Data_Ref-Type data_ref type\n",
+                    "major_tokens": [
+                      "Data",
+                      "Ref"
+                    ],
+                    "minor_token": "Type",
+                    "raw_content": "data_ref type\n",
+                    "offset": 15
+                  },
+                  "extralines": null,
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "Type",
+                  "is_header": false
+                }
+              ],
+              [
+                "URI",
+                {
+                  "headline": {
+                    "lineno": 5,
+                    "line": "@Data_Ref-URI data_ref uri\n",
+                    "major_tokens": [
+                      "Data",
+                      "Ref"
+                    ],
+                    "minor_token": "URI",
+                    "raw_content": "data_ref uri\n",
+                    "offset": 14
+                  },
+                  "extralines": null,
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "URI",
+                  "is_header": false
+                }
+              ],
+              [
+                "Filename",
+                {
+                  "headline": {
+                    "lineno": 6,
+                    "line": "@Data_Ref-Filename data_ref filename",
+                    "major_tokens": [
+                      "Data",
+                      "Ref"
+                    ],
+                    "minor_token": "Filename",
+                    "raw_content": "data_ref filename",
+                    "offset": 19
+                  },
+                  "extralines": null,
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "Filename",
+                  "is_header": false
+                }
+              ]
+            ]
+          },
+          "name": [
+            {
+              "headline": {
+                "lineno": 3,
+                "line": "@Data_Ref data_ref name\n",
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": null,
+                "raw_content": "data_ref name\n",
+                "offset": 10
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Data",
+                "Ref"
+              ],
+              "minor_token": null,
+              "is_header": true
+            },
+            "data_ref name"
+          ],
+          "Type": [
+            [
+              {
+                "headline": {
+                  "lineno": 4,
+                  "line": "@Data_Ref-Type data_ref type\n",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "Type",
+                  "raw_content": "data_ref type\n",
+                  "offset": 15
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "Type",
+                "is_header": false
+              },
+              "data_ref type"
+            ]
+          ],
+          "URI": [
+            [
+              {
+                "headline": {
+                  "lineno": 5,
+                  "line": "@Data_Ref-URI data_ref uri\n",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "URI",
+                  "raw_content": "data_ref uri\n",
+                  "offset": 14
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "URI",
+                "is_header": false
+              },
+              "data_ref uri"
+            ]
+          ],
+          "Filename": [
+            [
+              {
+                "headline": {
+                  "lineno": 6,
+                  "line": "@Data_Ref-Filename data_ref filename",
+                  "major_tokens": [
+                    "Data",
+                    "Ref"
+                  ],
+                  "minor_token": "Filename",
+                  "raw_content": "data_ref filename",
+                  "offset": 19
+                },
+                "extralines": null,
+                "major_tokens": [
+                  "Data",
+                  "Ref"
+                ],
+                "minor_token": "Filename",
+                "is_header": false
+              },
+              "data_ref filename"
+            ]
+          ]
+        }
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ]

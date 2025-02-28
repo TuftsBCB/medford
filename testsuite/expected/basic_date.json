@@ -1,17 +1,279 @@
 {
   "MEDFORD": [
     {
+<<<<<<< HEAD
       "value": "description",
       "Version": [
         "1.0"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 0,
+              "line": "@MEDFORD description\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": null,
+              "raw_content": "description\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "MEDFORD"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "description",
+        "minor_tokens": [
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 1,
+                "line": "@MEDFORD-Version 1.0\n",
+                "major_tokens": [
+                  "MEDFORD"
+                ],
+                "minor_token": "Version",
+                "raw_content": "1.0\n",
+                "offset": 17
+              },
+              "extralines": null,
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "description"
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "1.0"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ],
   "Date": [
     {
+<<<<<<< HEAD
       "value": "0000-00-00",
       "Note": [
         "date note"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 3,
+              "line": "@Date 0000-00-00\n",
+              "major_tokens": [
+                "Date"
+              ],
+              "minor_token": null,
+              "raw_content": "0000-00-00\n",
+              "offset": 6
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Date"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Date-Note date note",
+              "major_tokens": [
+                "Date"
+              ],
+              "minor_token": "Note",
+              "raw_content": "date note",
+              "offset": 11
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Date"
+            ],
+            "minor_token": "Note",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "Date"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 3,
+            "line": "@Date 0000-00-00\n",
+            "major_tokens": [
+              "Date"
+            ],
+            "minor_token": null,
+            "raw_content": "0000-00-00\n",
+            "offset": 6
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Date"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "0000-00-00",
+        "minor_tokens": [
+          [
+            "Note",
+            {
+              "headline": {
+                "lineno": 4,
+                "line": "@Date-Note date note",
+                "major_tokens": [
+                  "Date"
+                ],
+                "minor_token": "Note",
+                "raw_content": "date note",
+                "offset": 11
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Date"
+              ],
+              "minor_token": "Note",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 3,
+            "line": "@Date 0000-00-00\n",
+            "major_tokens": [
+              "Date"
+            ],
+            "minor_token": null,
+            "raw_content": "0000-00-00\n",
+            "offset": 6
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Date"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "0000-00-00"
+      ],
+      "Note": [
+        [
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Date-Note date note",
+              "major_tokens": [
+                "Date"
+              ],
+              "minor_token": "Note",
+              "raw_content": "date note",
+              "offset": 11
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Date"
+            ],
+            "minor_token": "Note",
+            "is_header": false
+          },
+          "date note"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ]

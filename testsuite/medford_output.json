@@ -1,14 +1,146 @@
 {
   "MEDFORD": [
     {
+<<<<<<< HEAD
       "value": "description",
       "Version": [
         "1.0"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 0,
+              "line": "@MEDFORD description\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": null,
+              "raw_content": "description\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "MEDFORD"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "description",
+        "minor_tokens": [
+          [
+            "Version",
+            {
+              "headline": {
+                "lineno": 1,
+                "line": "@MEDFORD-Version 1.0\n",
+                "major_tokens": [
+                  "MEDFORD"
+                ],
+                "minor_token": "Version",
+                "raw_content": "1.0\n",
+                "offset": 17
+              },
+              "extralines": null,
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 0,
+            "line": "@MEDFORD description\n",
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": null,
+            "raw_content": "description\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "MEDFORD"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "description"
+      ],
+      "Version": [
+        [
+          {
+            "headline": {
+              "lineno": 1,
+              "line": "@MEDFORD-Version 1.0\n",
+              "major_tokens": [
+                "MEDFORD"
+              ],
+              "minor_token": "Version",
+              "raw_content": "1.0\n",
+              "offset": 17
+            },
+            "extralines": null,
+            "major_tokens": [
+              "MEDFORD"
+            ],
+            "minor_token": "Version",
+            "is_header": false
+          },
+          "1.0"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ],
   "Species": [
     {
+<<<<<<< HEAD
       "value": "species",
       "Loc": [
         "species-loc"
@@ -21,6 +153,322 @@
       ],
       "CultureCollection": [
         "species-culturecollection"
+=======
+      "Block": {
+        "details": [
+          {
+            "headline": {
+              "lineno": 3,
+              "line": "@Species species\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": null,
+              "raw_content": "species\n",
+              "offset": 9
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": null,
+            "is_header": true
+          },
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Species-Loc species-loc\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "Loc",
+              "raw_content": "species-loc\n",
+              "offset": 13
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "Loc",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Species-ReefCollection species-reefcollection\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "ReefCollection",
+              "raw_content": "species-reefcollection\n",
+              "offset": 24
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "ReefCollection",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 6,
+              "line": "@Species-Cultured species-cultured\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "Cultured",
+              "raw_content": "species-cultured\n",
+              "offset": 18
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "Cultured",
+            "is_header": false
+          },
+          {
+            "headline": {
+              "lineno": 7,
+              "line": "@Species-CultureCollection species-culturecollection",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "CultureCollection",
+              "raw_content": "species-culturecollection",
+              "offset": 27
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "CultureCollection",
+            "is_header": false
+          }
+        ],
+        "major_tokens": [
+          "Species"
+        ],
+        "head_detail": {
+          "headline": {
+            "lineno": 3,
+            "line": "@Species species\n",
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": null,
+            "raw_content": "species\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Species"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "name": "species",
+        "minor_tokens": [
+          [
+            "Loc",
+            {
+              "headline": {
+                "lineno": 4,
+                "line": "@Species-Loc species-loc\n",
+                "major_tokens": [
+                  "Species"
+                ],
+                "minor_token": "Loc",
+                "raw_content": "species-loc\n",
+                "offset": 13
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "Loc",
+              "is_header": false
+            }
+          ],
+          [
+            "ReefCollection",
+            {
+              "headline": {
+                "lineno": 5,
+                "line": "@Species-ReefCollection species-reefcollection\n",
+                "major_tokens": [
+                  "Species"
+                ],
+                "minor_token": "ReefCollection",
+                "raw_content": "species-reefcollection\n",
+                "offset": 24
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "ReefCollection",
+              "is_header": false
+            }
+          ],
+          [
+            "Cultured",
+            {
+              "headline": {
+                "lineno": 6,
+                "line": "@Species-Cultured species-cultured\n",
+                "major_tokens": [
+                  "Species"
+                ],
+                "minor_token": "Cultured",
+                "raw_content": "species-cultured\n",
+                "offset": 18
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "Cultured",
+              "is_header": false
+            }
+          ],
+          [
+            "CultureCollection",
+            {
+              "headline": {
+                "lineno": 7,
+                "line": "@Species-CultureCollection species-culturecollection",
+                "major_tokens": [
+                  "Species"
+                ],
+                "minor_token": "CultureCollection",
+                "raw_content": "species-culturecollection",
+                "offset": 27
+              },
+              "extralines": null,
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "CultureCollection",
+              "is_header": false
+            }
+          ]
+        ]
+      },
+      "name": [
+        {
+          "headline": {
+            "lineno": 3,
+            "line": "@Species species\n",
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": null,
+            "raw_content": "species\n",
+            "offset": 9
+          },
+          "extralines": null,
+          "major_tokens": [
+            "Species"
+          ],
+          "minor_token": null,
+          "is_header": true
+        },
+        "species"
+      ],
+      "Loc": [
+        [
+          {
+            "headline": {
+              "lineno": 4,
+              "line": "@Species-Loc species-loc\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "Loc",
+              "raw_content": "species-loc\n",
+              "offset": 13
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "Loc",
+            "is_header": false
+          },
+          "species-loc"
+        ]
+      ],
+      "ReefCollection": [
+        [
+          {
+            "headline": {
+              "lineno": 5,
+              "line": "@Species-ReefCollection species-reefcollection\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "ReefCollection",
+              "raw_content": "species-reefcollection\n",
+              "offset": 24
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "ReefCollection",
+            "is_header": false
+          },
+          "species-reefcollection"
+        ]
+      ],
+      "Cultured": [
+        [
+          {
+            "headline": {
+              "lineno": 6,
+              "line": "@Species-Cultured species-cultured\n",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "Cultured",
+              "raw_content": "species-cultured\n",
+              "offset": 18
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "Cultured",
+            "is_header": false
+          },
+          "species-cultured"
+        ]
+      ],
+      "CultureCollection": [
+        [
+          {
+            "headline": {
+              "lineno": 7,
+              "line": "@Species-CultureCollection species-culturecollection",
+              "major_tokens": [
+                "Species"
+              ],
+              "minor_token": "CultureCollection",
+              "raw_content": "species-culturecollection",
+              "offset": 27
+            },
+            "extralines": null,
+            "major_tokens": [
+              "Species"
+            ],
+            "minor_token": "CultureCollection",
+            "is_header": false
+          },
+          "species-culturecollection"
+        ]
+>>>>>>> 6fcac6c (with test suite)
       ]
     }
   ]
