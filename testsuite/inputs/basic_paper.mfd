@@ -1,7 +1,7 @@
 @MEDFORD description
 @MEDFORD-Version 1.0
 
-@Paper paper
-@Paper-Link paper-link
-@Paper-PMID paper-pmid
-@Paper-DOI paper-doi
+@Paper_Primary paper
+@Paper_Primary-Link paper-link
+@Paper_Primary-PMID paper-pmid
+@Paper_Primary-DOI paper-doi

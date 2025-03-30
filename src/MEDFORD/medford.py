@@ -32,6 +32,43 @@ class ParserMode(Enum) :
 
     def __str__(self) :
         return self.value
+    
+def process_blocks_to_dict(blocks):
+    combined_dict = {}
+    
+    for block in blocks:
+        if not hasattr(block, 'major_tokens') or not block.major_tokens:
+            continue
+            
+        major_token = block.major_tokens[0]
+        if len(block.major_tokens) > 0:
+            major_token = "_".join(block.major_tokens)
+        
+        # Initialize category if needed
+        if major_token not in combined_dict:
+            combined_dict[major_token] = []
+        
+        block_dict = {}
+        if hasattr(block, 'details') and block.details:
+            # get header (first value)
+            header_detail = block.details[0]
+            block_dict["value"] = header_detail.get_raw_content().strip()
+            
+            # process minor tokens
+            for detail in block.details[1:]:
+                if detail.minor_token:
+                    minor_token = detail.minor_token
+                    content = detail.get_raw_content().strip()
+                    
+                    if minor_token not in block_dict:
+                        block_dict[minor_token] = []
+                    
+                    block_dict[minor_token].append(content)
+        
+        # add processed block to its major category
+        combined_dict[major_token].append(block_dict)
+    
+    return combined_dict
 
 class OutputMode(Enum):
     """Enum storing possible outout types of the MEDFORD parser."""
@@ -51,18 +88,6 @@ class OutputMode(Enum):
             if member.name.lower() == value.lower() :
                 return member
         return None
-
-class MedfordEncoder(json.JSONEncoder):
-    def default(self, obj):
-        # Try to convert any object to a dictionary
-        try:
-            return obj.__dict__
-        except AttributeError:
-            # If that fails, try to make it a string
-            try:
-                return str(obj)
-            except:
-                return f"<Unserializable object of type {type(obj).__name__}>"
     
 class MFD() :
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
@@ -152,7 +177,9 @@ class MFD() :
         if self.write_json :
             if self.output_path == "." :
                 with open("medford_output.json", 'w', encoding="utf-8") as f:
-                    json.dump(self.dict_data, f, indent=2, cls=MedfordEncoder)
+                    combined_data = process_blocks_to_dict(self.blocks)
+                #     print(combined_data)
+                    json.dump(combined_data, f, indent=2)
 
                 #     json.dump(self.dict_data, f, indent=2)
 
