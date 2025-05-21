@@ -268,9 +268,6 @@ class Detail(LineCollection) :
             self.is_header = True
         else :
             self.is_header = False
-        print(f"\nInside Detail's init", file=sys.stderr)
-        print(f"Headline major tokens: {headline.major_tokens}", file=sys.stderr)
-        print(f"Headline minor token: {headline.minor_token}", file=sys.stderr)
 
         content_length = len(self.headline.raw_content.strip())
         if self.extralines is not None :
@@ -280,19 +277,14 @@ class Detail(LineCollection) :
         if content_length == 0 :
             mfdglobals.validator.add_error(MissingContent(self))
 
-        print(f"content length is: {content_length}", file=sys.stderr)
-
     def get_str_majors(self) -> str :
         """Returns the list of major tokens as a _-joined string.
         """
-        print(f"\nInside get_str_majors", file=sys.stderr)
-        print(f"Major tokens: {self.major_tokens}", file=sys.stderr)
         return "_".join(self.major_tokens)
 
     def get_raw_content(self) -> str :
         """Returns the content of the Detail, as a string without substitutions.
         """
-        print(f"\n=== get_raw_content called ===", file=sys.stderr)
         
         import traceback
         # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
@@ -304,11 +296,7 @@ class Detail(LineCollection) :
         return out
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str :
-        print(f"\n=== get_content called ===", file=sys.stderr)
-        print(f"Major tokens: {self.major_tokens}", file=sys.stderr)
-        print(f"Minor token: {self.minor_token}", file=sys.stderr)
         out = self.headline.get_content(resolved_macros)
-        print(f"Content: {out}", file=sys.stderr)
         # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
         out = self.headline.get_content(resolved_macros)
         # print(f"\nInside get_content", file=sys.stderr)
