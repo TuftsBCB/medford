@@ -2,8 +2,20 @@
 @MEDFORD-Version 1.0
 
 @Contributor Michael K. DeSalvo
-@Contributor-Association School of Natural Sciences, University of California Merced
 @Contributor-Role Corresponding Author
+@Contributor-Email email
+
+@Data_Primary ref
+@Data_Primary-URI invalid uri
+
+
+@Species
+
+@FileRoot fileroot
+@FileRoot-File file
+@FileRoot-File file2
+
+
 
 
 

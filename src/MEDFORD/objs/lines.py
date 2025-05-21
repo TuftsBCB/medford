@@ -1,10 +1,7 @@
 from typing import List, Tuple, Dict
 import sys
-<<<<<<< HEAD
 import MEDFORD.mfdglobals as mfdglobals
 
-=======
->>>>>>> 6fcac6c (with test suite)
 
 # new plan:
 # three ABCs, Line, Content, and Templateable
@@ -261,6 +258,7 @@ class Line:
         self.lineno = lineno
         self.line = line
 <<<<<<< HEAD
+<<<<<<< HEAD
         if mfdglobals.debug:
             print(f"/n Inside Line's init")
             print(f"lineno is {lineno}")
@@ -272,6 +270,8 @@ class Line:
         print(f"/n Inside Line's init")
         print(f"lineno is {lineno}")
         print(f"line is {line}")
+=======
+>>>>>>> 90ea795 (halfway done with bagit handler)
     
     def __eq__(self, other) -> bool :
         if type(self) == type(other) :

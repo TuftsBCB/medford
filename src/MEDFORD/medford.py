@@ -1,7 +1,9 @@
 """Module containing the MEDFORD parser, which can validate and compile MEDFORD metadata files."""
 
 import sys
+import os
 from typing import List, Dict
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #TODO terminal would not recognize bagithandler without this
 
 import argparse
 import json
@@ -14,8 +16,12 @@ from MEDFORD.objs.linecollector import LineCollector, Macro, Block
 from MEDFORD.objs.dictionizer import Dictionizer
 from MEDFORD.models.generics import Entity
 from MEDFORD.objs.linecollections import Detail
+from MEDFORD.objs.bagitHandler import BagItHandler
+
 
 import MEDFORD.mfdglobals as mfdglobals
+
+
 
 # order of ops:
 # 1. open file
@@ -44,6 +50,7 @@ def process_blocks_to_dict(blocks):
             continue
 
         major_token = block.major_tokens[0]
+        # hard code joining token with underscore
         if len(block.major_tokens) > 0:
             major_token = "_".join(block.major_tokens)
 
@@ -137,16 +144,24 @@ class MFD() :
     pydantic_version = None
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def __init__(self, filename, write_json: bool = False, output_path: str = "."):
 =======
     def __init__(self, filename, write_json:bool=True, output_path:str=".") :
 >>>>>>> 6fcac6c (with test suite)
+=======
+    def __init__(self, filename, mode: OutputMode = OutputMode.OTHER, 
+             action: ParserMode = None, 
+             base_dir: str = None, write_json:bool=True, output_path:str=".") :
+>>>>>>> 90ea795 (halfway done with bagit handler)
         self.filename = filename
+        self.mode = mode
+        self.action = action  # Store the action
+        self.base_dir = base_dir
         self.write_json = write_json
         self.output_path = output_path
 
     def run_medford(self):
-        print("Starting MEDFORD validation", file=sys.stderr)
         """Main function that runs MEDFORD compilation from start to finish."""
         self.em_inst = mfdglobals.validator  # this is just for debug purposes
 
@@ -189,7 +204,12 @@ class MFD() :
         # maybe in the future look into fixing this?
         #   The problem is that Blocks aren't Dicts.
         self.pydantic_version = Entity(**self.dict_data)
+<<<<<<< HEAD
         if mfdglobals.mv.instance().has_pydantic_err():
+=======
+        if mfdglobals.mv.instance().has_pydantic_err() :
+            sys.stderr.write("has error\n")
+>>>>>>> 90ea795 (halfway done with bagit handler)
             mfdglobals.mv.instance().print_pydantic_errs()
 
         # try:
@@ -205,6 +225,7 @@ class MFD() :
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
+<<<<<<< HEAD
 
 <<<<<<< HEAD
         if self.write_json:
@@ -219,8 +240,38 @@ class MFD() :
                 with open("medford_output.json", 'w', encoding="utf-8") as f:
                     json.dump(self.dict_data, f, indent=2, cls=MedfordEncoder)
 >>>>>>> 6fcac6c (with test suite)
-
-                #     json.dump(self.dict_data, f, indent=2)
+=======
+        if self.mode == OutputMode.BAGIT:
+                # Process blocks to dictionary format
+            combined_data = process_blocks_to_dict(self.blocks)
+                
+            bagit_handler = BagItHandler(combined_data, self.base_dir, self.output_path)
+                   
+            if self.action == ParserMode.VALIDATE:  # <-- Note: This should be self.action, not self.ParserMode
+                print("meep\n")
+                if bagit_handler.validate():
+                    print("BagIt validation passed.")
+                else:
+                    print("BagIt validation failed.")
+                    sys.exit(1)
+                
+            elif self.action == ParserMode.COMPILE:  # <-- Note: This should be self.action, not self.ParserMode
+                pass
+                # Compile BagIt package
+                # try:
+                #     bag_path = bagit_handler.compile()
+                #     print(f"BagIt package created at: {bag_path}")
+                # except Exception as e:
+                #     print(f"Error creating BagIt package: {e}")
+                #     sys.exit(1)
+        
+    # Write JSON output if requested (indentation corrected)
+        if self.write_json:
+            if self.output_path == ".":
+                with open("medford_output.json", 'w', encoding="utf-8") as f:
+                    combined_data = process_blocks_to_dict(self.blocks)
+                    json.dump(combined_data, f, indent=2)
+>>>>>>> 90ea795 (halfway done with bagit handler)
 
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line]:
@@ -319,6 +370,7 @@ ap.add_argument(
 
 
 # want full API call to include all minor api calls; return dict w/ string indices?
+<<<<<<< HEAD
 def parse_args_and_go():
     args = ap.parse_args()
     mfd = MFD(PurePath(args.file), write_json=args.write_json)
@@ -329,6 +381,26 @@ def parse_args_and_go():
 def provide_args_and_go(action: ParserMode, file: str, mode: OutputMode, debug: bool = False):
     mfdglobals.debug = debug
     mfd = MFD(PurePath(file))
+=======
+def provide_args_and_go(action: ParserMode, file: str, mode: OutputMode, 
+                        base_dir: str = None, write_json: bool = False, 
+                        output_path: str = ".", debug: bool = False):
+    mfdglobals.debug = debug
+    mfd = MFD(file, mode, action, base_dir, write_json, output_path) 
+    mfd.run_medford()
+
+def parse_args_and_go():
+    args = ap.parse_args()
+    mfdglobals.debug = args.debug
+    mfd = MFD(
+        args.file,
+        mode=args.mode,
+        action=args.action,
+        base_dir=args.dir,
+        write_json=args.write_json,
+        output_path="."
+    )
+>>>>>>> 90ea795 (halfway done with bagit handler)
     mfd.run_medford()
 
 
