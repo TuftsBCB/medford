@@ -189,7 +189,7 @@ class MFD() :
                 # Process blocks to dictionary format
             combined_data = process_blocks_to_dict(self.blocks)
                 
-            bagit_handler = BagItHandler(combined_data, self.base_dir, self.output_path)
+            bagit_handler = BagItHandler(combined_data, self.base_dir, self.output_path, self.filename)
                    
             if self.action == ParserMode.VALIDATE:  # <-- Note: This should be self.action, not self.ParserMode
                 print("meep\n")
@@ -212,7 +212,7 @@ class MFD() :
     # Write JSON output if requested (indentation corrected)
         if self.write_json:
             if self.output_path == ".":
-                with open("medford_output.json", 'w', encoding="utf-8") as f:
+                with open("medford_output.json", 'w', encoding="utf-8") as f: #TODO create new file or use medford_output_json
                     combined_data = process_blocks_to_dict(self.blocks)
                     json.dump(combined_data, f, indent=2)
 
