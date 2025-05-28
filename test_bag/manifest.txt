@@ -1,0 +1,4 @@
+3a2cf24420e887d318be65a3d35c14cd  metadata.mfd
+b42c1b22991c1386c2be6f206b9601b1  metadata.json
+d41d8cd98f00b204e9800998ecf8427e  data/paper.pdf
+d41d8cd98f00b204e9800998ecf8427e  data/results.csv
