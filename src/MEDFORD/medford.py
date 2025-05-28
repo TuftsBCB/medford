@@ -1,13 +1,4 @@
 """Module containing the MEDFORD parser, which can validate and compile MEDFORD metadata files."""
-
-import sys
-import os
-from typing import List, Dict
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #TODO terminal would not recognize bagithandler without this
-
-import argparse
-import json
-
 from enum import Enum
 from pathlib import PurePath #?
 
@@ -18,9 +9,14 @@ from MEDFORD.models.generics import Entity
 from MEDFORD.objs.linecollections import Detail
 from MEDFORD.objs.bagitHandler import BagItHandler
 
+import sys
+import os
+from typing import List, Dict
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #TODO terminal would not recognize bagithandler without this
 
+import argparse
+import json
 import MEDFORD.mfdglobals as mfdglobals
-
 
 
 # order of ops:
@@ -31,12 +27,12 @@ import MEDFORD.mfdglobals as mfdglobals
 # 5. verify dict using Pydantic (using ?)
 
 # TODO : add error mgmt
-class ParserMode(Enum) :
+class ParserMode(Enum):
     """Enum storing the mode of operation of the MEDFORD parser."""
     VALIDATE = 'validate'
     COMPILE = 'compile'
 
-    def __str__(self) :
+    def __str__(self):
         return self.value
     
 def process_blocks_to_dict(blocks):
@@ -77,6 +73,7 @@ def process_blocks_to_dict(blocks):
     
     return combined_dict
 
+
 class OutputMode(Enum):
     """Enum storing possible outout types of the MEDFORD parser."""
     OTHER = 'OTHER'
@@ -96,7 +93,8 @@ class OutputMode(Enum):
                 return member
         return None
     
-class MFD() :
+
+class MFD():
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
 
     # TODO : ? is this the right way to implement this?
@@ -133,7 +131,7 @@ class MFD() :
 
     def run_medford(self):
         """Main function that runs MEDFORD compilation from start to finish."""
-        self.em_inst = mfdglobals.validator # this is just for debug purposes
+        self.em_inst = mfdglobals.validator  # this is just for debug purposes
         
         # TODO: way to avoid putting all lines into memory?
         # TODO: make LineProcessor take all of the strs/filename and do the work itself?
@@ -186,13 +184,12 @@ class MFD() :
         # TODO: export to json, bag
         # TODO: implement all of the old models
         if self.mode == OutputMode.BAGIT:
-                # Process blocks to dictionary format
+            # Process blocks to dictionary format
             combined_data = process_blocks_to_dict(self.blocks)
                 
             bagit_handler = BagItHandler(combined_data, self.base_dir, self.output_path, self.filename)
                    
             if self.action == ParserMode.VALIDATE:  # <-- Note: This should be self.action, not self.ParserMode
-                print("meep\n")
                 if bagit_handler.validate():
                     print("BagIt validation passed.")
                 else:
@@ -202,12 +199,12 @@ class MFD() :
             elif self.action == ParserMode.COMPILE:  # <-- Note: This should be self.action, not self.ParserMode
                 pass
                 # Compile BagIt package
-                # try:
-                #     bag_path = bagit_handler.compile()
-                #     print(f"BagIt package created at: {bag_path}")
-                # except Exception as e:
-                #     print(f"Error creating BagIt package: {e}")
-                #     sys.exit(1)
+                try:
+                    bag_path = bagit_handler._compile()
+                    print(f"BagIt package created at: {bag_path}")
+                except Exception as e:
+                    print(f"Error creating BagIt package: {e}")
+                    sys.exit(1)
         
     # Write JSON output if requested (indentation corrected)
         if self.write_json:
@@ -215,6 +212,8 @@ class MFD() :
                 with open("medford_output.json", 'w', encoding="utf-8") as f: #TODO create new file or use medford_output_json
                     combined_data = process_blocks_to_dict(self.blocks)
                     json.dump(combined_data, f, indent=2)
+                    hello
+                        
 
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line] :
