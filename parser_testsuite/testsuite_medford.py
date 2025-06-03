@@ -62,10 +62,17 @@ def deep_compare(expected, actual, path="root"):
 
 
 def main():
+<<<<<<< HEAD:testsuite/testsuite_medford.py
     input_dir = "testsuite/inputs"
     expected_dir = "testsuite/expected"
     output_dir = "testsuite/outputs"
 
+=======
+    input_dir = "parser_testsuite/inputs"
+    expected_dir = "parser_testsuite/expected"
+    output_dir = "parser_testsuite/outputs"
+    
+>>>>>>> 54aa5fb (testsuite done):parser_testsuite/testsuite_medford.py
     os.makedirs(output_dir, exist_ok=True)
 
     passed = 0
