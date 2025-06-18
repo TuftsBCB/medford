@@ -324,7 +324,7 @@ ap.add_argument("-v", "--version", action='version', version='%(prog)s {version}
 
 # want full API call to include all minor api calls; return dict w/ string indices?
 def provide_args_and_go(action: ParserMode, file: str, mode: OutputMode, 
-                        base_dir: str = None, write_json: bool = False, 
+                        base_dir: str = ".", write_json: bool = False, # changed base_dir default from None to "."
                         output_path: str = ".", debug: bool = False):
     mfdglobals.debug = debug
     mfd = MFD(file, mode, action, base_dir, write_json, output_path) 

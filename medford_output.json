@@ -1,6 +1,7 @@
 {
   "MEDFORD": [
     {
+      "value": "Shpillker 2024",
 <<<<<<< HEAD
 <<<<<<< HEAD
       "value": "description",
@@ -12,189 +13,19 @@
       ]
     }
   ],
-<<<<<<< HEAD
-  "Contributor": [
-    {
-      "value": "Michael K. DeSalvo",
-      "Association": [
-        "School of Natural Sciences, University of California Merced"
-      ],
-      "Role": [
-        "Corresponding Author"
-=======
-  "Paper_Primary": [
-    {
-      "value": "Transcriptome deep-sequencing and clustering of expressed isoforms from Favia corals",
-      "Link": [
-        "https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-14-546"
-      ]
-    }
-  ],
   "Date": [
     {
-      "value": "2012-12-12",
-      "Note": [
-        "Received"
-      ]
-    },
-    {
-      "value": "2013-08-03",
-      "Note": [
-        "Accepted"
-      ]
-    },
-    {
-      "value": "2013-08-12",
-      "Note": [
-        "Published"
-      ]
+      "value": "2024-01-15"
     }
   ],
-  "Contributor": [
+  "FileRoot": [
     {
-      "value": "Shaadi F Pooyaei Mehr",
-      "Association": [
-        "The Graduate Center, Molecular, Cellular and Developmental Biology, City University of New York, New York, NY 10065, USA",
-        "American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA"
-      ],
-      "Role": [
-        "First Author"
-      ]
-    },
-    {
-      "value": "Rob DeSalle",
-      "Email": [
-        "fpooyaei-mehr@amnh.org"
-      ],
-      "Association": [
-        "American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "value": "Hung-Teh Kao",
-      "Association": [
-        "Department of Psychiatry and Human Behavior, Division of Biology and Medicine, Warren Alpert Medical School, Brown University, Providence RI 02912, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "value": "Apurva Narechania",
-      "Association": [
-        "American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "value": "Zhou Han",
-      "Association": [
-        "John B. Pierce Laboratory, Cellular and Molecular Physiology, Yale University, New Haven, CT 06519, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "value": "Dan Tchernov",
-      "Association": [
-        "Marine Biology Department, The Leon H. Charney School of Marine Sciences, University of Haifa, Mount Carmel, Haifa 31905, Israel"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "value": "Vincent Pieribone",
-      "Association": [
-        "John B. Pierce Laboratory, Cellular and Molecular Physiology, Yale University, New Haven, CT 06519, USA"
-      ],
-      "Role": [
-        "Author"
-      ]
-    },
-    {
-      "value": "David F Gruber",
-      "Association": [
-        "The Graduate Center, Molecular, Cellular and Developmental Biology, City University of New York, New York, NY 10065, USA.",
-        "American Museum of Natural History, Sackler Institute of Comparative Genomics, New York, NY 10024, USA",
-        "Department of Natural Sciences, City University of New York, Baruch College, Box A-0506, 17 Lexington Avenue, New York, NY 10010, USA"
-      ],
-      "Role": [
-        "Last Author"
-      ]
+      "value": "./bagit_testsuite/inputs/test_data"
     }
   ],
-  "Funding": [
+  "Bag_Name": [
     {
-      "value": "NSF grant 0920572 and via a Baruch College Travel Grant to DFG.",
-      "ID": [
-        "0920572"
-      ]
-    }
-  ],
-  "Keyword": [
-    {
-      "value": "K-mer"
-    },
-    {
-      "value": "Contig"
-    },
-    {
-      "value": "Open reading frame"
-    },
-    {
-      "value": "Fluorescent protein"
-    },
-    {
-      "value": "Blast@Keyword Clustering"
-    },
-    {
-      "value": "High-throughput sequencing"
-    },
-    {
-      "value": "Illumina paired-end"
-    },
-    {
-      "value": "Coral"
-    }
-  ],
-  "Data_Ref": [
-    {
-      "value": "Parameters and commands used in this manuscript.",
-      "Type": [
-        "Word Doc Instructions"
-      ],
-      "URI": [
-        "https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM1_ESM.docx"
-      ],
-      "Filename": [
-        "12864_2012_5260_MOESM1_ESM.docx"
-      ],
-      "Size": [
-        "142 KB"
-      ]
-    },
-    {
-      "value": "BlastP parsed output files against N. vectensis proteome for sample Fav1 and Fav2 with 2e-30",
-      "Type": [
-        "Text File"
-      ],
-      "URI": [
-        "https://static-content.springer.com/esm/art%3A10.1186%2F1471-2164-14-546/MediaObjects/12864_2012_5260_MOESM3_ESM.txt"
-      ],
-      "Filename": [
-        "12864_2012_5260_MOESM3_ESM.txt"
-      ],
-      "Size": [
-        "9 MB"
->>>>>>> 90ea795 (halfway done with bagit handler)
-      ]
+      "value": "no_dir_primary_err"
     }
   ]
 }

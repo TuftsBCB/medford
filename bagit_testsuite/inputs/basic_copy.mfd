@@ -1,0 +1,10 @@
+@MEDFORD Shpillker 2024
+@MEDFORD-Version 1.0
+
+@Date 2024-01-15
+
+@FileRoot ./bagit_testsuite/inputs/test_data
+
+@Paper_Copy paper.pdf
+
+@Bag_Name basic_copy

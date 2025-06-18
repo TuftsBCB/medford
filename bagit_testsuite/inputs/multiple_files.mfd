@@ -5,15 +5,15 @@
 @FileRoot ./bagit_testsuite/inputs/test_data
 
 @Data experiment_data
-@Data-File results/experiment.csv
+@Data_Copy results/experiment.csv
 
 @Paper research_paper
-@Paper-File docs/paper_in_docs.pdf
+@Paper_Primary docs/paper_in_docs.pdf
 
-@Supplementary extra_info
-@Supplementary-File supplementary/notes.txt
+@Data extra_info
+@Data_Copy supplementary/notes.txt
 
 @Paper additional paper
-@Paper-File paper.pdf
+@Paper_Copy File paper.pdf
 
 @Bag_Name multiple_files

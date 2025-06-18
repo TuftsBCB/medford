@@ -9,7 +9,7 @@ import hashlib
 
 class BagItHandler:
     def __init__(self, medford_data: Dict[str, Any],
-                 base_dir: Optional[str] = None, output_path: str = ".",
+                 base_dir: Optional[str] = ".", output_path: str = ".",
                  medford_file_path: Optional[str] = None):
 
         self.medford_data = medford_data
@@ -32,6 +32,10 @@ class BagItHandler:
 
         # get FileRoot if specified
         self.file_root = self._get_file_root()
+        if self.file_root == None:
+            self.no_files = True
+        else:
+            self.no_files = False
 
     def _get_file_root(self):
         if "FileRoot" in self.medford_data:
@@ -39,6 +43,7 @@ class BagItHandler:
                 if "value" in entry:
                     file_root_value = entry["value"]
                     if file_root_value == ".":
+                        # print(self.base_dir)
                         return self.base_dir
                     elif os.path.isabs(file_root_value):  # absolute path
                         return Path(file_root_value)
@@ -46,68 +51,82 @@ class BagItHandler:
                         # relative path from base directory
                         return (self.base_dir / file_root_value
                                 if self.base_dir else Path(file_root_value))
+        else:
+            print("Warning: File root not specified.") # TODO what to do?
+
         return self.base_dir
 
     def _validate(self):
         # check if we have a file root
-        if not self.file_root:
-            print("Error: FileRoot is required for BagIt validation.")
-            return False
+        if self.no_files: #TODO
+            return True
+        else: 
+            if not self.file_root:
+                print("Error: FileRoot is required for BagIt validation.")
+                return False
 
-        # check if file root exists
-        if not self.file_root.exists():
-            print("Error: FileRoot directory "
-                  f"{self.file_root} does not exist.")
-            return False
+            # check if file root exists
+            if not self.file_root.exists():
+                print("Error: FileRoot directory "
+                    f"{self.file_root} does not exist.")
+                return False
 
-        # check if referenced files exist
-        referenced_files = self._get_file_references()
-        missing_files = []
+            # check if referenced files exist
+            referenced_files = self._get_file_references()
+            missing_files = []
 
-        for file_tag, file_path in referenced_files:
-            full_path = self.file_root / file_path
-            if not full_path.exists():
-                missing_files.append((file_tag, str(file_path)))
+            for file_tag, file_path in referenced_files:
+                full_path = self.file_root / file_path
+                if not full_path.exists():
+                    missing_files.append((file_tag, str(file_path)))
 
-        if missing_files:
-            print("Error: Referenced files are missing:")
-            for tag, file in missing_files:
-                print(f"  - {tag}: {file}")
-            return False
+            if missing_files:
+                print("Error: Referenced files are missing:")
+                for tag, file in missing_files:
+                    print(f"  - {tag}: {file}")
+                return False
 
-        # check all files in FileRoot must have corresponding tags
-        untagged_files = self._find_untagged_files(referenced_files)
-        if untagged_files:
-            print("Error: Files in FileRoot without corresponding tags:")
-            for file in untagged_files:
-                print(f"  - {file}")
-            return False
+            # check all files in FileRoot must have corresponding tags
+            untagged_files = self._find_untagged_files(referenced_files)
+            if untagged_files:
+                print("Error: Files in FileRoot without corresponding tags:")
+                for file in untagged_files:
+                    print(f"  - {file}")
+                return False
 
-        # check if all files are readable
-        unreadable_files = []
-        for tag_name, file_path in referenced_files:
-            full_path = self.file_root / file_path
-            if not os.access(full_path, os.R_OK):
-                unreadable_files.append(str(file_path))
+            # check if all files are readable
+            unreadable_files = []
+            for tag_name, file_path in referenced_files:
+                full_path = self.file_root / file_path
+                if not os.access(full_path, os.R_OK):
+                    unreadable_files.append(str(file_path))
 
-        if unreadable_files:
-            print("Error: Unreadable files:")
-            for file in unreadable_files:
-                print(f"  - {file}")
-            return False
+            if unreadable_files:
+                print("Error: Unreadable files:")
+                for file in unreadable_files:
+                    print(f"  - {file}")
+                return False
 
         return True
 
     def _get_file_references(self):
         file_references = []
+        seen_files = set() # to keep track of if there are 2 files with the same name
 
         for key in self.medford_data:
-            for entry in self.medford_data[key]:
-                if "File" in entry:
-                    files = (entry["File"] if isinstance(entry["File"], list)
-                             else [entry["File"]])
-                    for file_path in files:
-                        file_references.append((f"{key}-File", file_path))
+            if key.endswith("_Primary") or key.endswith("_Copy"):
+                for entry in self.medford_data[key]:
+                    if "value" in entry:
+                        file_path = entry["value"]
+                        filename = Path(file_path).name
+               
+                        if filename in seen_files:
+                            raise ValueError(f"Duplicate file name detected: '{filename}' "
+                                  f"in {key}. File names must be unique across all tags.")
+                        
+                        seen_files.add(filename)
+                        file_references.append((key, file_path))
+                    
 
         return file_references
 
@@ -129,7 +148,11 @@ class BagItHandler:
         return untagged
 
     def _compile(self):  # returns path to zip file
+
         try:
+            validated = self._validate()
+            if not validated:
+                raise ValueError("Could not create Bag because of failed validation")
             # clean up any existing temp directory
             if self.temp_dir.exists():
                 shutil.rmtree(self.temp_dir)
@@ -137,8 +160,10 @@ class BagItHandler:
             # create temporary directory structure
             self.temp_dir.mkdir(parents=True, exist_ok=True)
             self.data_dir.mkdir(parents=True, exist_ok=True)
+            
+            if not self.no_files:
+                self._copy_data_files()
 
-            self._copy_data_files()
             self._create_metadata_files()
             self._create_manifest()
             self._create_zip_bag()
@@ -160,7 +185,10 @@ class BagItHandler:
     def _copy_data_files(self):
         referenced_files = self._get_file_references()
         for file_tag, file_path in referenced_files:
+            
             source_path = self.file_root / file_path
+            if not source_path.exists():
+                raise ValueError(f"File {file_path} does not exist.")
 
             # convert Windows paths to forward slashes for the bag
             compatible_path = file_path.replace("\\", "/")
