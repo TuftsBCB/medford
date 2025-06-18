@@ -1,4 +1,4 @@
-@MEDFORD Lee 2025
+@MEDFORD Shpillker 2025
 @MEDFORD-Version 1.0
 
 @Paper_Primary Transcriptome deep-sequencing and clustering of expressed isoforms from Favia corals
@@ -7,13 +7,6 @@
 @Date 2024-01-15
 @Date-Note Sample collection
 
-@FileRoot ./samples/test_data
 
-@Bag_Name test_bag
-
-@Paper paper
-@Paper-File paper.pdf
-
-@Data results
-@Data-File results.csv
+@Bag_Name no_files_bag
 

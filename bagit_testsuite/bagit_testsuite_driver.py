@@ -14,7 +14,8 @@ def run_bagit_compiler(input_file):
     try:
         
         cmd = [
-            "python3", "src/MEDFORD/medford.py", "-m", "BAGIT", "compile", input_file
+            "python3", "src/MEDFORD/medford.py", "-m", "BAGIT", "compile", 
+            input_file
         ]
         
         result = subprocess.run(cmd, capture_output=True, text=True)
@@ -152,13 +153,13 @@ def main():
             if file.endswith(".zip"):
                 generated_bag = os.path.join(output_dir, file)
                 break
-        
+
         if not generated_bag or not os.path.exists(generated_bag):
             print("FAILED (no bag generated)")
             print("  Error: No .zip file found in output directory")
             failed += 1
             continue
-        
+
         results = compare_zip_files(expected_bag_path, generated_bag)
         
         if results['identical']:

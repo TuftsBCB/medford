@@ -307,7 +307,7 @@ ap.add_argument("-v", "--version", action='version',
 
 
 def provide_args_and_go(action: ParserMode, file: str, mode: OutputMode, 
-                        base_dir: str = None, write_json: bool = False, 
+                        base_dir: str = ".", write_json: bool = False, # changed base_dir default from None to "."
                         output_path: str = ".", debug: bool = False):
     mfdglobals.debug = debug
     mfd = MFD(file, mode, action, base_dir, write_json, output_path) 
