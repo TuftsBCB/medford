@@ -3,21 +3,23 @@ import pytest
 from MEDFORD.medford_detail import *
 from MEDFORD.medford_detailparser import *
 
+
 @pytest.fixture
-def general_context() :
-    emngr = error_mngr("ALL","LINE")
+def general_context():
+    emngr = error_mngr("ALL", "LINE")
     detail._clear_cache()
     return [emngr]
 
-def test_single_line(general_context) :
+
+def test_single_line(general_context):
     emngr = general_context[0]
 
     line = "@Date 02/24"
-    
+
     d = detail.FromLine(line, -1, None, emngr)
     p = detailparser([d.detail], emngr)
     out_dict = p.export()
-    
+
     assert list(out_dict.keys()) == ["Date"]
     assert len(out_dict["Date"]) == 1
 
@@ -27,6 +29,7 @@ def test_single_line(general_context) :
     assert out_dict["Date"][0][1]["desc"][0][1] == "02/24"
 
     assert len(emngr.return_syntax_errors()) == 0
+
 
 def test_multiple_details_one_instance(general_context):
     emngr = general_context[0]
@@ -44,7 +47,7 @@ def test_multiple_details_one_instance(general_context):
     assert list(out_dict.keys()) == ["Date"]
     assert len(out_dict["Date"]) == 1
 
-    assert list(out_dict["Date"][0][1].keys()) == ["desc","note"]
+    assert list(out_dict["Date"][0][1].keys()) == ["desc", "note"]
     assert len(out_dict["Date"][0][1]["desc"]) == 1
     assert len(out_dict["Date"][0][1]["note"]) == 1
 
@@ -52,6 +55,7 @@ def test_multiple_details_one_instance(general_context):
     assert out_dict["Date"][0][1]["note"][0][1] == "Hello World"
 
     assert len(emngr.return_syntax_errors()) == 0
+
 
 def test_multiple_notes_one_instance(general_context):
     emngr = general_context[0]
@@ -70,7 +74,7 @@ def test_multiple_notes_one_instance(general_context):
     p = detailparser(ds, emngr)
     out_dict = p.export()
 
-    assert list(out_dict["Date"][0][1].keys()) == ["desc","note"]
+    assert list(out_dict["Date"][0][1].keys()) == ["desc", "note"]
     assert len(out_dict["Date"][0][1]["note"]) == 2
 
     assert out_dict["Date"][0][1]["desc"][0][1] == "02/24"

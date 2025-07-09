@@ -9,7 +9,7 @@ class Dictionizer() :
     """Class to handle dictionary-based management of MEDFORD metadata.
     Essentially, any features that require "two-pass" parsing are handled 
     via this class.
-    
+
     Examples include generating a dictionary to store macro names and their
     content (stored in the variable macro_dictionary) and a function to
     generate a dictionary from a list of the completed Blocks."""
@@ -29,23 +29,24 @@ class Dictionizer() :
                 raise ValueError(f"Attempting to resolve macro {m.name} resulted in an error return, not a string.")
             self.resolved_macros[n] = res
 
-
-    def validate_atat(self, bls: List[Block]) :
+    def validate_atat(self, bls: List[Block]):
         """DEPRECIATED. Does nothing."""
         all_valid = True
-        for bl in bls :
-            all_valid = all_valid and bl.validate_atat(self.resolved_macros, self.name_dictionary)
-        if not all_valid :
+        for bl in bls:
+            all_valid = all_valid and bl.validate_atat(
+                self.resolved_macros, self.name_dictionary
+            )
+        if not all_valid:
             print("There is an invalid @-@ somewhere.")
-        else :
+        else:
             print("All @-@ successfully validated")
 
     def generate_dict(self, bls: List[Block]):
-        """Generate the proper form dictionary from a list of Blocks to pass 
+        """Generate the proper form dictionary from a list of Blocks to pass
         to Pydantic."""
         self.validate_atat(bls)
         root_dict: Dict[str, Any] = {}
-        for _, bl in enumerate(bls) :
+        for _, bl in enumerate(bls):
             self._recurse_majors(root_dict, bl)
 
         return root_dict
