@@ -18,14 +18,14 @@
       "value": "2024-01-15"
     }
   ],
-  "FileRoot": [
+  "Paper_Ref": [
     {
-      "value": "./bagit_testsuite/inputs/test_data"
+      "value": "paper.pdf"
     }
   ],
   "Bag_Name": [
     {
-      "value": "no_dir_primary_err"
+      "value": "basic_ref"
     }
   ]
 }

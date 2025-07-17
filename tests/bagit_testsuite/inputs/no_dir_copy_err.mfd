@@ -5,6 +5,4 @@
 
 @FileRoot ./bagit_testsuite/inputs/test_data
 
-@Paper_Copy paper/paper.pdf
-
-@Bag_Name basic_copy
+@Bag_Name no_dir_copy_err

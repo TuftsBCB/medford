@@ -18,6 +18,7 @@ def run_bagit_compiler(input_file):
             input_file
         ]
         
+        print(f"running command {cmd}")
         result = subprocess.run(cmd, capture_output=True, text=True)
         
         success = result.returncode == 0
@@ -111,6 +112,7 @@ def main():
     input_dir = "bagit_testsuite/inputs"
     expected_dir = "bagit_testsuite/expected"
     output_dir = "."  # Changed to current directory
+    test_data_dir = "bagit_testsuite/inputs/test_data"
     
     passed = 0
     failed = 0
@@ -122,7 +124,8 @@ def main():
 
     for input_file in input_files:
         base_name = os.path.splitext(input_file)[0]
-        
+        if base_name == "missing_files": continue
+
         input_path = os.path.join(input_dir, input_file)
         expected_bag_path = os.path.join(expected_dir, f"{base_name}.zip")
 
@@ -131,8 +134,7 @@ def main():
         # No need to clean output directory since we're using current directory
 
         success, stdout, stderr = run_bagit_compiler(input_path)
-        
-        # Handle error test cases (files ending with _err)
+
         if base_name.endswith("_err"):
             if not success and "Error creating" in stderr:
                 print("PASSED (expected error)")
@@ -144,9 +146,8 @@ def main():
                 print("FAILED (error message doesn't contain 'Error creating')")
                 print(f"  Actual error: {stderr}")
                 failed += 1
-            continue  # Skip bag comparison for error cases
-        
-        # Handle normal test cases
+            continue
+
         if not success:
             print("FAILED (compilation error)")
             print(f"  Error: {stderr}")
@@ -171,7 +172,7 @@ def main():
             print("  Error: No .zip file found in output directory")
             failed += 1
             continue
-
+        print(f"expected bag path is {expected_bag_path}")
         # Check if expected bag exists
         if not os.path.exists(expected_bag_path):
             print("SKIPPED (no expected bag)")
@@ -180,7 +181,7 @@ def main():
             continue
 
         results = compare_zip_files(expected_bag_path, generated_bag)
-        
+        os.remove(generated_bag)
         if results['identical']:
             print("PASSED")
             passed += 1

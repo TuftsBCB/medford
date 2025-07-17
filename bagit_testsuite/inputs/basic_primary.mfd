@@ -5,6 +5,6 @@
 
 @FileRoot ./bagit_testsuite/inputs/test_data
 
-@Paper_Primary paper.pdf
+@Paper_Primary paper/paper.pdf
 
 @Bag_Name basic_primary

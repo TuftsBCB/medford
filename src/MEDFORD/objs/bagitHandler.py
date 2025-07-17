@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import zipfile
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Tuple, Optional
 import hashlib
@@ -166,6 +167,7 @@ class BagItHandler:
 
             self._create_metadata_files()
             self._create_manifest()
+            self._create_bag_info()
             self._create_zip_bag()
 
             # clean up temporary directory
@@ -234,6 +236,77 @@ class BagItHandler:
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
+
+    def _create_bag_info(self):
+        bag_info_path = self.temp_dir / "bag-info.txt"
+        
+        payload_stats = self._calculate_payload_stats()
+        bagging_date = datetime.now().strftime("%Y-%m-%d")
+        bag_info_lines = []
+        
+        bag_info_lines.append(f"Bagging-Date: {bagging_date}")
+        bag_info_lines.append(f"Bag-Size: {payload_stats['bag_size']}")
+        bag_info_lines.append(f"Payload-Oxum: {payload_stats['octet_count']}.{payload_stats['stream_count']}")
+        
+        if "MEDFORD" in self.medford_data:
+            for entry in self.medford_data["MEDFORD"]:
+                if "value" in entry:
+                    bag_info_lines.append(f"External-Description: MEDFORD metadata package: {entry['value']}")
+                    break
+        
+        if "Contributor" in self.medford_data:
+            for entry in self.medford_data["Contributor"]:
+                if "value" in entry:
+                    bag_info_lines.append(f"Contact-Name: {entry['value']}")
+                if "Email" in entry:
+                    emails = entry["Email"] if isinstance(entry["Email"], list) else [entry["Email"]]
+                    bag_info_lines.append(f"Contact-Email: {emails[0]}")
+        
+        if "Paper_Primary" in self.medford_data:
+            for entry in self.medford_data["Paper_Primary"]:
+                if "value" in entry:
+                    bag_info_lines.append(f"Internal-Sender-Description: Research data for: {entry['value']}")
+                    break
+        
+        if self.medford_file_path:
+            external_id = Path(self.medford_file_path).stem
+            bag_info_lines.append(f"External-Identifier: {external_id}")
+        
+        #TODO ask about this
+        bag_info_lines.append("Source-Organization: idk")
+        
+        with open(bag_info_path, 'w', encoding='utf-8') as f:
+            for line in bag_info_lines:
+                f.write(line + '\n')
+                
+
+    def _calculate_payload_stats(self):
+        total_bytes = 0
+        file_count = 0
+        
+        if self.data_dir.exists():
+            for file_path in self.data_dir.rglob("*"):
+                if file_path.is_file():
+                    total_bytes += file_path.stat().st_size
+                    file_count += 1
+        
+        # got this code from someone else
+        if total_bytes >= 1024**4:  # TB
+            bag_size = f"{total_bytes / (1024**4):.1f} TB"
+        elif total_bytes >= 1024**3:  # GB
+            bag_size = f"{total_bytes / (1024**3):.1f} GB"
+        elif total_bytes >= 1024**2:  # MB
+            bag_size = f"{total_bytes / (1024**2):.1f} MB"
+        elif total_bytes >= 1024:  # KB
+            bag_size = f"{total_bytes / 1024:.1f} KB"
+        else:
+            bag_size = f"{total_bytes} bytes"
+        
+        return {
+            'bag_size': bag_size,
+            'octet_count': total_bytes,
+            'stream_count': file_count
+        }
 
     def _create_zip_bag(self):
         with zipfile.ZipFile(self.bag_path, 'w', zipfile.ZIP_DEFLATED) as zf:
