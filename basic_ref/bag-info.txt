@@ -1,0 +1,6 @@
+Bagging-Date: 2025-07-17
+Bag-Size: 0 bytes
+Payload-Oxum: 0.0
+External-Description: MEDFORD metadata package: Shpillker 2024
+External-Identifier: basic_ref
+Source-Organization: idk

@@ -14,11 +14,8 @@ for input_file in "$INPUT_DIR"/*.mfd; do
 done
 
 
-python3 src/MEDFORD/medford.py -m BAGIT compile bagit_testsuite/inputs/curr_directory.mfd
-python3 src/MEDFORD/medford.py -m BAGIT validate bagit_testsuite/inputs/curr_directory.mfd
-python3 src/MEDFORD/medford.py -m BAGIT compile bagit_testsuite/inputs/multiple_files.mfd
-python3 src/MEDFORD/medford.py -m BAGIT validate bagit_testsuite/inputs/multiple_files.mfd
-python3 src/MEDFORD/medford.py -m BAGIT compile bagit_testsuite/inputs/absolute_path.mfd
-python3 src/MEDFORD/medford.py -m BAGIT validate bagit_testsuite/inputs/curr_directory.mfd
-python3 src/MEDFORD/medford.py -m BAGIT compile bagit_testsuite/inputs/multiple_files.mfd
-python3 src/MEDFORD/medford.py -m BAGIT validate bagit_testsuite/inputs/multiple_files.mfd
+
+python3 src/MEDFORD/medford.py -m BAGIT compile --write_json bagit_testsuite/inputs/multiple_files.mfd
+python3 src/MEDFORD/medford.py -m BAGIT compile --write_json bagit_testsuite/inputs/basic_copy.mfd
+python3 src/MEDFORD/medford.py -m BAGIT compile --write_json bagit_testsuite/inputs/basic_ref.mfd
+python3 src/MEDFORD/medford.py -m BAGIT compile --write_json bagit_testsuite/inputs/no_file.mfd

@@ -4,7 +4,7 @@
 @Date 2024-05-01
 @FileRoot .bagit_testsuite/inputs/test_data
 @Data missing_data
-@Data-File nonexistent.csv
+@Data_Primary nonexistent.csv
 @Paper missing_paper
-@Paper-File missing.pdf
+@Paper_Primary missing.pdf
 @Bag_Name missing

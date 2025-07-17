@@ -3,8 +3,8 @@
 
 @Date 2024-01-15
 
-@FileRoot ./bagit_testsuite/inputs/test_data
+@FileRoot ./bagit_testsuite/inputs/test_data/paper
 
-@Paper_Copy paper/paper.pdf
+@Paper_Copy paper.pdf
 
 @Bag_Name basic_copy

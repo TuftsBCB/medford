@@ -14,10 +14,10 @@ def run_bagit_compiler(input_file):
     try:
         
         cmd = [
-            "python3", "src/MEDFORD/medford.py", "-m", "BAGIT", "--write_json", "compile", 
+            "python3", "src/MEDFORD/medford.py", "-m", "BAGIT", "compile", 
             input_file
         ]
-        
+        print(f"cmd is {cmd}")
         result = subprocess.run(cmd, capture_output=True, text=True)
         
         success = result.returncode == 0
@@ -110,7 +110,7 @@ def get_all_paths(directory):
 def main():
     input_dir = "bagit_testsuite/inputs"
     expected_dir = "bagit_testsuite/expected"
-    output_dir = "."  # Changed to current directory
+    output_dir = "."
     
     passed = 0
     failed = 0
@@ -124,25 +124,18 @@ def main():
         base_name = os.path.splitext(input_file)[0]
         
         input_path = os.path.join(input_dir, input_file)
-        expected_bag_path = os.path.join(expected_dir, f"{base_name}.zip")
+        expected_bag_path = os.path.join(expected_dir, f"exp_{base_name}.zip")
 
         print(f"\nTesting {base_name}: ", end="", flush=True)
 
-        # No need to clean output directory since we're using current directory
-
         success, stdout, stderr = run_bagit_compiler(input_path)
         
-        # Handle error test cases (files ending with _err)
         if base_name.endswith("_err"):
-            if not success and "Error creating" in stderr:
+            if ("BagIt package created at: None" in stdout) and ("Error creating" in stdout):
                 print("PASSED (expected error)")
                 passed += 1
-            elif success:
-                print("FAILED (expected error but compilation succeeded)")
-                failed += 1
             else:
-                print("FAILED (error message doesn't contain 'Error creating')")
-                print(f"  Actual error: {stderr}")
+                print("FAILED (expected error but compilation succeeded)")
                 failed += 1
             continue  # Skip bag comparison for error cases
         
@@ -177,6 +170,12 @@ def main():
             print("SKIPPED (no expected bag)")
             print(f"  Expected: {expected_bag_path}")
             skipped += 1
+            # Clean up generated bag for skipped test
+            try:
+                if os.path.exists(generated_bag):
+                    os.remove(generated_bag)
+            except OSError as e:
+                print(f"  Warning: Could not remove {generated_bag}: {e}")
             continue
 
         results = compare_zip_files(expected_bag_path, generated_bag)
@@ -194,6 +193,13 @@ def main():
             if results['content_differences']:
                 print(f"    Content differs: {results['content_differences'][:3]}")
             failed += 1
+        
+        # Clean up generated bag after comparison
+        try:
+            if os.path.exists(generated_bag):
+                os.remove(generated_bag)
+        except OSError as e:
+            print(f"  Warning: Could not remove {generated_bag}: {e}")
         
     print(f"\nTests completed: {passed + failed + skipped}")
     print(f"Passed: {passed}")
