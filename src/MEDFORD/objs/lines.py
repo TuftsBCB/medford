@@ -1,5 +1,4 @@
 from typing import List, Tuple, Dict
-import sys
 import MEDFORD.mfdglobals as mfdglobals
 
 

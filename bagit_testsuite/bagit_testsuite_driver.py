@@ -1,13 +1,10 @@
 import subprocess
-import json
 import os
 import sys
-import shutil
 import tempfile
 import zipfile
 import filecmp
 from pathlib import Path
-from collections import OrderedDict
 
 
 def run_bagit_compiler(input_file):

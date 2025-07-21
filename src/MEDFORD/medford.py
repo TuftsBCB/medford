@@ -1,6 +1,5 @@
 """Module containing the MEDFORD parser, which can validate and compile MEDFORD metadata files."""
 from enum import Enum
-from pathlib import PurePath  # ?
 
 from MEDFORD.objs.linereader import LineReader, Line
 from MEDFORD.objs.linecollector import LineCollector, Macro, Block
