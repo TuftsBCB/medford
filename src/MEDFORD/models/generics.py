@@ -3,6 +3,7 @@ These are models that are expected to be used across multiple MEDFORD metadata a
 as well as some that are expected for our initial use case tests.
 
 These Models are defined for use with Pydantic, and contain custom data types and type validation."""
+
 77
 import datetime
 from enum import Flag, auto
@@ -83,6 +84,7 @@ class RoleOpts(Flag):
 # Attributes                                #
 #############################################
 
+<<<<<<< HEAD
 class MEDFORDMDL(BlockModel):
     """Model to store MEDFORD metadata describing the MEDFORD file itself,
      such as MEDFORD file colloqiual name and the version of MEDFORD used
@@ -92,6 +94,10 @@ class MEDFORDMDL(BlockModel):
 
 
 class MEDFORDmdl(BlockModel):
+=======
+
+class MEDFORDMDL(BlockModel):
+>>>>>>> 94a60a9 (some formatting)
     """Model to store MEDFORD metadata describing the MEDFORD file itself,
     such as MEDFORD file colloqiual name and the version of MEDFORD used
     to write this file."""
@@ -131,6 +137,7 @@ class DateMDL(BlockModel):
 
 
 class ContributorMDL(BlockModel):
+<<<<<<< HEAD
     @model_validator(mode='after')
     @classmethod
     def check_date_minor(cls, v) :
@@ -162,13 +169,15 @@ class PaperMDL(BlockModel):
 
     
 class ContributorMDL(BlockModel) :
+=======
+>>>>>>> 94a60a9 (some formatting)
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     @classmethod
     def check_corresponding_has_email(cls, v):
         if v.Role is not None:
@@ -179,6 +188,10 @@ class ContributorMDL(BlockModel) :
                         v.Block, "Email", "Corresponding Author is listed under Roles"
                     )
                 )
+<<<<<<< HEAD
+=======
+                a = mv.instance()
+>>>>>>> 94a60a9 (some formatting)
         return v
 
     @computed_field
@@ -224,6 +237,10 @@ class KeywordMDL(BlockModel):
 #############################################
 
 
+<<<<<<< HEAD
 class Entity(BaseModel) :
+=======
+class Entity(BaseModel):
+>>>>>>> 94a60a9 (some formatting)
     MEDFORD: MajorsT[MEDFORDMDL]
     Contributor: OptMajorT[ContributorMDL] = None
