@@ -7,17 +7,14 @@
       ]
     }
   ],
-  "Method": [
+  "Contributor": [
     {
-      "value": "method",
-      "Type": [
-        "method-type"
+      "value": "Michael K. DeSalvo",
+      "Association": [
+        "School of Natural Sciences, University of California Merced"
       ],
-      "Company": [
-        "method-company"
-      ],
-      "Sample": [
-        "method-sample"
+      "Role": [
+        "Corresponding Author"
       ]
     }
   ]
