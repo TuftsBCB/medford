@@ -99,10 +99,6 @@ class OutputMode(Enum):
 
 class MFD():
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
-=======
-    """Base class runner of the MEDFORD parser. 
-    Runs entire validation/compilation pipeline from file input to output."""
->>>>>>> 54aa5fb (testsuite done)
 
     # TODO : ? is this the right way to implement this?
     @classmethod
@@ -126,15 +122,7 @@ class MFD():
     dict_data = None
     pydantic_version = None
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    def __init__(self, filename, write_json: bool = False, output_path: str = "."):
-=======
-    def __init__(self, filename, write_json:bool=True, output_path:str=".") :
->>>>>>> 6fcac6c (with test suite)
-=======
     def __init__(self, filename, mode: OutputMode = OutputMode.OTHER, 
-<<<<<<< HEAD
              action: ParserMode = None, 
              base_dir: str = None, write_json:bool=True, output_path:str=".") :
         self.filename = filename
@@ -183,11 +171,7 @@ class MFD():
         #   The problem is that Blocks aren't Dicts.
         self.pydantic_version = Entity(**self.dict_data)
         if mfdglobals.mv.instance().has_pydantic_err() :
-=======
-        if mfdglobals.mv.instance().has_pydantic_err():
->>>>>>> 54aa5fb (testsuite done)
             sys.stderr.write("has error\n")
->>>>>>> 90ea795 (halfway done with bagit handler)
             mfdglobals.mv.instance().print_pydantic_errs()
         
         #try:
@@ -196,11 +180,6 @@ class MFD():
         #except ValidationError as e:
         #    if(len(e.errors()) != mfdglobals.mv.instance().n_pydantic_errs()) :
         #        print("ERROR: Validation errors are not all being accounted for by the validator.")
-=======
-        #    if(len(e.errors()) != mfdglobals.mv.instance().n_pydantic_errs()):
-        #        print("ERROR: Validation errors are not all being accounted 
-        #              for by the validator.")
->>>>>>> 54aa5fb (testsuite done)
         #        raise Exception("Missing validation errors")
         #    else :
         #        if mfdglobals.mv.instance().has_pydantic_err() :
@@ -208,22 +187,14 @@ class MFD():
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
-<<<<<<< HEAD
 
-<<<<<<< HEAD
         if self.write_json:
             if self.output_path == ".":
                 with open("medford_output.json", "w", encoding="utf-8") as f:
                     combined_data = process_blocks_to_dict(self.blocks)
                     #     print(combined_data)
                     json.dump(combined_data, f, indent=2)
-=======
-        if self.write_json :
-            if self.output_path == "." :
-                with open("medford_output.json", 'w', encoding="utf-8") as f:
-                    json.dump(self.dict_data, f, indent=2, cls=MedfordEncoder)
->>>>>>> 6fcac6c (with test suite)
-=======
+
         if self.mode == OutputMode.BAGIT:
                 # Process blocks to dictionary format
             combined_data = process_blocks_to_dict(self.blocks)

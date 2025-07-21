@@ -257,25 +257,13 @@ class Line:
     def __init__(self, lineno: int, line: str):
         self.lineno = lineno
         self.line = line
-<<<<<<< HEAD
-<<<<<<< HEAD
         if mfdglobals.debug:
             print(f"/n Inside Line's init")
             print(f"lineno is {lineno}")
             print(f"line is {line}")
 
     def __eq__(self, other) -> bool:
-        if type(self) == type(other):
-=======
-        print(f"/n Inside Line's init")
-        print(f"lineno is {lineno}")
-        print(f"line is {line}")
-=======
->>>>>>> 90ea795 (halfway done with bagit handler)
-    
-    def __eq__(self, other) -> bool :
         if type(self) == type(other) :
->>>>>>> 6fcac6c (with test suite)
             return self.line == other.line and self.lineno == other.lineno
 
         return False

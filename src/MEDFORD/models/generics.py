@@ -128,12 +128,9 @@ class JournalMDL(BlockModel):
 class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 
 class ContributorMDL(BlockModel):
-=======
     @model_validator(mode='after')
     @classmethod
     def check_date_minor(cls, v) :
@@ -143,6 +140,7 @@ class ContributorMDL(BlockModel):
             raise ValueError(f"Paper missing required fields: ")
         #     mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Date", "Date requires"))
         return v
+
 
 class PaperMDL(BlockModel):
     print("PaperMDL class is being loaded")
@@ -161,26 +159,16 @@ class PaperMDL(BlockModel):
 #             if missing_file_tokens:
 #                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
 #         return v
-=======
->>>>>>> 90ea795 (halfway done with bagit handler)
+
     
 class ContributorMDL(BlockModel) :
->>>>>>> 6fcac6c (with test suite)
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    @model_validator(mode="after")
-=======
-    
-=======
->>>>>>> 90ea795 (halfway done with bagit handler)
     @model_validator(mode='after')
->>>>>>> 6fcac6c (with test suite)
     @classmethod
     def check_corresponding_has_email(cls, v):
         if v.Role is not None:
@@ -235,14 +223,7 @@ class KeywordMDL(BlockModel):
 # File-Wide Validation                      #
 #############################################
 
-<<<<<<< HEAD
-class Entity(BaseModel):
-=======
+
 class Entity(BaseModel) :
-<<<<<<< HEAD
-    print("Entity class is being loaded", file=sys.stderr)
->>>>>>> 6fcac6c (with test suite)
-=======
->>>>>>> 90ea795 (halfway done with bagit handler)
     MEDFORD: MajorsT[MEDFORDMDL]
     Contributor: OptMajorT[ContributorMDL] = None

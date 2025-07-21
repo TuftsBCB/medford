@@ -2,12 +2,6 @@
   "MEDFORD": [
     {
       "value": "Shpillker 2024",
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "value": "description",
-=======
-      "value": "Pooyaei Mehr 2013",
->>>>>>> 90ea795 (halfway done with bagit handler)
       "Version": [
         "1.0"
       ]
@@ -29,6 +23,3 @@
     }
   ]
 }
-=======
-      "Block": 
->>>>>>> 6fcac6c (with test suite)

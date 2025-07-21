@@ -19,12 +19,6 @@ from MEDFORD.submodules.mfdvalidator.errors import (
 import MEDFORD.mfdglobals as mfdglobals
 import sys
 
-<<<<<<< HEAD
-
-=======
-import MEDFORD.mfdglobals as mfdglobals 
-import sys
->>>>>>> 6fcac6c (with test suite)
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
 class LineCollection:
@@ -327,12 +321,10 @@ class Detail(LineCollection):
         """Returns the content of the Detail, as a string without substitutions."""
         if mfdglobals.debug:
             print("\n=== get_raw_content called ===", file=sys.stderr)
+            print(f"content length is: {content_length}", file=sys.stderr)
 
-=======
-        print(f"content length is: {content_length}", file=sys.stderr)
 
-=======
->>>>>>> 90ea795 (halfway done with bagit handler)
+
     def get_str_majors(self) -> str :
         """Returns the list of major tokens as a _-joined string.
         """
@@ -341,15 +333,11 @@ class Detail(LineCollection):
     def get_raw_content(self) -> str :
         """Returns the content of the Detail, as a string without substitutions.
         """
-        
-        import traceback
-        # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
->>>>>>> 6fcac6c (with test suite)
         out = str.strip(self.headline.raw_content)
         if self.extralines is not None:
             for line in self.extralines:
                 out = out + " " + str.strip(line.raw_content)
-<<<<<<< HEAD
+
         if mfdglobals.debug:
             print(f"Inside get_raw_content: {out}", file=sys.stderr)
         return out
@@ -362,14 +350,8 @@ class Detail(LineCollection):
         out = self.headline.get_content(resolved_macros)
         if mfdglobals.debug:
             print(f"Content: {out}", file=sys.stderr)
-            # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
         out = self.headline.get_content(resolved_macros)
-        # print(f"\nInside get_content", file=sys.stderr)
-        # print(f"Headline processed content: {out}", file=sys.stderr)
-        if self.extralines is not None:
-            for line in self.extralines:
-=======
-        # print(f"Inside get_raw_content: {out}", file=sys.stderr)
+
         return out
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str :
@@ -380,10 +362,8 @@ class Detail(LineCollection):
         # print(f"Headline processed content: {out}", file=sys.stderr)
         if self.extralines is not None :
             for line in self.extralines :
->>>>>>> 6fcac6c (with test suite)
                 out = out + line.get_content(resolved_macros)
         out = out.strip()
-        # print(f"Final processed content: {out}", file=sys.stderr)
         return out
 
     def __eq__(self, other) -> bool:
