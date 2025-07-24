@@ -1,4 +1,6 @@
 from typing import List, Tuple, Dict
+import MEDFORD.mfdglobals as mfdglobals
+
 import sys
 
 # new plan:
@@ -255,9 +257,13 @@ class Line:
     def __init__(self, lineno: int, line: str):
         self.lineno = lineno
         self.line = line
+        if mfdglobals.debug:
+            print(f"/n Inside Line's init")
+            print(f"lineno is {lineno}")
+            print(f"line is {line}")
 
     def __eq__(self, other) -> bool:
-        if type(self) == type(other):
+        if type(self) == type(other) :
             return self.line == other.line and self.lineno == other.lineno
 
         return False

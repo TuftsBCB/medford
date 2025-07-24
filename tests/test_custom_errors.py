@@ -1,19 +1,24 @@
-from MEDFORD.submodules.medforderrors.errors import *
+from typing import Dict, List
 
 import MEDFORD.mfdglobals as mfdglobals
-from MEDFORD.objs.linecollections import Detail, Macro
-from MEDFORD.objs.linereader import LineReader as LR
-from MEDFORD.objs.linecollector import LineCollector as LC, Line, NovelDetailLine
 from MEDFORD.objs.dictionizer import Dictionizer
-
-from typing import List, Dict
+from MEDFORD.objs.linecollections import Detail, Macro
+from MEDFORD.objs.linecollector import Line, NovelDetailLine
+from MEDFORD.objs.linecollector import LineCollector as LC
+from MEDFORD.objs.linereader import LineReader as LR
+from MEDFORD.submodules.medforderrors.errors import (
+    ErrType,
+    MaxMacroDepthExceeded,
+    MFDErr,
+    MissingDescError,
+)
 
 
 class ProcessToLineObj:
     def preprocess_lines(self, lines: List[str]) -> List[Line]:
         line_objs: List[Line] = []
         for idx, l in enumerate(lines):
-            # TODO : shouldn't have to manually be getting rid of None lines tbh
+            # TODO :shouldn't have to manually be getting rid of None lines tbh
             pl = LR.process_line(l, idx)
             if pl is not None:
                 line_objs.append(pl)
@@ -25,7 +30,7 @@ class ProcessToMacros:
     def preprocess_lines(self, lines: List[str]) -> Dict[str, Macro]:
         line_objs: List[Line] = []
         for idx, l in enumerate(lines):
-            # TODO : shouldn't have to manually be getting rid of None lines tbh
+            # TODO :shouldn't have to manually be getting rid of None lines tbh
             pl = LR.process_line(l, idx)
             if pl is not None:
                 line_objs.append(pl)
@@ -76,6 +81,40 @@ class TestMaxMacroDepthErr(ProcessToMacros):
             ]
         )
 
+class TestMaxMacroDepthErr(ProcessToMacros):
+    def test_help_message(self):
+        line_objs: Dict[str, Macro] = self.preprocess_lines(
+            [
+                "`@Macro1 content ",
+                "content continue",
+                "`@Macro2 `@Macro1",
+                "`@Macro3 `@Macro2",
+                "`@Macro4 `@Macro3",
+                "`@Macro5 `@Macro4",
+                "`@Macro6 `@Macro5",
+                "`@Macro7 `@Macro6",
+                "`@Macro8 `@Macro7",
+                "`@Macro9 `@Macro8",
+                "`@Macro0 `@Macro9",
+            ]
+        )
+
+        corrected_order: List[Macro] = [
+            line_objs[name]
+            for name in [
+                "Macro0",
+                "Macro9",
+                "Macro8",
+                "Macro7",
+                "Macro6",
+                "Macro5",
+                "Macro4",
+                "Macro3",
+                "Macro2",
+                "Macro1",
+            ]
+        ]
+
         corrected_order: List[Macro] = [
             line_objs[name]
             for name in [
@@ -93,9 +132,11 @@ class TestMaxMacroDepthErr(ProcessToMacros):
         ]
 
         err: MaxMacroDepthExceeded = MaxMacroDepthExceeded(corrected_order)
-        assert (
-            err.msg
-            == "Macro Macro0 on line 10 is 11 references deep in a macro reference chain. (Macro history: Macro0->Macro9->Macro8->Macro7->Macro6->Macro5->Macro4->Macro3->Macro2->Macro1)"
+        assert err.msg == (
+            "Macro Macro0 on line 10 is 11 references deep in a "
+            "macro reference chain. (Macro history: Macro0->Macro9"
+            "->Macro8->Macro7->Macro6->Macro5->Macro4->Macro3->"
+            "Macro2->Macro1)"
         )
         assert (
             err.helpmsg

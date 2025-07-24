@@ -20,7 +20,18 @@ from MEDFORD.objs.medfordValidator import Validator
 
 import argparse
 import json
+from MEDFORD.objs.linecollections import Detail
+from MEDFORD.objs.bagitHandler import BagItHandler
+
+import sys
+import os
+from typing import List, Dict
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #TODO terminal would not recognize bagithandler without this
+
+import argparse
+import json
 import MEDFORD.mfdglobals as mfdglobals
+
 
 # order of ops:
 # 1. open file
@@ -30,6 +41,7 @@ import MEDFORD.mfdglobals as mfdglobals
 # 5. verify dict using Pydantic (using ?)
 
 
+
 # TODO : add error mgmt
 class ParserMode(Enum):
     """Enum storing the mode of operation of the MEDFORD parser."""
@@ -37,9 +49,12 @@ class ParserMode(Enum):
     VALIDATE = "validate"
     COMPILE = "compile"
 
+    VALIDATE = "validate"
+    COMPILE = "compile"
+
     def __str__(self):
         return self.value
-
+    
 
 def process_blocks_to_dict(blocks):
     combined_dict = {}
@@ -127,7 +142,7 @@ class OutputMode(Enum):
             if member.name.lower() == value.lower():
                 return member
         return None
-
+    
 
 class MFD:
     """Base class runner of the MEDFORD parser.
@@ -290,11 +305,13 @@ class MFD:
 
         return object_lines
 
+
     # for testing purposes in model unit tests
     @classmethod
     def _get_unvalidated_blocks(cls, input: str) -> List[Block]:
         object_lines = MFD._get_line_objects(input)
         line_collector = MFD._get_line_collector(object_lines)
+        # macro_definitions = line_collector.get_macros()
         # macro_definitions = line_collector.get_macros()
         blocks = line_collector.get_flat_blocks()
 

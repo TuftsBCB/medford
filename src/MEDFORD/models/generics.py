@@ -4,7 +4,6 @@ as well as some that are expected for our initial use case tests.
 
 These Models are defined for use with Pydantic, and contain custom data types and type validation."""
 
-77
 import datetime
 from enum import Flag, auto
 from typing import TypeVar, Tuple, List, Optional, Union
@@ -118,11 +117,33 @@ class JournalMDL(BlockModel):
     Issue: OptMinorT[str]
     Pages: OptMinorT[str]
 
+
 class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
 
-class ContributorMDL(BlockModel):
+
+
+class PaperMDL(BlockModel):
+    print("PaperMDL class is being loaded")
+    name: MinorT[str]
+    Link: OptMinorT[str] #instead of str does it have to be link?
+    PMID: OptMinorT[str]
+    DOI: OptMinorT[str] 
+
+# dont really understand what the file thing is about
+#     @model_validator(mode='after')
+#     @classmethod
+#     def check_file(cls, v) :
+#         if v.File is not None:
+#             required_file_tokens = ["File"]
+#             missing_file_tokens = [t for t in required_file_tokens if not hasattr(v, t)]
+#             if missing_file_tokens:
+#                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
+#         return v
+
+    
+class ContributorMDL(BlockModel) :
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
@@ -140,7 +161,6 @@ class ContributorMDL(BlockModel):
                         v.Block, "Email", "Corresponding Author is listed under Roles"
                     )
                 )
-                a = mv.instance()
         return v
 
     @computed_field
@@ -170,7 +190,6 @@ class ContributorMDL(BlockModel):
         #    print("is corresponding author")
 
         return cur_flags
-
 
 class FundingMDL(BlockModel):
     ID: OptMinorT[str]

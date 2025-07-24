@@ -1,13 +1,10 @@
 import subprocess
-import json
 import os
 import sys
-import shutil
 import tempfile
 import zipfile
 import filecmp
 from pathlib import Path
-from collections import OrderedDict
 
 
 def run_bagit_compiler(input_file):
@@ -17,10 +14,12 @@ def run_bagit_compiler(input_file):
             "src/MEDFORD/medford.py",
             "-m",
             "BAGIT",
+            "--write_json",
             "compile",
             input_file,
         ]
 
+        print(f"running command {cmd}")
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         success = result.returncode == 0
@@ -109,16 +108,13 @@ def get_all_paths(directory):
         if item.is_file():
             relative_path = item.relative_to(directory)
             paths.add(str(relative_path))
-        # relative_path = item.relative_to(directory)
-
-        # paths.add(str(relative_path))
     return paths
 
 
 def main():
     input_dir = "bagit_testsuite/inputs"
     expected_dir = "bagit_testsuite/expected"
-    output_dir = "bagit_testsuite/outputs"
+    output_dir = "."  # Changed to current directory
     test_data_dir = "bagit_testsuite/inputs/test_data"
 
     passed = 0
@@ -139,20 +135,36 @@ def main():
 
         print(f"\nTesting {base_name}: ", end="", flush=True)
 
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
-
-        # for file in os.listdir(output_dir):
-        #     if file.endswith(".zip"):
-        #         os.remove(os.path.join(output_dir, file))
+        # No need to clean output directory since we're using current directory
 
         success, stdout, stderr = run_bagit_compiler(input_path)
+
+        if base_name.endswith("_err"):
+            if not success and "Error creating" in stderr:
+                print("PASSED (expected error)")
+                passed += 1
+            elif success:
+                print("FAILED (expected error but compilation succeeded)")
+                failed += 1
+            else:
+                print("FAILED (error message doesn't contain 'Error creating')")
+                print(f"  Actual error: {stderr}")
+                failed += 1
+            continue
 
         if not success:
             print("FAILED (compilation error)")
             print(f"  Error: {stderr}")
             failed += 1
             continue
+
+        # Check if output directory exists before listing
+        if not os.path.exists(output_dir):
+            print("FAILED (no output directory)")
+            print("  Error: Output directory was not created")
+            failed += 1
+            continue
+
         generated_bag = None
         for file in os.listdir(output_dir):
             if file.endswith(".zip"):
@@ -164,9 +176,16 @@ def main():
             print("  Error: No .zip file found in output directory")
             failed += 1
             continue
+        print(f"expected bag path is {expected_bag_path}")
+        # Check if expected bag exists
+        if not os.path.exists(expected_bag_path):
+            print("SKIPPED (no expected bag)")
+            print(f"  Expected: {expected_bag_path}")
+            skipped += 1
+            continue
 
         results = compare_zip_files(expected_bag_path, generated_bag)
-
+        os.remove(generated_bag)
         if results["identical"]:
             print("PASSED")
             passed += 1
@@ -185,6 +204,7 @@ def main():
     print(f"Passed: {passed}")
     print(f"Failed: {failed}")
     print(f"Skipped: {skipped}")
+
     return 0 if failed == 0 else 1
 
 

@@ -1,3 +1,4 @@
+import random
 from typing import Dict, List
 from MEDFORD.submodules.mfdvalidator.errors import MFDErr, ErrType, MissingRequiredField
 import random
@@ -17,6 +18,7 @@ class MedfordValidator(object):
     #   - fail mode (on first, after collection)
     #   - verbosity (errors, warnings)
 
+
     @classmethod
     def init(cls) -> "MedfordValidator":
         if mfdglobals.debug:
@@ -32,27 +34,40 @@ class MedfordValidator(object):
 
     @classmethod
     def instance(cls) -> "MedfordValidator":
+    def instance(cls) -> "MedfordValidator":
         # TODO: change into proper error?
         if MedfordValidator._instance is None:
             print("Warning: had to create error manager in instance call.")
+        if MedfordValidator._instance is None:
+            print("Warning: had to create error manager in instance call.")
             return MedfordValidator.init()
+
 
         return MedfordValidator._instance
 
     def add_error(self, err: MFDErr):
         if err.errtype == ErrType.SYNTAX:
+    def add_error(self, err: MFDErr):
+        if err.errtype == ErrType.SYNTAX:
             self._add_syntax_err(err)
+        elif err.errtype == ErrType.PYDANTIC:
         elif err.errtype == ErrType.PYDANTIC:
             self._add_pydantic_err(err)
         else:
+        else:
             self._add_other_err(err)
+
 
         pass
 
     def _add_syntax_err(self, err: MFDErr):
+
+    def _add_syntax_err(self, err: MFDErr):
         lineno = err.get_head_lineno()
         if lineno in self._syntax_err_coll.keys():
+        if lineno in self._syntax_err_coll.keys():
             self._syntax_err_coll[lineno].append(err)
+        else:
         else:
             self._syntax_err_coll[lineno] = [err]
 
@@ -62,22 +77,34 @@ class MedfordValidator(object):
     def print_syntax_errs(self):
         for line, errs in self._syntax_err_coll.items():
             for err in errs:
+    def has_syntax_err(self):
+        return len(self._syntax_err_coll) > 0
+
+    def print_syntax_errs(self):
+        for line, errs in self._syntax_err_coll.items():
+            for err in errs:
                 print(f"line {line}: {err.msg}")
 
     def n_syntax_errs(self):
+    def n_syntax_errs(self):
         n = 0
+        for k, v in self._syntax_err_coll.items():
         for k, v in self._syntax_err_coll.items():
             n = n + len(v)
         return n
 
     def _add_other_err(self, err: MFDErr):
+    def _add_other_err(self, err: MFDErr):
         lineno = err.get_head_lineno()
         if lineno in self._other_err_coll.keys():
+        if lineno in self._other_err_coll.keys():
             self._other_err_coll[lineno].append(err)
+        else:
         else:
             self._other_err_coll[lineno] = [err]
         print(self._id)
 
+    def has_other_err(self):
     def has_other_err(self):
         return len(self._other_err_coll) > 0
 
@@ -115,7 +142,10 @@ class MedfordValidator(object):
             #            if e['type'] == "value_error" :
             else:
                 raise ValueError(
-                    "Error manager was passed a pydantic error it does not know how to handle: %s"
+                    (
+                        "Error manager was passed a pydantic error "
+                        "it does not know how to handle: %s"
+                    )
                     % str(e)
                 )
         pass

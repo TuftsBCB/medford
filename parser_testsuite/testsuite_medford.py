@@ -3,7 +3,6 @@ import json
 import os
 import sys
 import shutil
-from collections import OrderedDict
 
 
 def run_medford(input_file):

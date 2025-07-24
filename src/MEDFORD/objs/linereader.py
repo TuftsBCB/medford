@@ -217,6 +217,8 @@ class LineReader:
         Currently only returns None in the case of an At-At line (which are currently being ignored entirely) or if the line is empty."""
         if line.strip() == "":
             return None
+        
+        line = line.strip()
 
         if LineReader.is_comment_line(line):
             return CommentLine(lineno, line)

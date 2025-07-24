@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List, Tuple
+
 
 
 class ErrType(Enum):
@@ -12,11 +13,18 @@ class ErrType(Enum):
 
 class MFDErr:
     # lineobjs: List[Line]
+
+class MFDErr:
+    # lineobjs: List[Line]
     errname: str
     errtype: ErrType
     msg: str  # verbose-ish error message
     helpmsg: str  # extended error message for user help
+    msg: str  # verbose-ish error message
+    helpmsg: str  # extended error message for user help
 
+    def __init__(self, errname: str, msg: str, helpmsg: str):
+        # self.lineobjs = lineobjs
     def __init__(self, errname: str, msg: str, helpmsg: str):
         # self.lineobjs = lineobjs
         self.errname = errname
@@ -25,16 +33,24 @@ class MFDErr:
         # TODO: implement
 
     def get_head_lineno(self) -> int:
+    def get_head_lineno(self) -> int:
         raise NotImplementedError("not implemented :)")
+
+    def get_lineno_range(self) -> Tuple[int, int]:
 
     def get_lineno_range(self) -> Tuple[int, int]:
         raise NotImplementedError("also not implemented. :)")
 
     def _overwrite_msg(self, msg: str) -> None:
+
+    def _overwrite_msg(self, msg: str) -> None:
         self.msg = msg
 
     def _overwrite_helpmsg(self, helpmsg: str) -> None:
+
+    def _overwrite_helpmsg(self, helpmsg: str) -> None:
         self.helpmsg = helpmsg
+
 
 
 # Syntax -> easy for discovery; helpful; fast
@@ -42,7 +58,9 @@ class MFDErr:
 # when possible, add specific character ranges of error
 
 
+
 # Specific Error Types: Syntax
+class MissingDescError(MFDErr):
 class MissingDescError(MFDErr):
     # SPECIFICALLY, this means that a block is missing the DESC line
     #   (the NAME line), aka we don't have a name for the block.
@@ -56,17 +74,25 @@ class MissingDescError(MFDErr):
     lineno_all: List[int]
 
     def __init__(self, detailobj):
+    def __init__(self, detailobj):
         self.errtype = ErrType.SYNTAX
 
         from MEDFORD.objs.linecollections import Detail
 
         if not isinstance(detailobj, Detail):
+        if not isinstance(detailobj, Detail):
             raise ValueError("Attempted to create a MissingDescError without a Detail.")
+
 
         self.detail: Detail = detailobj
         self.major_token = "_".join(detailobj.major_tokens)
         if detailobj.minor_token is not None:
+        if detailobj.minor_token is not None:
             self.minor_token = detailobj.minor_token
+        else:
+            raise ValueError(
+                "Attempted to create a MissingDescError when the detail has no minor token, aka is a desc line."
+            )
         else:
             raise ValueError(
                 "Attempted to create a MissingDescError when the detail has no minor token, aka is a desc line."
@@ -77,6 +103,10 @@ class MissingDescError(MFDErr):
         self.lineno_head = self.lineno_range[0]
 
         message: str = f"A new block for major token {self.major_token} was created at line {self.lineno_head} without a Name line."
+        helpmsg: str = (
+            f"A MEDFORD Block should begin with a line like this:\n@{self.major_token} (name of this medford block)\n@{self.major_token}-{self.minor_token} %s"
+            % (self.detail.get_raw_content())
+        )
         helpmsg: str = (
             f"A MEDFORD Block should begin with a line like this:\n@{self.major_token} (name of this medford block)\n@{self.major_token}-{self.minor_token} %s"
             % (self.detail.get_raw_content())
@@ -123,7 +153,7 @@ class MissingContent(MFDErr):
         message: str = f"A detail line on line {self.lineno_head} was created without any content: {self.major_token}"
         if self.minor_token != "desc":
             message = message + f"-{self.minor_token}."
-        helpmsg: str = f"All MEDFORD blocks must consist of either two or three parts: a name line, with a major token and content, or a detail line, with a major token, a minor token, and content."
+        helpmsg: str = "All MEDFORD blocks must consist of either two or three parts: a name line, with a major token and content, or a detail line, with a major token, a minor token, and content."
 
         super(MissingContent, self).__init__(type(self).__name__, message, helpmsg)
 
@@ -139,11 +169,22 @@ class MaxMacroDepthExceeded(MFDErr):
     lineno_all_flat: List[int]  # list of ALL involved line no's
     lineno_all_2d: List[List[int]]  # list of all involved line no's, split by macro
     lineno_head_each_macro: List[int]  # list of only head line of each macro
+class MaxMacroDepthExceeded(MFDErr):
+    lineno_all_flat: List[int]  # list of ALL involved line no's
+    lineno_all_2d: List[List[int]]  # list of all involved line no's, split by macro
+    lineno_head_each_macro: List[int]  # list of only head line of each macro
 
+    def __init__(self, macroobjs: List):
     def __init__(self, macroobjs: List):
         self.errtype = ErrType.OTHER
 
         from MEDFORD.objs.linecollections import Macro
+
+        for idx, mo in enumerate(macroobjs):
+            if not isinstance(mo, Macro):
+                raise ValueError(
+                    "{idx} entry in List passed to MaxMacroDepthExceeded is not a Macro."
+                )
 
         for idx, mo in enumerate(macroobjs):
             if not isinstance(mo, Macro):
