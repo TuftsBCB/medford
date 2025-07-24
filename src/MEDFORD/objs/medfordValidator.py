@@ -1,8 +1,10 @@
 import re, datetime
 from pprint import pprint
 from urllib.parse import urlparse
+import MEDFORD.mfdglobals as mfdglobals
 
-__DEBUG__ = True
+__DEBUG__ = mfdglobals.debug
+
 
 class Validator:
     """Container for validation methods"""
@@ -46,7 +48,7 @@ class Validator:
                     print("line {}: no validation functions found.".format(line))
                     continue
                 else:
-                    tag = stuff[0] #hardcoded HERE
+                    tag = stuff[0]  # hardcoded HERE
                     rule = stuff[1]
                     parts = rule.split(",")
                     # pprint(parts)
@@ -66,14 +68,14 @@ class Validator:
     def add_tag_occurrence(self, tag, value, line_number, file_path, minor_tokens=None):
         if minor_tokens is None:
             minor_tokens = {}
-            
+
         occurrence = {
-            'value': value,
-            'line_number': line_number,
-            'minor_tokens': minor_tokens,
-            'file_path': file_path
+            "value": value,
+            "line_number": line_number,
+            "minor_tokens": minor_tokens,
+            "file_path": file_path,
         }
-        
+
         if tag in self.tags_seen:
             self.tags_seen[tag].append(occurrence)
         else:
@@ -88,68 +90,78 @@ class Validator:
 
     def add_validation_error(self, tag, value, line_number, file_path, error_message):
         error = {
-            'tag': tag,
-            'value': value,
-            'line_number': line_number,
-            'file_path': file_path,
-            'error': error_message
+            "tag": tag,
+            "value": value,
+            "line_number": line_number,
+            "file_path": file_path,
+            "error": error_message,
         }
         self.validation_errors.append(error)
 
-    def validate(self, tag, value, line_number = None, file_path = None):
+    def validate(self, tag, value, line_number=None, file_path=None):
         """validate one tag's value"""
         self.add_tag_occurrence(tag, value, line_number, file_path)
-        
+
         # check if this is a file reference and track it
-        if tag.endswith('_File') or tag.endswith('-File'):
+        if tag.endswith("_File") or tag.endswith("-File"):
             from pathlib import Path
+
             filename = Path(value).name
             self.add_file_reference(filename, tag)
-        
-        if tag in self.validators: 
+
+        if tag in self.validators:
             valids = self.validators[tag]
-            for v in valids: 
+            for v in valids:
                 func = v[0]
                 args = v[1:]
                 response = self.invoke(tag, func, value, *args)
                 if response:
-                    self.add_validation_error(tag, value, line_number, file_path, response)
-                    
-        elif '-' in tag: 
-            tags = tag.split('-')
+                    self.add_validation_error(
+                        tag, value, line_number, file_path, response
+                    )
+
+        elif "-" in tag:
+            tags = tag.split("-")
             minor = tags[1]
 
             matchtag = "*-" + minor
-            if matchtag in self.validators: 
+            if matchtag in self.validators:
                 valids = self.validators[matchtag]
                 for v in valids:
                     func = v[0]
                     args = v[1:]
                     response = self.invoke(tag, func, value, *args)
                     if response:
-                        self.add_validation_error(tag, value, line_number, file_path, response)
-        else: 
+                        self.add_validation_error(
+                            tag, value, line_number, file_path, response
+                        )
+        else:
             if __DEBUG__:
                 # print("no validator for {}".format(tag))
                 pass
+
     def print_validation_summary(self):
         if not self.validation_errors:
             print("All validations passed!")
             return True
-        
+
         for error in self.validation_errors:
-            context = f"Line {error['line_number']}" if error['line_number'] else "Unknown line"
-            if error['file_path']:
+            context = (
+                f"Line {error['line_number']}"
+                if error["line_number"]
+                else "Unknown line"
+            )
+            if error["file_path"]:
                 context += f" in {error['file_path']}"
-            
+
             print(f"Error: {context}")
             print(f"  Tag: @{error['tag']}")
             print(f"  Value: '{error['value']}'")
             print(f"  Issue: {error['error']}")
             print()
-        
+
         return False
-    
+
     def invoke(self, tag, validator, value, *args):
         """Validate a specific value for a tag.
         tag: the tag to validate against.
@@ -166,29 +178,32 @@ class Validator:
         else:
             return "Specified validator '{}' does not exist.".format(validator)
 
-    def email(self, tag, value, *args): #DONE
+    def email(self, tag, value, *args):
         """An email value is valid.
         Value is the value to be validated as an email address.
         """
         print("validating email {}".format(value))
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
         if not re.match(email_pattern, value):
             return f"Invalid email format: '{value}'"
-        
+
         # additional checks
         if len(value) > 254:
             return f"Email address too long: '{value}'"
-        
-        if '..' in value:
+
+        if ".." in value:
             return f"Email contains consecutive dots: '{value}'"
-        
+
         return None  # no error
 
     def text(self, tag, value, *args):
-        # print(
-        #     "text invoked with tag='{}' value='{}' args='{}'".format(tag, value, args)
-        # )
+        if __DEBUG__:
+            print(
+                "text invoked with tag='{}' value='{}' args='{}'".format(
+                    tag, value, args
+                )
+            )
 
         if not value or not value.strip():
             return "Text value cannot be empty or whitespace only"
@@ -197,18 +212,17 @@ class Validator:
     def date(self, tag, value, *args):
         try:
             parsed_date = datetime.strptime(value, "%Y-%m-%d")
-            
+
             current_year = datetime.now().year
             if parsed_date.year < 1900 or parsed_date.year > current_year + 10:
                 return f"Year {parsed_date.year} is outside reasonable range (1900-{current_year + 10})"
-            
-            return None  
-            
+
+            return None
+
         except ValueError:
             return f"Invalid date format: '{value}'. Expected formats: YYYY-MM-DD"
 
-
-    def number(self, tag, value, *args): #DONE
+    def number(self, tag, value, *args):
         print(
             "number invoked with tag='{}' value='{}' args='{}'".format(tag, value, args)
         )
@@ -223,19 +237,25 @@ class Validator:
             return "Value '{}' is not an integer".format(value)
 
     def integer(self, tag, value, *args):
-        print(
-            "integer invoked with tag='{}' value='{}' args='{}'".format(
-                tag, value, args
+        if __DEBUG__:
+            print(
+                "integer invoked with tag='{}' value='{}' args='{}'".format(
+                    tag, value, args
+                )
             )
-        )
         try:
             value = int(value)
             return None
-        except:
+        except ValueError:
             return "Value '{}' is not an integer".format(value)
 
     def uri(self, tag, value, *args):
-        print("uri invoked with tag='{}' value='{}' args='{}'".format(tag, value, args))
+        if __DEBUG__:
+            print(
+                "uri invoked with tag='{}' value='{}' args='{}'".format(
+                    tag, value, args
+                )
+            )
         try:
             urlparse(value)
             return None
@@ -243,7 +263,10 @@ class Validator:
             return "Value '{}' is not a valid URI: {}".format(value, e)
 
     def lt(self, tag, value, *args):
-        print("lt invoked with tag='{}' value='{}' args='{}'".format(tag, value, args))
+        if __DEBUG__:
+            print(
+                "lt invoked with tag='{}' value='{}' args='{}'".format(tag, value, args)
+            )
         if len(args) < 1:
             print("No limiting value specified")
         else:
@@ -260,7 +283,12 @@ class Validator:
                 return None
             else:
                 return "Value {} is not less than limit {}".format(value, limit)
+
     def gt(self, tag, value, *args):
+        if __DEBUG__:
+            print(
+                "gt invoked with tag='{}' value='{}' args='{}'".format(tag, value, args)
+            )
         if len(args) < 1:
             print("No threshold value specified")
         else:
@@ -276,9 +304,15 @@ class Validator:
             if value > limit:
                 return None
             else:
-                return "Value {} is not greater than threshold value {}".format(value, limit)
-            
+                return "Value {} is not greater than threshold value {}".format(
+                    value, limit
+                )
+
     def le(self, tag, value, *args):
+        if __DEBUG__:
+            print(
+                "le invoked with tag='{}' value='{}' args='{}'".format(tag, value, args)
+            )
         if len(args) < 1:
             print("No limiting value specified")
         else:
@@ -294,9 +328,14 @@ class Validator:
             if value <= limit:
                 return None
             else:
-                return "Value {} is not less than or equal to limit {}".format(value, limit)
+                return "Value {} is not less than or equal to limit {}".format(
+                    value, limit
+                )
+
 
 def ge(self, tag, value, *args):
+    if __DEBUG__:
+        print("ge invoked with tag='{}' value='{}' args='{}'".format(tag, value, args))
     if len(args) < 1:
         print("No threshold value specified")
     else:
@@ -312,9 +351,14 @@ def ge(self, tag, value, *args):
         if value >= limit:
             return None
         else:
-            return "Value {} is not greater than or equal to threshold value {}".format(value, limit)
+            return "Value {} is not greater than or equal to threshold value {}".format(
+                value, limit
+            )
+
 
 def eq(self, tag, value, *args):
+    if __DEBUG__:
+        print("eq invoked with tag='{}' value='{}' args='{}'".format(tag, value, args))
     if len(args) < 1:
         print("No comparison value specified")
     else:

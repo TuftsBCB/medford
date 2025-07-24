@@ -234,13 +234,11 @@ class MFD:
         # me to use Dict[str, Any] instead of Dict[str, Dict[...]]...
         # maybe in the future look into fixing this?
         #   The problem is that Blocks aren't Dicts.
-        # print("HERE\n")
         # self.pydantic_version = Entity(**self.dict_data)
-        print("About to create Entity")
-        print(f"dict_data keys: {list(self.dict_data.keys())}")
         try:
             self.pydantic_version = Entity(**self.dict_data)
-            print("Entity created successfully")
+            if mfdglobals.debug:
+                print("Entity created successfully")
         except Exception as e:
             print(f"Entity creation failed: {e}")
             import traceback
