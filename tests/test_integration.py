@@ -1,4 +1,4 @@
-from MEDFORD.medford import provide_args_and_go, ParserMode, OutputMode
+from MEDFORD import provide_args_and_go, ParserMode, OutputMode
 import pytest
 
 # example error case:

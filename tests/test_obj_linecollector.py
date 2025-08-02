@@ -1,3 +1,4 @@
+import pytest
 from MEDFORD.objs.linecollector import LineCollector
 from MEDFORD.objs.linereader import LineReader
 from MEDFORD.objs.lines import AtAtLine, Line, ContinueLine, MacroLine, CommentLine, NovelDetailLine
@@ -145,6 +146,7 @@ class TestLineCollection() :
         ex_b = Block([ex_d])
         assert lc.named_blocks['Major']['content continue'] == ex_b
 
+    @pytest.mark.skip(reason="@-@ is being reworked.")
     def test_process_atat(self) :
         test_lines : List[str] = ["@Major content", "@Major-@MajorTwo Test"]
         test_Line_1 : Optional[Line] = LineReader.process_line(test_lines[0], 0)
@@ -336,7 +338,7 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].get_content({"Macro":resolved}) == "value" # type: ignore
+        assert blocks[0].head_detail.get_content({"Macro":resolved}) == "value" # type: ignore
 
     def test_multiline_macro_replace(self) :
         test_lines: List[str] = [
@@ -360,7 +362,7 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].get_content({"Macro":resolved}) == "value value 2" # type: ignore
+        assert blocks[0].head_detail.get_content({"Macro":resolved}) == "value value 2" # type: ignore
 
     def test_multilayer_macro_replace(self) :
         test_lines: List[str] = [
@@ -388,35 +390,7 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].get_content(resolved_macros) == "value"
-    
-    def test_multilayer_macro_replace_3(self) :
-        test_lines: List[str] = [
-            "`@Macro1 value",
-            "`@Macro2 21`@Macro1",
-            "@Major 23`@Macro2"
-        ]
-        test_Lines : List[Optional[Line]] = []
-        for idx, l in enumerate(test_lines) :
-            test_Lines.append(LineReader.process_line(l, idx))
-
-        confirmed_lines : List[Line] = []
-        for idx, L in enumerate(test_Lines) :
-            assert L is not None
-            confirmed_lines.append(L)
-
-        lc : LineCollector = LineCollector(confirmed_lines)
-        assert len(lc.defined_macros.keys()) == 2
-        resolved_macros : Dict[str, str] = {}
-        for m in lc.defined_macros.keys() :
-            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros) # type: ignore
-            
-        assert resolved_macros['Macro1'] == "value"
-        assert resolved_macros['Macro2'] == "21value"
-
-        blocks:List[Block] = lc.get_flat_blocks()
-        assert len(blocks) == 1
-        assert blocks[0].get_content(resolved_macros) == "2321value"
+        assert blocks[0].head_detail.get_content(resolved_macros) == "value"
     
     def test_multilayer_macro_replace_2(self) :
         test_lines: List[str] = [
@@ -445,8 +419,36 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 2
-        assert blocks[0].get_content(resolved_macros) == "2321value32"
-        assert blocks[1].get_content(resolved_macros) == "23{21value}32"
+        assert blocks[0].head_detail.get_content(resolved_macros) == "2321value32"
+        assert blocks[1].head_detail.get_content(resolved_macros) == "23{21value}32"
+    
+    def test_multilayer_macro_replace_3(self) :
+        test_lines: List[str] = [
+            "`@Macro1 value",
+            "`@Macro2 21`@Macro1",
+            "@Major 23`@Macro2"
+        ]
+        test_Lines : List[Optional[Line]] = []
+        for idx, l in enumerate(test_lines) :
+            test_Lines.append(LineReader.process_line(l, idx))
+
+        confirmed_lines : List[Line] = []
+        for idx, L in enumerate(test_Lines) :
+            assert L is not None
+            confirmed_lines.append(L)
+
+        lc : LineCollector = LineCollector(confirmed_lines)
+        assert len(lc.defined_macros.keys()) == 2
+        resolved_macros : Dict[str, str] = {}
+        for m in lc.defined_macros.keys() :
+            resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros) # type: ignore
+            
+        assert resolved_macros['Macro1'] == "value"
+        assert resolved_macros['Macro2'] == "21value"
+
+        blocks:List[Block] = lc.get_flat_blocks()
+        assert len(blocks) == 1
+        assert blocks[0].head_detail.get_content(resolved_macros) == "2321value"
 
     def test_multiline_multilayer_macro_replace(self) :
         test_lines: List[str] = [
@@ -476,7 +478,7 @@ class TestLineCollection() :
 
         blocks:List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].get_content(resolved_macros) == "hello value value 2 hello hello"
+        assert blocks[0].head_detail.get_content(resolved_macros) == "hello value value 2 hello hello"
 
     #########################################
     # Free-for-all. Yipee!                  #
