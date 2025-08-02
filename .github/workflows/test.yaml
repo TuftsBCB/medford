@@ -2,7 +2,7 @@ name: Build & Test
 
 on:
   push:
-    branches: ["dev_fix_packaging"]
+    branches: ["dev"]
 
 permissions:
   contents: read
