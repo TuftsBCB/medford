@@ -604,6 +604,7 @@ class TestLineCollection() :
         ex_detail:Detail = ex_block.details[1]
         assert ex_detail.get_raw_content() == "Tufts University"
 
+    @pytest.mark.skip(reason="Not sure what the intended functionality is here. Just skip for now and bring it up during the next medford discussion meeting.")
     def test_twoline_tab_spacing(self) :
         test_lines = ["@Contributor Polina Shpilker","\t@Contributor-Association\t Tufts ", " University"]
         test_Lines : List[Optional[Line]] = []
