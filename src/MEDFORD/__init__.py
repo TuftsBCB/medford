@@ -9,12 +9,12 @@ import json
 from enum import Enum
 from pathlib import PurePath #?
 
-from MEDFORD.objs.linereader import LineReader, Line
-from MEDFORD.objs.linecollector import LineCollector, Macro, Block
-from MEDFORD.objs.dictionizer import Dictionizer
-from MEDFORD.models.generics import Entity
+from .objs.linereader import LineReader, Line
+from .objs.linecollector import LineCollector, Macro, Block
+from .objs.dictionizer import Dictionizer
+from .models.generics import Entity
 
-import MEDFORD.mfdglobals as mfdglobals
+from . import mfdglobals
 
 # order of ops:
 # 1. open file
@@ -175,7 +175,7 @@ class MFD() :
         return Dictionizer(macro_definitions, name_dictionary)
 
 
-ap = argparse.ArgumentParser(prog="MEDFORD parser")
+ap = argparse.ArgumentParser(prog="medford")
 # basic arguments
 ap.add_argument("action", type=ParserMode, choices=list(ParserMode),
                 help="Whether to run the MEDFORD parser in Validation or Compilation mode. (Compilation creates a novel output file.)")

@@ -1,4 +1,4 @@
-from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as mv
+from .submodules.mfdvalidator.validator import MedfordValidator as mv
 
 validator: mv
 version: str
