@@ -6,7 +6,7 @@ from MEDFORD.objs.linecollections import Macro, Detail, Block
 from typing import List, Dict
 
 from typing import Optional
-
+import MEDFORD.mfdglobals as mfdglobals
 
 class TestLineCollection() :
     def setup_method(self, test_method) :

@@ -84,6 +84,11 @@ class MedfordValidator(object):
         for k,v in self._other_err_coll.items() :
             n = n + len(v)
         return n
+
+    def print_other_errs(self) :
+        for line,errs in self._other_err_coll.items() :
+            for err in errs :
+                print(f"line {line}: {err.msg}")
     
     def _add_pydantic_err(self, err: MFDErr) :
         lineno = err.get_head_lineno()

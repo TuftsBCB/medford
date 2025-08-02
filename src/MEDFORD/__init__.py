@@ -110,6 +110,7 @@ class MFD() :
 
         if mfdglobals.mv.instance().has_other_err() :
             print(f"Other errors found! : {mfdglobals.mv.instance().n_other_errs()} errors")
+            mfdglobals.mv.instance().print_other_errs()
             sys.exit(1)
             # TODO : enter error mode
 

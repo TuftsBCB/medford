@@ -13,3 +13,7 @@ def init() :
 
     global validator
     validator = mv.init()
+
+def ForceNewValidator() :
+    global validator
+    validator = mv.init()

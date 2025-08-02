@@ -1,3 +1,4 @@
+import pytest
 from MEDFORD.submodules.mfdvalidator.errors import *
 
 import MEDFORD.mfdglobals as mfdglobals
@@ -7,6 +8,10 @@ from MEDFORD.objs.linecollector import LineCollector as LC, Line, NovelDetailLin
 from MEDFORD.objs.dictionizer import Dictionizer
 
 from typing import List, Dict
+
+@pytest.fixture(autouse=True)
+def force_new_validator():
+    mfdglobals.ForceNewValidator()
 
 class ProcessToLineObj() :
     def preprocess_lines(self, lines: List[str]) -> List[Line] :
