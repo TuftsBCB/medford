@@ -136,7 +136,8 @@ class MFD() :
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
-
+        print("No errors found in the provided MEDFORD file!")
+        
         if self.write_json :
             if self.output_path == "." :
                 with open("medford_output.json", 'w', encoding="utf-8") as f:
