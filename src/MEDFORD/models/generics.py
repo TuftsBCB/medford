@@ -6,13 +6,14 @@ These Models are defined for use with Pydantic, and contain custom data types an
 
 import datetime
 from enum import Flag, auto
-from typing import TypeVar, Tuple, List, Optional, Union
+from typing import Dict, TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
 from ..objs.linecollections import Block, Detail
 
 from ..submodules.mfdvalidator.validator import MedfordValidator as mv
 from ..submodules.mfdvalidator.errors import InvalidValue, MissingRequiredFieldbcofLogic
+
 #############################################
 # Building Blocks                           #
 #############################################
@@ -78,6 +79,10 @@ class MEDFORDMDL(BlockModel) :
     name: MinorT[str]
     Version: MinorsT[str] # TODO: a way to make this singular?
 
+    @classmethod
+    def minors(cls) :
+        return ["version"]
+
     @model_validator(mode='after')
     @classmethod
     def check_version(cls, values) :
@@ -103,9 +108,17 @@ class JournalMDL(BlockModel):
     Issue: OptMinorT[str]
     Pages: OptMinorT[str]
 
+    @classmethod
+    def minors(cls) :
+        return ["volume", "issue", "pages"]
+
 class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
+
+    @classmethod
+    def minors(cls) :
+        return ["note"]
     
 class ContributorMDL(BlockModel) :
     name: MinorT[str]
@@ -113,6 +126,10 @@ class ContributorMDL(BlockModel) :
     Association: OptMinorT[str] = None
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
+
+    @classmethod
+    def minors(cls) :
+        return ["orcid", "association", "role", "email"]
 
     @model_validator(mode='after')
     @classmethod
@@ -154,10 +171,16 @@ class ContributorMDL(BlockModel) :
 
 class FundingMDL(BlockModel):
     ID: OptMinorT[str]
+
+    @classmethod
+    def minors(cls) :
+        return ["id"]
     # TODO: research possible funding IDs so we can implement validation
 
 class KeywordMDL(BlockModel):
-    pass
+    @classmethod
+    def minors(cls) :
+        return []
 
 
 
@@ -168,3 +191,12 @@ class KeywordMDL(BlockModel):
 class Entity(BaseModel) :
     MEDFORD: MajorsT[MEDFORDMDL]
     Contributor: OptMajorT[ContributorMDL] = None
+
+DefinedMajorMinor: Dict[str, List[str]] = {
+    "MEDFORD": MEDFORDMDL.minors(),
+    "Journal": JournalMDL.minors(),
+    "Date": DateMDL.minors(), 
+    "Contributor": ContributorMDL.minors(), 
+    "Funding": FundingMDL.minors(), 
+    "Keyword": KeywordMDL.minors(),
+}
