@@ -7,20 +7,14 @@
       ]
     }
   ],
-  "Species": [
+  "Software": [
     {
-      "value": "species",
-      "Loc": [
-        "species-loc"
+      "value": "software",
+      "Type": [
+        "software-type"
       ],
-      "ReefCollection": [
-        "species-reefcollection"
-      ],
-      "Cultured": [
-        "species-cultured"
-      ],
-      "CultureCollection": [
-        "species-culturecollection"
+      "Version": [
+        "software-version"
       ]
     }
   ]

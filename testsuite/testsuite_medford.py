@@ -9,8 +9,9 @@ from collections import OrderedDict
 def run_medford(input_file):
     result = subprocess.run(
         [
-            "python3",
-            "src/MEDFORD/medford.py",
+            sys.executable,
+            "-m",
+            "MEDFORD",
             "-m",
             "BAGIT",
             "--write_json",
@@ -19,6 +20,7 @@ def run_medford(input_file):
         ],
         capture_output=True,
         text=True,
+        env={"PYTHONPATH":"../src"}
     )
     return result.returncode == 0, result.stdout, result.stderr
 
@@ -62,9 +64,9 @@ def deep_compare(expected, actual, path="root"):
 
 
 def main():
-    input_dir = "testsuite/inputs"
-    expected_dir = "testsuite/expected"
-    output_dir = "testsuite/outputs"
+    input_dir = "inputs"
+    expected_dir = "expected"
+    output_dir = "outputs"
 
     os.makedirs(output_dir, exist_ok=True)
 
