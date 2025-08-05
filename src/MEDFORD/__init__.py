@@ -185,14 +185,14 @@ class MFD:
         # TODO: export to json, bag
         # TODO: implement all of the old models
         print("No errors found in the provided MEDFORD file!")
-
+        
         if self.write_json:
             if self.output_path == ".":
                 with open("medford_output.json", "w", encoding="utf-8") as f:
                     combined_data = process_blocks_to_dict(self.blocks)
-                    #     print(combined_data)
                     json.dump(combined_data, f, indent=2)
-
+            else :
+                raise NotImplementedError("Output paths other than '.' not yet supported.")
                 #     json.dump(self.dict_data, f, indent=2)
 
     @classmethod
@@ -263,7 +263,6 @@ ap.add_argument(
 )
 
 # debug arguments
-# TODO: Implement
 ap.add_argument(
     "--write_json",
     action="store_true",
@@ -295,12 +294,12 @@ ap.add_argument(
 def parse_args_and_go():
     args = ap.parse_args()
     mfdglobals.debug = args.debug
-    mfd = MFD(PurePath(args.file))
+    mfd = MFD(PurePath(args.file), write_json=args.write_json)
     mfd.run_medford()
 
-def provide_args_and_go(action:ParserMode, file:str, mode:OutputMode, debug:bool = False) :
+def provide_args_and_go(action:ParserMode, file:str, mode:OutputMode, debug:bool = False, write_json:bool = False) :
     mfdglobals.debug = debug
-    mfd = MFD(PurePath(file))
+    mfd = MFD(PurePath(file), write_json=write_json)
     mfd.run_medford()
 
 if __name__ == "__main__" :
