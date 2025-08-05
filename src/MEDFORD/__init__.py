@@ -9,12 +9,12 @@ import json
 from enum import Enum
 from pathlib import PurePath #?
 
-from MEDFORD.objs.linereader import LineReader, Line
-from MEDFORD.objs.linecollector import LineCollector, Macro, Block
-from MEDFORD.objs.dictionizer import Dictionizer
-from MEDFORD.models.generics import Entity
+from .objs.linereader import LineReader, Line
+from .objs.linecollector import LineCollector, Macro, Block
+from .objs.dictionizer import Dictionizer
+from .models.generics import Entity
 
-import MEDFORD.mfdglobals as mfdglobals
+from . import mfdglobals
 
 # order of ops:
 # 1. open file
@@ -110,6 +110,7 @@ class MFD() :
 
         if mfdglobals.mv.instance().has_other_err() :
             print(f"Other errors found! : {mfdglobals.mv.instance().n_other_errs()} errors")
+            mfdglobals.mv.instance().print_other_errs()
             sys.exit(1)
             # TODO : enter error mode
 
@@ -121,6 +122,7 @@ class MFD() :
         self.pydantic_version = Entity(**self.dict_data)
         if mfdglobals.mv.instance().has_pydantic_err() :
             mfdglobals.mv.instance().print_pydantic_errs()
+            sys.exit(1)
         
         #try:
         #    self.pydantic_version = Entity(**self.dict_data)
@@ -135,6 +137,7 @@ class MFD() :
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
+        print("No errors found in the provided MEDFORD file!")
 
         if self.write_json :
             if self.output_path == "." :
@@ -175,7 +178,7 @@ class MFD() :
         return Dictionizer(macro_definitions, name_dictionary)
 
 
-ap = argparse.ArgumentParser(prog="MEDFORD parser")
+ap = argparse.ArgumentParser(prog="medford")
 # basic arguments
 ap.add_argument("action", type=ParserMode, choices=list(ParserMode),
                 help="Whether to run the MEDFORD parser in Validation or Compilation mode. (Compilation creates a novel output file.)")
