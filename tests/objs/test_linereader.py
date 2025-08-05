@@ -7,7 +7,7 @@ from MEDFORD.objs.lines import (
     ContinueLine,
 )
 from MEDFORD.objs.linereader import LineReader
-from submodules.mfdvalidator.validator import MedfordValidator as em
+from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as em
 from MEDFORD.submodules.mfdvalidator.errors import MissingAtAtName
 
 #################################
@@ -56,9 +56,9 @@ def noveldetail_ex_fixture():
 # Tests                         #
 #################################
 
-
-class TestAtAtImplementation:
-    def test_detect_atat(self):
+class TestAtAtImplementation() :
+    __test__ = False
+    def test_detect_atat(self) :
         example_line = "@Major-@MajorTwo Content"
         assert isinstance(LineReader.process_line(example_line, 0), AtAtLine)
 
@@ -149,7 +149,15 @@ def test_detect_macro_badcurly():
     assert isinstance(res, NovelDetailLine)
     assert res.has_macros
 
+def test_creating_comment_line() :
+    example_lines = [" # Comment Line"]
+    a = CommentLine(0,example_lines[0])
+    assert a.line == " # Comment Line"
 
+    b = LineReader.process_line(example_lines[0],0)
+    assert type(b) is CommentLine
+    assert b.line == " # Comment Line"
+    
 # TODO : move tests over from test_linereader to test "find" capabilities
 # TODO : add test for major-minor identification
 # TODO : add raw content setting tests (e.g. mname, mbody)

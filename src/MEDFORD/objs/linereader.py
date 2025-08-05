@@ -5,16 +5,16 @@ in a line. Eventually returns Line objects."""
 
 import re
 from typing import Tuple, List, Optional
-from MEDFORD.submodules.mfdvalidator.errors import MissingAtAtName
-from MEDFORD.objs.lines import (
-    Line,
-    MacroLine,
-    CommentLine,
-    NovelDetailLine,
-    ContinueLine,
+from ..submodules.mfdvalidator.errors import MissingAtAtName
+from .lines import (
+    Line, 
+    MacroLine, 
+    CommentLine, 
+    NovelDetailLine, 
+    ContinueLine
 )
 
-import MEDFORD.mfdglobals as mfdglobals
+from .. import mfdglobals
 
 Macro = Tuple[int, int, str]
 Tex = Tuple[int, int]
@@ -63,8 +63,9 @@ class LineReader:
     # Macro definition
     # Novel token
     @staticmethod
-    def is_comment_line(line: str) -> bool:
-        """Returns True if the provided string is a comment line."""
+    def is_comment_line(line:str) -> bool :
+        """Returns True if the provided string is a comment line. Ignores leading spaces."""
+        line = line.strip()
         return re.match(f"{DetailStatics.comment_header}", line) is not None
 
     @staticmethod

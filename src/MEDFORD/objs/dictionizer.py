@@ -3,7 +3,7 @@ such as macro definitions and generating the output dictionary for pydantic
 consumption."""
 
 from typing import Any, List, Dict
-from MEDFORD.objs.linecollections import Block, Macro
+from .linecollections import Block, Macro
 
 
 class Dictionizer:
@@ -35,22 +35,21 @@ class Dictionizer:
                 )
             self.resolved_macros[n] = res
 
-    def validate_atat(self, bls: List[Block]):
-        """DEPRECIATED. Does nothing."""
-        all_valid = True
-        for bl in bls:
-            all_valid = all_valid and bl.validate_atat(
-                self.resolved_macros, self.name_dictionary
-            )
-        if not all_valid:
-            print("There is an invalid @-@ somewhere.")
-        else:
-            print("All @-@ successfully validated")
+
+    # def validate_atat(self, bls: List[Block]) :
+    #     """DEPRECIATED. Does nothing."""
+    #     all_valid = True
+    #     for bl in bls :
+    #         all_valid = all_valid and bl.validate_atat(self.resolved_macros, self.name_dictionary)
+    #     if not all_valid :
+    #         print("There is an invalid @-@ somewhere.")
+    #     else :
+    #         print("All @-@ successfully validated")
 
     def generate_dict(self, bls: List[Block]):
         """Generate the proper form dictionary from a list of Blocks to pass
         to Pydantic."""
-        self.validate_atat(bls)
+        #self.validate_atat(bls)
         root_dict: Dict[str, Any] = {}
         for _, bl in enumerate(bls):
             self._recurse_majors(root_dict, bl)

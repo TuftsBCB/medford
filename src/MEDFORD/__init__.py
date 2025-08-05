@@ -9,13 +9,12 @@ import json
 from enum import Enum
 from pathlib import PurePath  # ?
 
-from MEDFORD.objs.linereader import LineReader, Line
-from MEDFORD.objs.linecollector import LineCollector, Macro, Block
-from MEDFORD.objs.dictionizer import Dictionizer
-from MEDFORD.models.generics import Entity
-from MEDFORD.objs.linecollections import Detail
+from .objs.linereader import LineReader, Line
+from .objs.linecollector import LineCollector, Macro, Block
+from .objs.dictionizer import Dictionizer
+from .models.generics import Entity
 
-import MEDFORD.mfdglobals as mfdglobals
+from . import mfdglobals
 
 # order of ops:
 # 1. open file
@@ -156,10 +155,9 @@ class MFD:
         )
         self.dict_data = self.dictionizer.generate_dict(self.blocks)
 
-        if mfdglobals.mv.instance().has_other_err():
-            print(
-                f"Other errors found! : {mfdglobals.mv.instance().n_other_errs()} errors"
-            )
+        if mfdglobals.mv.instance().has_other_err() :
+            print(f"Other errors found! : {mfdglobals.mv.instance().n_other_errs()} errors")
+            mfdglobals.mv.instance().print_other_errs()
             sys.exit(1)
             # TODO : enter error mode
 
@@ -171,8 +169,9 @@ class MFD:
         self.pydantic_version = Entity(**self.dict_data)
         if mfdglobals.mv.instance().has_pydantic_err():
             mfdglobals.mv.instance().print_pydantic_errs()
-
-        # try:
+            sys.exit(1)
+        
+        #try:
         #    self.pydantic_version = Entity(**self.dict_data)
         #    print(self.pydantic_version.dict())
         # except ValidationError as e:
@@ -185,6 +184,7 @@ class MFD:
 
         # TODO: export to json, bag
         # TODO: implement all of the old models
+        print("No errors found in the provided MEDFORD file!")
 
         if self.write_json:
             if self.output_path == ".":
@@ -230,7 +230,7 @@ class MFD:
         return Dictionizer(macro_definitions, name_dictionary)
 
 
-ap = argparse.ArgumentParser(prog="MEDFORD parser")
+ap = argparse.ArgumentParser(prog="medford")
 # basic arguments
 ap.add_argument(
     "action",
@@ -294,10 +294,14 @@ ap.add_argument(
 # want full API call to include all minor api calls; return dict w/ string indices?
 def parse_args_and_go():
     args = ap.parse_args()
-    mfd = MFD(PurePath(args.file), write_json=args.write_json)
     mfdglobals.debug = args.debug
+    mfd = MFD(PurePath(args.file))
     mfd.run_medford()
 
+def provide_args_and_go(action:ParserMode, file:str, mode:OutputMode, debug:bool = False) :
+    mfdglobals.debug = debug
+    mfd = MFD(PurePath(file))
+    mfd.run_medford()
 
-if __name__ == "__main__":
+if __name__ == "__main__" :
     parse_args_and_go()

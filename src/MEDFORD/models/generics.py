@@ -10,12 +10,12 @@ from enum import Flag, auto
 from typing import TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
-from MEDFORD.objs.linecollections import Block, Detail
+from ..objs.linecollections import Block, Detail
 
-from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as mv
-from MEDFORD.submodules.mfdvalidator.errors import (
-    InvalidValue,
-    MissingRequiredFieldbcofLogic,
+from ..submodules.mfdvalidator.validator import MedfordValidator as mv
+from ..submodules.mfdvalidator.errors import (
+    InvalidValue, 
+    MissingRequiredFieldbcofLogic
 )
 #############################################
 # Building Blocks                           #
@@ -84,6 +84,12 @@ class RoleOpts(Flag):
 # Attributes                                #
 #############################################
 
+class MEDFORDMDL(BlockModel) :
+    """Model to store MEDFORD metadata describing the MEDFORD file itself,
+     such as MEDFORD file colloqiual name and the version of MEDFORD used
+     to write this file."""
+    name: MinorT[str]
+    Version: MinorsT[str] # TODO: a way to make this singular?
 
 class MEDFORDmdl(BlockModel):
     """Model to store MEDFORD metadata describing the MEDFORD file itself,
@@ -111,7 +117,7 @@ class MEDFORDmdl(BlockModel):
         return values
 
 
-class Journal(BlockModel):
+class JournalMDL(BlockModel):
     name: MinorT[str]
     # TODO: Validation? Do we care about proper format for this?
     Volume: OptMinorT[str]
@@ -153,7 +159,7 @@ class PaperMDL(BlockModel):
 #         return v
 
 
-class Contributor(BlockModel):
+class ContributorMDL(BlockModel):
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
@@ -201,13 +207,11 @@ class Contributor(BlockModel):
 
         return cur_flags
 
-
-class Funding(BlockModel):
+class FundingMDL(BlockModel):
     ID: OptMinorT[str]
     # TODO: research possible funding IDs so we can implement validation
 
-
-class Keyword(BlockModel):
+class KeywordMDL(BlockModel):
     pass
 
 
@@ -215,7 +219,6 @@ class Keyword(BlockModel):
 # File-Wide Validation                      #
 #############################################
 
-
-class Entity(BaseModel):
-    MEDFORD: MajorsT[MEDFORDmdl]
-    Contributor: OptMajorT[Contributor]
+class Entity(BaseModel) :
+    MEDFORD: MajorsT[MEDFORDMDL]
+    Contributor: OptMajorT[ContributorMDL] = None

@@ -1,7 +1,8 @@
-from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as mv
+from .submodules.mfdvalidator.validator import MedfordValidator as mv
 
 validator: mv
 version: str
+debug: bool
 
 
 def init():
@@ -11,5 +12,9 @@ def init():
     global debug
     debug = False
 
+    global validator
+    validator = mv.init()
+
+def ForceNewValidator() :
     global validator
     validator = mv.init()

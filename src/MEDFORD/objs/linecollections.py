@@ -7,18 +7,17 @@ is defined as a MacroLine followed by 0 or more ContinueLines.)
 """
 
 from typing import Optional, List, Dict, Tuple, Union
-from MEDFORD.objs.lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
+from .lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
 
-from MEDFORD.submodules.mfdvalidator.errors import (
-    MissingDescError,
-    MaxMacroDepthExceeded,
-    AtAtReferencedDoesNotExist,
-    MissingContent,
+from ..submodules.mfdvalidator.errors import (
+    MissingDescError, 
+    MaxMacroDepthExceeded, 
+    AtAtReferencedDoesNotExist, 
+    MissingContent
 )
 
-import MEDFORD.mfdglobals as mfdglobals
+from .. import mfdglobals
 import sys
-
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
