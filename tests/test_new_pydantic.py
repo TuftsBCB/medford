@@ -7,16 +7,17 @@ from MEDFORD.objs.dictionizer import Dictionizer as D
 
 from MEDFORD.models.generics import ContributorMDL, Entity
 
-class TestPydanticModels() :
-    def setup_method(self, test_method) :
+
+class TestPydanticModels:
+    def setup_method(self, test_method):
         pass
 
-    def preprocess_lines(self, lines: List[str]) -> Tuple[List[Block], Dict[str, Any]] :
+    def preprocess_lines(self, lines: List[str]) -> Tuple[List[Block], Dict[str, Any]]:
         line_objs: List[Line] = []
-        for idx, l in enumerate(lines) :
+        for idx, l in enumerate(lines):
             # TODO : shouldn't have to manually be getting rid of None lines tbh
             pl = LR.process_line(l, idx)
-            if pl is not None :
+            if pl is not None:
                 line_objs.append(pl)
 
         lc = LC(line_objs)
@@ -24,13 +25,11 @@ class TestPydanticModels() :
         d = D(lc.defined_macros, lc.get_1lvl_blocks())
         return (bls, d.generate_dict(bls))
 
-    def test_contributor(self) :
-        sample_lines = [
-            "@Contributor Polina Shpilker"
-            ]
-        
-        (bls,cd) = self.preprocess_lines(sample_lines)
-        contributor_data = cd['Contributor'][0]
+    def test_contributor(self):
+        sample_lines = ["@Contributor Polina Shpilker"]
+
+        (bls, cd) = self.preprocess_lines(sample_lines)
+        contributor_data = cd["Contributor"][0]
 
         res = ContributorMDL(**contributor_data)
 

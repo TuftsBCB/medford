@@ -1,0 +1,27 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Species": [
+    {
+      "value": "species",
+      "Loc": [
+        "species-loc"
+      ],
+      "ReefCollection": [
+        "species-reefcollection"
+      ],
+      "Cultured": [
+        "species-cultured"
+      ],
+      "CultureCollection": [
+        "species-culturecollection"
+      ]
+    }
+  ]
+}

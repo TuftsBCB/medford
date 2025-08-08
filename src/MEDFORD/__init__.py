@@ -1,20 +1,31 @@
 """Module containing the MEDFORD parser, which can validate and compile MEDFORD metadata files."""
+from enum import Enum
+
+<<<<<<<< HEAD:src/MEDFORD/medford.py
+from MEDFORD.objs.linereader import LineReader, Line
+from MEDFORD.objs.linecollector import LineCollector, Macro, Block
+from MEDFORD.objs.dictionizer import Dictionizer
+from MEDFORD.models.generics import Entity
+from MEDFORD.objs.linecollections import Detail
+from MEDFORD.objs.bagitHandler import BagItHandler
 
 import sys
+import os
 from typing import List, Dict
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #TODO terminal would not recognize bagithandler without this
 
 import argparse
 import json
-
-from enum import Enum
-from pathlib import PurePath #?
-
+import MEDFORD.mfdglobals as mfdglobals
+========
 from .objs.linereader import LineReader, Line
 from .objs.linecollector import LineCollector, Macro, Block
 from .objs.dictionizer import Dictionizer
 from .models.generics import Entity
 
 from . import mfdglobals
+>>>>>>>> dev:src/MEDFORD/__init__.py
+
 
 # order of ops:
 # 1. open file
@@ -23,41 +34,83 @@ from . import mfdglobals
 # 4. turn specialized objs into dict (using ?)
 # 5. verify dict using Pydantic (using ?)
 
-# TODO : add error mgmt
-class ParserMode(Enum) :
-    """Enum storing the mode of operation of the MEDFORD parser."""
-    VALIDATE = 'validate'
-    COMPILE = 'compile'
 
-    def __str__(self) :
+# TODO : add error mgmt
+class ParserMode(Enum):
+    """Enum storing the mode of operation of the MEDFORD parser."""
+
+    VALIDATE = "validate"
+    COMPILE = "compile"
+
+    def __str__(self):
         return self.value
+    
+def process_blocks_to_dict(blocks):
+    combined_dict = {}
+
+    for block in blocks:
+        if not hasattr(block, "major_tokens") or not block.major_tokens:
+            continue
+
+        major_token = block.major_tokens[0]
+        # hard code joining token with underscore
+        if len(block.major_tokens) > 0:
+            major_token = "_".join(block.major_tokens)
+
+        # Initialize category if needed
+        if major_token not in combined_dict:
+            combined_dict[major_token] = []
+
+        block_dict = {}
+        if hasattr(block, "details") and block.details:
+            # get header (first value)
+            header_detail = block.details[0]
+            block_dict["value"] = header_detail.get_raw_content().strip()
+
+            # process minor tokens
+            for detail in block.details[1:]:
+                if detail.minor_token:
+                    minor_token = detail.minor_token
+                    content = detail.get_raw_content().strip()
+
+                    if minor_token not in block_dict:
+                        block_dict[minor_token] = []
+
+                    block_dict[minor_token].append(content)
+
+        # add processed block to its major category
+        combined_dict[major_token].append(block_dict)
+
+    return combined_dict
+
 
 class OutputMode(Enum):
     """Enum storing possible outout types of the MEDFORD parser."""
-    OTHER = 'OTHER'
-    BCODMO = 'BCODMO'
-    RDF = 'RDF'
-    BAGIT = 'BAGIT'
+
+    OTHER = "OTHER"
+    BCODMO = "BCODMO"
+    RDF = "RDF"
+    BAGIT = "BAGIT"
     # TODO : Make creating a bag a separate option?
     # Could want to make an output RDF file AND zip it.
 
-    def __str__(self) :
+    def __str__(self):
         return self.value
 
     @classmethod
     def _missing_(cls, value: str):
-        for member in cls :
-            if member.name.lower() == value.lower() :
+        for member in cls:
+            if member.name.lower() == value.lower():
                 return member
         return None
+    
 
-
-class MFD() :
+class MFD():
     """Base class runner of the MEDFORD parser. Runs the entire validation/compilation pipeline from file input to output."""
 
     # TODO : ? is this the right way to implement this?
     @classmethod
-    def get_version(cls) -> str :
+    def get_version(cls) -> str:
         return mfdglobals.version
 
     mfdglobals.init()
@@ -77,17 +130,23 @@ class MFD() :
     dict_data = None
     pydantic_version = None
 
-    def __init__(self, filename, write_json:bool=False, output_path:str=".") :
+    def __init__(self, filename, mode: OutputMode = OutputMode.OTHER, 
+             action: ParserMode = None, 
+             base_dir: str = None, write_json:bool=True, output_path:str=".") :
         self.filename = filename
+        self.mode = mode
+        self.action = action  # Store the action
+        self.base_dir = base_dir
         self.write_json = write_json
         self.output_path = output_path
 
     def run_medford(self):
         """Main function that runs MEDFORD compilation from start to finish."""
-        self.em_inst = mfdglobals.validator # this is just for debug purposes
-        
+        self.em_inst = mfdglobals.validator  # this is just for debug purposes
+
         # TODO: way to avoid putting all lines into memory?
-        # TODO: make LineProcessor take all of the strs/filename and do the work itself?
+        # TODO: make LineProcessor take all of the strs/filename and do 
+        #       the work itself?
         # 1, 2
         self.object_lines = MFD._get_line_objects(self.filename)
 
@@ -121,6 +180,7 @@ class MFD() :
         #   The problem is that Blocks aren't Dicts.
         self.pydantic_version = Entity(**self.dict_data)
         if mfdglobals.mv.instance().has_pydantic_err() :
+            sys.stderr.write("has error\n")
             mfdglobals.mv.instance().print_pydantic_errs()
             sys.exit(1)
         
@@ -139,10 +199,47 @@ class MFD() :
         # TODO: implement all of the old models
         print("No errors found in the provided MEDFORD file!")
 
-        if self.write_json :
-            if self.output_path == "." :
+        if self.write_json:
+            if self.output_path == ".":
+                with open("medford_output.json", "w", encoding="utf-8") as f:
+                    combined_data = process_blocks_to_dict(self.blocks)
+                    #     print(combined_data)
+                    json.dump(combined_data, f, indent=2)
+
+        if self.mode == OutputMode.BAGIT:
+                # Process blocks to dictionary format
+            combined_data = process_blocks_to_dict(self.blocks)
+                
+            bagit_handler = BagItHandler(combined_data, self.base_dir, 
+                                         self.output_path, self.filename)
+                   
+            if self.action == ParserMode.VALIDATE:  # <-- Note: This should be self.action, not self.ParserMode
+                if bagit_handler.validate():
+                    print("BagIt validation passed.")
+                else:
+                    print("BagIt validation failed.")
+                    sys.exit(1)
+            
+            # Note: This should be self.action, not self.ParserMode
+            elif self.action == ParserMode.COMPILE:
+                pass
+                # Compile BagIt package
+                # try:
+                #     bag_path = bagit_handler.compile()
+                #     print(f"BagIt package created at: {bag_path}")
+                # except Exception as e:
+                #     print(f"Error creating BagIt package: {e}")
+                #     sys.exit(1)
+        
+    # Write JSON output if requested (indentation corrected)
+        if self.write_json:
+            if self.output_path == ".":
+                # TODO create new file or use medford_output_json
                 with open("medford_output.json", 'w', encoding="utf-8") as f:
-                    json.dump(self.dict_data, f, indent=2)
+                    combined_data = process_blocks_to_dict(self.blocks)
+                    json.dump(combined_data, f, indent=2)
+                    hello
+                        
 
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line] :
@@ -150,24 +247,24 @@ class MFD() :
         with open(filename, 'r', encoding="utf-8") as f :
             for idx,line in enumerate(f.readlines()) :
                 p_line = LineReader.process_line(line, idx)
-                if p_line is not None :
+                if p_line is not None:
                     object_lines.append(p_line)
 
         return object_lines
-    
+
     # for testing purposes in model unit tests
     @classmethod
-    def _get_unvalidated_blocks(cls, input: str)-> List[Block] :
+    def _get_unvalidated_blocks(cls, input: str) -> List[Block]:
         object_lines = MFD._get_line_objects(input)
         line_collector = MFD._get_line_collector(object_lines)
-        #macro_definitions = line_collector.get_macros()
+        # macro_definitions = line_collector.get_macros()
         blocks = line_collector.get_flat_blocks()
 
         return blocks
 
-
     # note for later: what happens when it takes too long to process ?
-    # user writes a new line, add it to LineCollector that single line at a time?
+    # user writes a new line, add it to LineCollector that single line at a 
+    # time?
     # 10s of ms amount of time to run is allocation usually
     @classmethod
     def _get_line_collector(cls, object_lines: List[Line]) -> LineCollector:
@@ -208,6 +305,33 @@ ap.add_argument("-v", "--version", action='version', version='%(prog)s {version}
 # syntax check -> get back both line objects & errors
 
 # want full API call to include all minor api calls; return dict w/ string indices?
+<<<<<<<< HEAD:src/MEDFORD/medford.py
+def provide_args_and_go(action: ParserMode, file: str, mode: OutputMode, 
+                        base_dir: str = ".", write_json: bool = False, # changed base_dir default from None to "."
+                        output_path: str = ".", debug: bool = False):
+    mfdglobals.debug = debug
+    mfd = MFD(file, mode, action, base_dir, write_json, output_path) 
+    mfd.run_medford()
+
+
+def parse_args_and_go():
+    args = ap.parse_args()
+    mfdglobals.debug = args.debug
+    mfd = MFD(
+        args.file,
+        mode=args.mode,
+        action=args.action,
+        base_dir=args.dir,
+        write_json=args.write_json,
+        output_path="."
+    )
+>>>>>>> 90ea795 (halfway done with bagit handler)
+    mfd.run_medford()
+
+
+if __name__ == "__main__":
+    parse_args_and_go()
+========
 def parse_args_and_go() :
     args = ap.parse_args()
     mfdglobals.debug = args.debug
@@ -221,3 +345,4 @@ def provide_args_and_go(action:ParserMode, file:str, mode:OutputMode, debug:bool
 
 if __name__ == "__main__" :
     parse_args_and_go()
+>>>>>>>> dev:src/MEDFORD/__init__.py

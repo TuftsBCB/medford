@@ -1,0 +1,9 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Expedition expedition
+@Expedition-ShipName expedition-shipname
+@Expedition-CruiseID expedition-cruiseID
+@Expedition-MooringID expedition-mooringID
+@Expedition-DiveNumber expedition-divenumber
+@Expedition-Synonyms expedition-synonyms

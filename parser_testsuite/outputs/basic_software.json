@@ -1,0 +1,21 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Software": [
+    {
+      "value": "software",
+      "Type": [
+        "software-type"
+      ],
+      "Version": [
+        "software-version"
+      ]
+    }
+  ]
+}

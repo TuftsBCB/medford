@@ -1,0 +1,18 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Funding": [
+    {
+      "value": "funding",
+      "ID": [
+        "funding-id"
+      ]
+    }
+  ]
+}
