@@ -7,16 +7,16 @@ is defined as a MacroLine followed by 0 or more ContinueLines.)
 """
 
 from typing import Optional, List, Dict, Tuple, Union
-from MEDFORD.objs.lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
+from .lines import AtAtLine, ContinueLine, MacroLine, NovelDetailLine
 
-from MEDFORD.submodules.mfdvalidator.errors import (
+from ..submodules.mfdvalidator.errors import (
     MissingDescError,
     MaxMacroDepthExceeded,
     AtAtReferencedDoesNotExist,
     MissingContent,
 )
 
-import MEDFORD.mfdglobals as mfdglobals
+from .. import mfdglobals
 import sys
 
 # create mixin for macro, named obj handling
@@ -294,7 +294,7 @@ class Detail(LineCollection):
             self.is_header = False
 
         if mfdglobals.debug:
-            print(f"\nInside Detail's init", file=sys.stderr)
+            print("\nInside Detail's init", file=sys.stderr)
             print(f"Headline major tokens: {headline.major_tokens}", file=sys.stderr)
             print(f"Headline minor token: {headline.minor_token}", file=sys.stderr)
 
@@ -308,26 +308,12 @@ class Detail(LineCollection):
         if mfdglobals.debug:
             print(f"content length is: {content_length}", file=sys.stderr)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    def get_str_majors(self) -> str:
-        """Returns the list of major tokens as a _-joined string."""
-        if mfdglobals.debug:
-            print(f"\nInside get_str_majors", file=sys.stderr)
-            print(f"Major tokens: {self.major_tokens}", file=sys.stderr)
-        return "_".join(self.major_tokens)
-
-    def get_raw_content(self) -> str:
-        """Returns the content of the Detail, as a string without substitutions."""
-        if mfdglobals.debug:
-            print("\n=== get_raw_content called ===", file=sys.stderr)
-            print(f"content length is: {content_length}", file=sys.stderr)
-
-
-
     def get_str_majors(self) -> str :
         """Returns the list of major tokens as a _-joined string.
         """
+        if mfdglobals.debug:
+            print("\nInside get_str_majors", file=sys.stderr)
+            print(f"Major tokens: {self.major_tokens}", file=sys.stderr)
         return "_".join(self.major_tokens)
 
     def get_raw_content(self) -> str :
@@ -350,16 +336,7 @@ class Detail(LineCollection):
         out = self.headline.get_content(resolved_macros)
         if mfdglobals.debug:
             print(f"Content: {out}", file=sys.stderr)
-        out = self.headline.get_content(resolved_macros)
 
-        return out
-
-    def get_content(self, resolved_macros: Dict[str, str]) -> str :
-        out = self.headline.get_content(resolved_macros)
-        # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
-        out = self.headline.get_content(resolved_macros)
-        # print(f"\nInside get_content", file=sys.stderr)
-        # print(f"Headline processed content: {out}", file=sys.stderr)
         if self.extralines is not None :
             for line in self.extralines :
                 out = out + line.get_content(resolved_macros)
@@ -389,7 +366,6 @@ class AtAt(Detail):
     (Used to) represent a detail that contains a reference to a block."""
 
     major_tokens: List[str]
-    minor_token: str
     referenced_majors: List[str]
     is_header: bool = False
 
@@ -403,7 +379,10 @@ class AtAt(Detail):
         return "_".join(self.referenced_majors)
 
     def _get_referenced_name(self, macro_defs: Dict[str, str]) -> str:
-        temp_name = self.minor_token + "@" + self.headline.get_content(macro_defs)
+        if self.minor_token :
+            temp_name = self.minor_token + "@" + self.headline.get_content(macro_defs)
+        else :
+            temp_name = "@" + self.headline.get_content(macro_defs)
         if self.extralines is not None:
             for line in self.extralines:
                 temp_name += line.get_content(macro_defs)
