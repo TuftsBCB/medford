@@ -4,7 +4,8 @@ validator: mv
 version: str
 debug: bool
 
-def init() :
+
+def init():
     global version
     version = "2.0.0"
 
