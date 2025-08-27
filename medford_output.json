@@ -1,0 +1,21 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "value": "Michael K. DeSalvo",
+      "Association": [
+        "School of Natural Sciences, University of California Merced"
+      ],
+      "Role": [
+        "Corresponding Author"
+      ]
+    }
+  ]
+}

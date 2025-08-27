@@ -1,10 +1,11 @@
-"""Module containing generic Model information for standard MEDFORD use. 
-These are models that are expected to be used across multiple MEDFORD metadata applications, 
+"""Module containing generic Model information for standard MEDFORD use.
+These are models that are expected to be used across multiple MEDFORD metadata applications,
 as well as some that are expected for our initial use case tests.
 
 These Models are defined for use with Pydantic, and contain custom data types and type validation."""
 
 import datetime
+import sys
 from enum import Flag, auto
 from typing import Dict, TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
@@ -12,8 +13,10 @@ from pydantic import model_validator, computed_field
 from ..objs.linecollections import Block, Detail
 
 from ..submodules.mfdvalidator.validator import MedfordValidator as mv
-from ..submodules.mfdvalidator.errors import InvalidValue, MissingRequiredFieldbcofLogic
-
+from ..submodules.mfdvalidator.errors import (
+    InvalidValue, 
+    MissingRequiredFieldbcofLogic
+)
 #############################################
 # Building Blocks                           #
 #############################################
@@ -25,14 +28,14 @@ from ..submodules.mfdvalidator.errors import InvalidValue, MissingRequiredFieldb
 # for now, updates to generics.py should be patch updates
 # will figure out how to deal with this once people are adding their
 # own major/minor tokens later.
-T = TypeVar('T')
+T = TypeVar("T")
 MinorT = Tuple[Detail, T]
 MinorsT = List[MinorT[T]]
 OptMinorT = Optional[MinorsT[T]]
 
 MajorsT = List[T]
 OptMajorT = Optional[MajorsT[T]]
-# TODO : I want to be able to use minorT instead of MinorsT; 
+# TODO : I want to be able to use minorT instead of MinorsT;
 #       what in the dictionizer is making this not possible?
 #       -> dictionizer can't know what's supposed to be singular and
 #           what isn't, so is always returning lists...
@@ -40,33 +43,42 @@ OptMajorT = Optional[MajorsT[T]]
 #           dictionizer know about the models.
 
 # TODO: there's gotta be a better way to store & check MEDFORD versions.
-all_versions = ["1.0","1.1","2.0"]
+all_versions = ["1.0", "1.1", "2.0"]
 
-class BaseModel(PydanticBaseModel) :
+
+class BaseModel(PydanticBaseModel):
     """Base model for use by other MEDFORD model. Importantly, allows custom typing
     and additional attributes, allowing users to add arbitrary minor tokens."""
+
     class Config:
         """Configuration for the BaseModel allowing custom typing and extra attributes."""
-        arbitrary_types_allowed = True
-        extra = 'allow' #comment out to check only defined attr
 
-class BlockModel(BaseModel) :
+        arbitrary_types_allowed = True
+        extra = "allow"  # comment out to check only defined attr
+
+
+class BlockModel(BaseModel):
     """An extension to the BaseModel that adds an expected attribute Block,
     for cases where the Block information is being provided alongside the expected
     Model features."""
+
     Block: Block
+
 
 #############################################
 # Helper Types                              #
 #############################################
 
-class RoleOpts(Flag) :
+
+class RoleOpts(Flag):
     """A Flag describing author role features, such as Corresponding author or First author."""
-    HASROLES =  0 # TODO: does this actually only flag if they have a role set, or does it also flag ones w/o roles?
+
+    HASROLES = 0  # TODO: does this actually only flag if they have a role set, or does it also flag ones w/o roles?
     CORR = auto()
     FIRST = auto()
     OTHER = auto()
     # TODO: other types of Roles we'll want to recognize
+
 
 #############################################
 # Attributes                                #
@@ -83,44 +95,79 @@ class MEDFORDMDL(BlockModel) :
     def minors(cls) :
         return ["version"]
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     @classmethod
-    def check_version(cls, values) :
+    def check_version(cls, values):
         """Ensures that the version described in this entry is a valid MEDFORD version."""
         # TODO: make this a more generic version checker, e.g. right
         #       regex format.
-        if values.Version == [] :
+        if values.Version == []:
             raise ValueError("Need to define a custom error for missing data.")
-        
+
         version_tuple = values.Version[0]
         version = version_tuple[1]
-        if version not in all_versions :
-            mv.instance().add_error(InvalidValue(values.Block, 'Version', version))
-#            raise ValueError(f"Version {version} not a valid Version number.")
+        if version not in all_versions:
+            mv.instance().add_error(InvalidValue(values.Block, "Version", version))
+        #            raise ValueError(f"Version {version} not a valid Version number.")
 
         return values
-    
+
 
 class JournalMDL(BlockModel):
     name: MinorT[str]
-    #TODO: Validation? Do we care about proper format for this?
+    # TODO: Validation? Do we care about proper format for this?
     Volume: OptMinorT[str]
     Issue: OptMinorT[str]
     Pages: OptMinorT[str]
 
     @classmethod
-    def minors(cls) :
-        return ["volume", "issue", "pages"]
+    def minors(cls):
+        return ["volume","issue","pages"]
+
 
 class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
-
+    
     @classmethod
     def minors(cls) :
         return ["note"]
-    
-class ContributorMDL(BlockModel) :
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_date_minor(cls, v):
+        expected_tokens = ["Note"]
+        has_tokens = all(hasattr(v, t) for t in expected_tokens)
+        if not has_tokens:
+            raise ValueError(f"Paper missing required fields: ")
+        #     mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Date", "Date requires"))
+        return v
+
+
+class PaperMDL(BlockModel):
+    name: MinorT[str]
+    Link: OptMinorT[str]  # instead of str does it have to be link?
+    PMID: OptMinorT[str]
+    DOI: OptMinorT[str]
+
+    @classmethod
+    def minors(cls):
+        return ["link","pmid","doi"]
+
+
+# dont really understand what the file thing is about
+#     @model_validator(mode='after')
+#     @classmethod
+#     def check_file(cls, v) :
+#         if v.File is not None:
+#             required_file_tokens = ["File"]
+#             missing_file_tokens = [t for t in required_file_tokens if not hasattr(v, t)]
+#             if missing_file_tokens:
+#                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
+#         return v
+
+
+class ContributorMDL(BlockModel):
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
@@ -133,38 +180,41 @@ class ContributorMDL(BlockModel) :
 
     @model_validator(mode='after')
     @classmethod
-    def check_corresponding_has_email(cls, v) :
+    def check_corresponding_has_email(cls, v):
         if v.Role is not None:
             roles = [r[1] for r in v.Role]
             if "Corresponding Author" in roles and v.Email is None:
-                mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Email", "Corresponding Author is listed under Roles"))
-                a = mv.instance()
+                mv.instance().add_error(
+                    MissingRequiredFieldbcofLogic(
+                        v.Block, "Email", "Corresponding Author is listed under Roles"
+                    )
+                )
         return v
-    
+
     @computed_field
     @property
-    def _role(self) -> RoleOpts :
+    def _role(self) -> RoleOpts:
         # TODO: this doesn't actually help the way I wanted it to.
         #       We want the LSP to be able to suggest values for the
         #       minor token, but there is no way for the LSP to see
         #       these strings. The flags are cool and all, but how
         #       can we expose the string equivalents to the LSP?
-        cur_flags : RoleOpts = RoleOpts.HASROLES
+        cur_flags: RoleOpts = RoleOpts.HASROLES
 
         # pylint: disable=unsupported-binary-operation
         # known issue in pylint for py<3.11; throws false error when ENUMs are logic chained.
         # https://github.com/pylint-dev/pylint/issues/7381
-        if self.Role is not None :
+        if self.Role is not None:
             roles = [r[1] for r in self.Role]
-            if "Corresponding Author" in roles :
+            if "Corresponding Author" in roles:
                 cur_flags = cur_flags | RoleOpts.CORR
-            if "First Author" in roles :
+            if "First Author" in roles:
                 cur_flags = cur_flags | RoleOpts.FIRST
 
         # proving to myself how flag enums work
-        #if RoleOpts.FIRST & cur_flags :
+        # if RoleOpts.FIRST & cur_flags :
         #    print("is first author")
-        #if RoleOpts.CORR & cur_flags :
+        # if RoleOpts.CORR & cur_flags :
         #    print("is corresponding author")
 
         return cur_flags
@@ -181,7 +231,6 @@ class KeywordMDL(BlockModel):
     @classmethod
     def minors(cls) :
         return []
-
 
 
 #############################################

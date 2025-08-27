@@ -1,0 +1,24 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Method": [
+    {
+      "value": "method",
+      "Type": [
+        "method-type"
+      ],
+      "Company": [
+        "method-company"
+      ],
+      "Sample": [
+        "method-sample"
+      ]
+    }
+  ]
+}
