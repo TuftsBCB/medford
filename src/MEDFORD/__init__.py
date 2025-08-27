@@ -13,6 +13,7 @@ from .objs.linereader import LineReader, Line
 from .objs.linecollector import LineCollector, Macro, Block
 from .objs.dictionizer import Dictionizer
 from .models.generics import Entity
+from .models import models_get_major_minors
 
 from . import mfdglobals
 
@@ -301,6 +302,9 @@ def provide_args_and_go(action:ParserMode, file:str, mode:OutputMode, debug:bool
     mfdglobals.debug = debug
     mfd = MFD(PurePath(file), write_json=write_json)
     mfd.run_medford()
+
+def get_major_minors() -> Dict[str, List[str]] :
+    return models_get_major_minors()
 
 if __name__ == "__main__" :
     parse_args_and_go()

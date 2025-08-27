@@ -7,7 +7,7 @@ These Models are defined for use with Pydantic, and contain custom data types an
 import datetime
 import sys
 from enum import Flag, auto
-from typing import TypeVar, Tuple, List, Optional, Union
+from typing import Dict, TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
 from ..objs.linecollections import Block, Detail
@@ -91,13 +91,9 @@ class MEDFORDMDL(BlockModel) :
     name: MinorT[str]
     Version: MinorsT[str] # TODO: a way to make this singular?
 
-class MEDFORDmdl(BlockModel):
-    """Model to store MEDFORD metadata describing the MEDFORD file itself,
-    such as MEDFORD file colloqiual name and the version of MEDFORD used
-    to write this file."""
-
-    name: MinorT[str]
-    Version: MinorsT[str]  # TODO: a way to make this singular?
+    @classmethod
+    def minors(cls) :
+        return ["version"]
 
     @model_validator(mode="after")
     @classmethod
@@ -124,10 +120,18 @@ class JournalMDL(BlockModel):
     Issue: OptMinorT[str]
     Pages: OptMinorT[str]
 
+    @classmethod
+    def minors(cls):
+        return ["volume","issue","pages"]
 
-class Date(BlockModel):
+
+class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
+    
+    @classmethod
+    def minors(cls) :
+        return ["note"]
 
     @model_validator(mode="after")
     @classmethod
@@ -145,6 +149,10 @@ class PaperMDL(BlockModel):
     Link: OptMinorT[str]  # instead of str does it have to be link?
     PMID: OptMinorT[str]
     DOI: OptMinorT[str]
+
+    @classmethod
+    def minors(cls):
+        return ["link","pmid","doi"]
 
 
 # dont really understand what the file thing is about
@@ -166,7 +174,11 @@ class ContributorMDL(BlockModel):
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
 
-    @model_validator(mode="after")
+    @classmethod
+    def minors(cls) :
+        return ["orcid", "association", "role", "email"]
+
+    @model_validator(mode='after')
     @classmethod
     def check_corresponding_has_email(cls, v):
         if v.Role is not None:
@@ -209,10 +221,16 @@ class ContributorMDL(BlockModel):
 
 class FundingMDL(BlockModel):
     ID: OptMinorT[str]
+
+    @classmethod
+    def minors(cls) :
+        return ["id"]
     # TODO: research possible funding IDs so we can implement validation
 
 class KeywordMDL(BlockModel):
-    pass
+    @classmethod
+    def minors(cls) :
+        return []
 
 
 #############################################
@@ -222,3 +240,12 @@ class KeywordMDL(BlockModel):
 class Entity(BaseModel) :
     MEDFORD: MajorsT[MEDFORDMDL]
     Contributor: OptMajorT[ContributorMDL] = None
+
+DefinedMajorMinor: Dict[str, List[str]] = {
+    "MEDFORD": MEDFORDMDL.minors(),
+    "Journal": JournalMDL.minors(),
+    "Date": DateMDL.minors(), 
+    "Contributor": ContributorMDL.minors(), 
+    "Funding": FundingMDL.minors(), 
+    "Keyword": KeywordMDL.minors(),
+}
