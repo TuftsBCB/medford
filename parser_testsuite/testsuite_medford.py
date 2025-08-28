@@ -8,8 +8,9 @@ import shutil
 def run_medford(input_file):
     result = subprocess.run(
         [
-            "python3",
-            "src/MEDFORD/medford.py",
+            sys.executable,
+            "-m",
+            "MEDFORD",
             "-m",
             "BAGIT",
             "--write_json",
@@ -18,6 +19,7 @@ def run_medford(input_file):
         ],
         capture_output=True,
         text=True,
+        env={"PYTHONPATH":"../src"}
     )
     return result.returncode == 0, result.stdout, result.stderr
 
@@ -61,10 +63,10 @@ def deep_compare(expected, actual, path="root"):
 
 
 def main():
+
     input_dir = "parser_testsuite/inputs"
     expected_dir = "parser_testsuite/expected"
     output_dir = "parser_testsuite/outputs"
-
     os.makedirs(output_dir, exist_ok=True)
 
     passed = 0

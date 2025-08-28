@@ -3,7 +3,7 @@ from typing import Dict, List
 from MEDFORD.submodules.mfdvalidator.errors import MFDErr, ErrType, MissingRequiredField
 import random
 import MEDFORD.mfdglobals as mfdglobals
-
+from .errors import ErrType, MFDErr, MissingRequiredField
 
 class MedfordValidator(object):
     _instance = None
@@ -20,9 +20,10 @@ class MedfordValidator(object):
 
 
     @classmethod
-    def init(cls) -> "MedfordValidator":
-        if mfdglobals.debug:
-            print("Creating new MedfordErrorManager instance.")
+
+    def init(cls) -> 'MedfordValidator': 
+        if (mfdglobals.debug) : 
+            print('Creating new MedfordErrorManager instance.')
         MedfordValidator._instance = super(MedfordValidator, cls).__new__(cls)
 
         MedfordValidator._instance._syntax_err_coll = {}
@@ -114,7 +115,12 @@ class MedfordValidator(object):
             n = n + len(v)
         return n
 
-    def _add_pydantic_err(self, err: MFDErr):
+    def print_other_errs(self) :
+        for line,errs in self._other_err_coll.items() :
+            for err in errs :
+                print(f"line {line}: {err.msg}")
+    
+    def _add_pydantic_err(self, err: MFDErr) :
         lineno = err.get_head_lineno()
         if lineno in self._pydantic_err_coll.keys():
             self._pydantic_err_coll[lineno].append(err)

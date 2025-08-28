@@ -1,4 +1,6 @@
 from typing import Dict, List
+import pytest
+from MEDFORD.submodules.mfdvalidator.errors import *
 
 import MEDFORD.mfdglobals as mfdglobals
 from MEDFORD.objs.dictionizer import Dictionizer
@@ -6,7 +8,7 @@ from MEDFORD.objs.linecollections import Detail, Macro
 from MEDFORD.objs.linecollector import Line, NovelDetailLine
 from MEDFORD.objs.linecollector import LineCollector as LC
 from MEDFORD.objs.linereader import LineReader as LR
-from MEDFORD.submodules.medforderrors.errors import (
+from MEDFORD.submodules.mfdvalidator.errors import (
     ErrType,
     MaxMacroDepthExceeded,
     MFDErr,
@@ -14,8 +16,12 @@ from MEDFORD.submodules.medforderrors.errors import (
 )
 
 
-class ProcessToLineObj:
-    def preprocess_lines(self, lines: List[str]) -> List[Line]:
+@pytest.fixture(autouse=True)
+def force_new_validator():
+    mfdglobals.ForceNewValidator()
+
+class ProcessToLineObj() :
+    def preprocess_lines(self, lines: List[str]) -> List[Line] :
         line_objs: List[Line] = []
         for idx, l in enumerate(lines):
             # TODO :shouldn't have to manually be getting rid of None lines tbh
@@ -189,7 +195,8 @@ class TestMaxMacroDepthErr(ProcessToMacros):
         assert len(errs) == 1
         assert isinstance(errs[0], MaxMacroDepthExceeded)
         err: MaxMacroDepthExceeded = errs[0]
-        assert err.errtype == "MaxMacroDepthExceeded"
+        assert err.errtype == ErrType.OTHER
+        assert err.errname == "MaxMacroDepthExceeded"
         assert err.macros[0].name == "Macro11"
         assert err.macros[0].get_raw_content() == "`@Macro10"
 
@@ -222,6 +229,7 @@ class TestMaxMacroDepthErr(ProcessToMacros):
         assert len(errs) == 1
         assert isinstance(errs[0], MaxMacroDepthExceeded)
         err: MaxMacroDepthExceeded = errs[0]
-        assert err.errtype == "MaxMacroDepthExceeded"
+        assert err.errtype == ErrType.OTHER
+        assert err.errname == "MaxMacroDepthExceeded"
         assert err.macros[0].name == "Macro11"
         assert err.macros[0].get_raw_content() == "`@Macro10"

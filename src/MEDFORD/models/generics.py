@@ -6,15 +6,15 @@ These Models are defined for use with Pydantic, and contain custom data types an
 
 import datetime
 from enum import Flag, auto
-from typing import TypeVar, Tuple, List, Optional, Union
+from typing import Dict, TypeVar, Tuple, List, Optional, Union
 from pydantic import BaseModel as PydanticBaseModel, field_validator
 from pydantic import model_validator, computed_field
-from MEDFORD.objs.linecollections import Block, Detail
+from ..objs.linecollections import Block, Detail
 
-from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as mv
-from MEDFORD.submodules.mfdvalidator.errors import (
-    InvalidValue,
-    MissingRequiredFieldbcofLogic,
+from ..submodules.mfdvalidator.validator import MedfordValidator as mv
+from ..submodules.mfdvalidator.errors import (
+    InvalidValue, 
+    MissingRequiredFieldbcofLogic
 )
 #############################################
 # Building Blocks                           #
@@ -84,13 +84,16 @@ class RoleOpts(Flag):
 #############################################
 
 
-class MEDFORDMDL(BlockModel):
+class MEDFORDMDL(BlockModel) :
     """Model to store MEDFORD metadata describing the MEDFORD file itself,
-    such as MEDFORD file colloqiual name and the version of MEDFORD used
-    to write this file."""
-
+     such as MEDFORD file colloqiual name and the version of MEDFORD used
+     to write this file."""
     name: MinorT[str]
-    Version: MinorsT[str]  # TODO: a way to make this singular?
+    Version: MinorsT[str] # TODO: a way to make this singular?
+
+    @classmethod
+    def minors(cls) :
+        return ["version"]
 
     @model_validator(mode="after")
     @classmethod
@@ -121,6 +124,20 @@ class JournalMDL(BlockModel):
 class DateMDL(BlockModel):
     name: Union[MinorT[datetime.date], MinorT[datetime.datetime]]
     Note: OptMinorT[str]
+    
+    @classmethod
+    def minors(cls) :
+        return ["note"]
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_date_minor(cls, v):
+        expected_tokens = ["Note"]
+        has_tokens = all(hasattr(v, t) for t in expected_tokens)
+        if not has_tokens:
+            raise ValueError(f"Paper missing required fields: ")
+        #     mv.instance().add_error(MissingRequiredFieldbcofLogic(v.Block, "Date", "Date requires"))
+        return v
 
 
 
@@ -130,6 +147,12 @@ class PaperMDL(BlockModel):
     Link: OptMinorT[str] #instead of str does it have to be link?
     PMID: OptMinorT[str]
     DOI: OptMinorT[str] 
+
+    @classmethod
+    def minors(cls):
+        return ["link","pmid","doi"]
+
+
 
 # dont really understand what the file thing is about
 #     @model_validator(mode='after')
@@ -142,15 +165,18 @@ class PaperMDL(BlockModel):
 #                 mv.instan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ce().add_error(MissingRequiredFieldbcofLogic(v.Block, "Paper", "Paper with file requires file token"))
 #         return v
 
-    
-class ContributorMDL(BlockModel) :
+class ContributorMDL(BlockModel):
     name: MinorT[str]
     ORCID: OptMinorT[str] = None
     Association: OptMinorT[str] = None
     Role: OptMinorT[str] = None
     Email: OptMinorT[str] = None
 
-    @model_validator(mode="after")
+    @classmethod
+    def minors(cls) :
+        return ["orcid", "association", "role", "email"]
+
+    @model_validator(mode='after')
     @classmethod
     def check_corresponding_has_email(cls, v):
         if v.Role is not None:
@@ -193,18 +219,34 @@ class ContributorMDL(BlockModel) :
 
 class FundingMDL(BlockModel):
     ID: OptMinorT[str]
+
+    @classmethod
+    def minors(cls) :
+        return ["id"]
     # TODO: research possible funding IDs so we can implement validation
 
 
 class KeywordMDL(BlockModel):
-    pass
+    @classmethod
+    def minors(cls) :
+        return []
+
 
 
 #############################################
 # File-Wide Validation                      #
 #############################################
 
-
-class Entity(BaseModel):
+class Entity(BaseModel) :
     MEDFORD: MajorsT[MEDFORDMDL]
     Contributor: OptMajorT[ContributorMDL] = None
+
+DefinedMajorMinor: Dict[str, List[str]] = {
+    "MEDFORD": MEDFORDMDL.minors(),
+    "Journal": JournalMDL.minors(),
+    "Date": DateMDL.minors(), 
+    "Contributor": ContributorMDL.minors(), 
+    "Funding": FundingMDL.minors(), 
+    "Keyword": KeywordMDL.minors(),
+}
+>>>>>>> dev

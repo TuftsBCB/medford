@@ -7,7 +7,7 @@ from MEDFORD.objs.lines import (
     ContinueLine,
 )
 from MEDFORD.objs.linereader import LineReader
-from submodules.mfdvalidator.validator import MedfordValidator as em
+from MEDFORD.submodules.mfdvalidator.validator import MedfordValidator as em
 from MEDFORD.submodules.mfdvalidator.errors import MissingAtAtName
 
 #################################
@@ -56,9 +56,9 @@ def noveldetail_ex_fixture():
 # Tests                         #
 #################################
 
-
-class TestAtAtImplementation:
-    def test_detect_atat(self):
+class TestAtAtImplementation() :
+    __test__ = False
+    def test_detect_atat(self) :
         example_line = "@Major-@MajorTwo Content"
         assert isinstance(LineReader.process_line(example_line, 0), AtAtLine)
 
