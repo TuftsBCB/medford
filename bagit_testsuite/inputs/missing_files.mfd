@@ -2,7 +2,7 @@
 @MEDFORD-Version 1.0
 @Paper_Primary Missing files test
 @Date 2024-05-01
-@FileRoot .bagit_testsuite/inputs/test_data
+@FileRoot ./test_data
 @Data missing_data
 @Data-File nonexistent.csv
 @Paper missing_paper

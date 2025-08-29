@@ -12,17 +12,30 @@ from collections import OrderedDict
 
 def run_bagit_compiler(input_file):
     try:
-        cmd = [
-            "python3",
-            "src/MEDFORD/medford.py",
+        #cmd = [
+        #    "python3",
+        #    "src/MEDFORD/medford.py",
+        #    "-m",
+        #    "BAGIT",
+        #    "compile",
+        #    input_file,
+        #]
+
+        #result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "MEDFORD",
             "-m",
             "BAGIT",
             "compile",
             input_file,
-        ]
-
-        result = subprocess.run(cmd, capture_output=True, text=True)
-
+        ],
+        capture_output=True,
+        text=True,
+        env={"PYTHONPATH":"../src"}
+        )
         success = result.returncode == 0
         return success, result.stdout, result.stderr
 
@@ -116,10 +129,10 @@ def get_all_paths(directory):
 
 
 def main():
-    input_dir = "bagit_testsuite/inputs"
-    expected_dir = "bagit_testsuite/expected"
-    output_dir = "bagit_testsuite/outputs"
-    test_data_dir = "bagit_testsuite/inputs/test_data"
+    input_dir = "inputs"
+    expected_dir = "expected"
+    output_dir = "outputs"
+    test_data_dir = "inputs/test_data"
 
     passed = 0
     failed = 0
@@ -141,6 +154,7 @@ def main():
 
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
+
 
         # for file in os.listdir(output_dir):
         #     if file.endswith(".zip"):

@@ -3,7 +3,7 @@
 
 @Date 2024-01-15
 
-@FileRoot ./bagit_testsuite/inputs/test_data
+@FileRoot ./test_data
 
 @Paper_Primary paper.pdf
 
@@ -13,7 +13,7 @@
 
 @Date 2024-01-15
 
-@FileRoot ./bagit_testsuite/inputs/test_data/paper
+@FileRoot ./test_data/paper
 
 @Paper_Primary paper.pdf
 

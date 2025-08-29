@@ -2,7 +2,7 @@
 @MEDFORD-Version 1.0
 @Paper_Primary Multi-file test case
 @Date 2024-02-20
-@FileRoot ./bagit_testsuite/inputs/test_data
+@FileRoot ./test_data
 
 @Data experiment_data
 @Data_Copy results/experiment.csv

@@ -3,7 +3,7 @@
 
 @Date 2024-01-15
 
-@FileRoot test_data/paper
+@FileRoot ./test_data/paper
 
 @Paper_Copy paper.pdf
 

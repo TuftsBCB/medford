@@ -1,6 +1,7 @@
 #!/bin/bash
 
-INPUT_DIR="./inputs"
+#INPUT_DIR="./inputs"
+INPUT_DIR="."
 EXPECTED_DIR="./expected"
 mkdir -p "$EXPECTED_DIR"
 

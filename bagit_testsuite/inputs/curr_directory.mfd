@@ -2,7 +2,7 @@
 @MEDFORD-Version 1.0
 @Paper_Primary Current directory test
 @Date 2024-04-05
-@FileRoot ./bagit_testsuite/inputs
+@FileRoot ./
 @Results analysis
 @Results-File analysis.txt
 @Bag_Name curr_directory
