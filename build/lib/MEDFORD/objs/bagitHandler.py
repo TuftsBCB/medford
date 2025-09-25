@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import zipfile
+import warnings
 from pathlib import Path
 from typing import Dict, List, Any, Tuple, Optional
 import hashlib
@@ -57,7 +58,7 @@ class BagItHandler:
                             else Path(file_root_value)
                         )
         else:
-            print("Warning: File root not specified.")  # TODO what to do?
+            warnings.warn("File root not specified.", UserWarning)
 
         return self.base_dir
 
@@ -67,12 +68,12 @@ class BagItHandler:
             return True
         else:
             if not self.file_root:
-                print("Error: FileRoot is required for BagIt validation.")
+                warnings.warn("FileRoot is required for BagIt validation.", UserWarning)
                 return False
 
             # check if file root exists
             if not self.file_root.exists():
-                print(f"Error: FileRoot directory {self.file_root} does not exist.")
+                warnings.warn(f"FileRoot directory {self.file_root} does not exist.", UserWarning)
                 return False
 
             # check if referenced files exist
@@ -85,17 +86,19 @@ class BagItHandler:
                     missing_files.append((file_tag, str(file_path)))
 
             if missing_files:
-                print("Error: Referenced files are missing:")
+                warning_msg = "Referenced files are missing:\n"
                 for tag, file in missing_files:
-                    print(f"  - {tag}: {file}")
+                    warning_msg += f"  - {tag}: {file}\n"
+                warnings.warn(warning_msg.rstrip(), UserWarning)
                 return False
 
             # check all files in FileRoot must have corresponding tags
             untagged_files = self._find_untagged_files(referenced_files)
             if untagged_files:
-                print("Error: Files in FileRoot without corresponding tags:")
+                warning_msg = "Files in FileRoot without corresponding tags:\n"
                 for file in untagged_files:
-                    print(f"  - {file}")
+                    warning_msg += f"  - {file}\n"
+                warnings.warn(warning_msg.rstrip(), UserWarning)
                 return False
 
             # check if all files are readable
@@ -106,9 +109,10 @@ class BagItHandler:
                     unreadable_files.append(str(file_path))
 
             if unreadable_files:
-                print("Error: Unreadable files:")
+                warning_msg = "Unreadable files:\n"
                 for file in unreadable_files:
-                    print(f"  - {file}")
+                    warning_msg += f"  - {file}\n"
+                warnings.warn(warning_msg.rstrip(), UserWarning)
                 return False
 
         return True
@@ -178,7 +182,7 @@ class BagItHandler:
             return self.bag_path
 
         except Exception as e:
-            print(f"Error creating BagIt package: {e}")
+            warnings.warn(f"Error creating BagIt package: {e}", UserWarning)
 
             # clean up
             if self.temp_dir.exists():
@@ -211,7 +215,7 @@ class BagItHandler:
             metadata_mfd_path = self.temp_dir / "metadata.mfd"
             shutil.copy2(self.medford_file_path, metadata_mfd_path)
         else:
-            print("Warning: Original MEDFORD file not found")
+            warnings.warn("Original MEDFORD file not found", UserWarning)
 
     def _create_manifest(self):
         manifest_path = self.temp_dir / "manifest.txt"
