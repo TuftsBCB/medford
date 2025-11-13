@@ -9,18 +9,20 @@ from pathlib import Path
 
 def run_bagit_compiler(input_file):
     try:
-        cmd = [
-            "python3",
-            "src/MEDFORD/medford.py",
-            "-m",
-            "BAGIT",
-            "--write_json",
-            "compile",
-            input_file,
-        ]
-
-        print(f"running command {cmd}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "MEDFORD",
+                "-m",
+                "BAGIT",
+                "--write_json",
+                "compile",
+                input_file,
+            ],
+            capture_output=True,
+            text=True,
+        )
 
         success = result.returncode == 0
         return success, result.stdout, result.stderr
@@ -139,17 +141,25 @@ def main():
 
         success, stdout, stderr = run_bagit_compiler(input_path)
 
+        # Tests ending with "_err" should now succeed with warnings (not fail)
+        # because we changed errors to warnings in the bagit handler
         if base_name.endswith("_err"):
-            if not success and "Error creating" in stderr:
-                print("PASSED (expected error)")
+            if success and ("Warning" in stderr or "UserWarning" in stderr):
+                print("PASSED (expected warnings)")
                 passed += 1
-            elif success:
-                print("FAILED (expected error but compilation succeeded)")
+            elif not success:
+                print("FAILED (should succeed with warnings, not fail)")
+                print(f"  Error: {stderr}")
                 failed += 1
             else:
-                print("FAILED (error message doesn't contain 'Error creating')")
-                print(f"  Actual error: {stderr}")
+                print("FAILED (expected warnings but got none)")
+                print(f"  stderr: {stderr}")
                 failed += 1
+            # Clean up any generated bag
+            if os.path.exists(output_dir):
+                for file in os.listdir(output_dir):
+                    if file.endswith(".zip"):
+                        os.remove(os.path.join(output_dir, file))
             continue
 
         if not success:

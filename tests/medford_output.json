@@ -1,0 +1,35 @@
+{
+  "MEDFORD": [
+    {
+      "value": "Shpillker 2024",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Date": [
+    {
+      "value": "2024-01-15"
+    }
+  ],
+  "FileRoot": [
+    {
+      "value": "./bagit_testsuite/inputs/test_data/paper"
+    }
+  ],
+  "Paper_Ref": [
+    {
+      "value": "whatever.pdf"
+    }
+  ],
+  "Paper_Primary": [
+    {
+      "value": "paper.pdf"
+    }
+  ],
+  "Bag_Name": [
+    {
+      "value": "basic_ref"
+    }
+  ]
+}
