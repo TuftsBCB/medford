@@ -129,9 +129,9 @@ def get_all_paths(directory):
 
 
 def main():
-    input_dir = "inputs"
+    input_dir = "../inputs"
     expected_dir = "expected"
-    output_dir = "outputs"
+    # output_dir = "outputs"
     test_data_dir = "inputs/test_data"
 
     passed = 0
@@ -152,8 +152,8 @@ def main():
 
         print(f"\nTesting {base_name}: ", end="", flush=True)
 
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
+        # if os.path.exists(output_dir):
+        #     shutil.rmtree(output_dir)
 
 
         # for file in os.listdir(output_dir):
@@ -167,10 +167,11 @@ def main():
             print(f"  Error: {stderr}")
             failed += 1
             continue
+
         generated_bag = None
-        for file in os.listdir(output_dir):
+        for file in os.listdir("."):
             if file.endswith(".zip"):
-                generated_bag = os.path.join(output_dir, file)
+                generated_bag = file
                 break
 
         if not generated_bag or not os.path.exists(generated_bag):
@@ -178,8 +179,11 @@ def main():
             print("  Error: No .zip file found in output directory")
             failed += 1
             continue
-
+        
         results = compare_zip_files(expected_bag_path, generated_bag)
+
+        if generated_bag and os.path.exists(generated_bag):
+            os.remove(generated_bag)
 
         if results["identical"]:
             print("PASSED")

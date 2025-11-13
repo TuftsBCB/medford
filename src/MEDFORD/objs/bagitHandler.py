@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 from typing import Dict, List, Any, Tuple, Optional
 import hashlib
+import warnings
 
 
 class BagItHandler:
@@ -28,11 +29,9 @@ class BagItHandler:
 
         self.bag_path = self.output_path / f"{self.bag_name}.zip"
 
-        # make temporary directory
         self.temp_dir = self.output_path / f"temp_{self.bag_name}"
         self.data_dir = self.temp_dir / "data"
 
-        # get FileRoot if specified
         self.file_root = self._get_file_root()
         if self.file_root == None:
             self.no_files = True
@@ -45,77 +44,79 @@ class BagItHandler:
                 if "value" in entry:
                     file_root_value = entry["value"]
                     if file_root_value == ".":
-                        # print(self.base_dir)
                         return self.base_dir
-                    elif os.path.isabs(file_root_value):  # absolute path
-                        return Path(file_root_value)
+                    elif os.path.isabs(file_root_value):
+                        file_root_path = Path(file_root_value)
+                        if not file_root_path.exists():
+                            warnings.warn(f"FileRoot directory {file_root_path} does not exist. Proceeding without files.", UserWarning)
+                            return None
+                        return file_root_path
                     else:
-                        # relative path from base directory
-                        return (
+                        file_root_path = (
                             self.base_dir / file_root_value
                             if self.base_dir
                             else Path(file_root_value)
                         )
+                        if not file_root_path.exists():
+                            warnings.warn(f"FileRoot directory {file_root_path} does not exist. Proceeding without files.", UserWarning)
+                            return None
+                        return file_root_path
         else:
-            print("Warning: File root not specified.")  # TODO what to do?
+            warnings.warn("File root not specified. Proceeding without files.", UserWarning)
 
-        return self.base_dir
+        return None
 
     def _validate(self):
-        # check if we have a file root
-        if self.no_files:  # TODO
+        if self.no_files:
             return True
-        else:
-            if not self.file_root:
-                print("Error: FileRoot is required for BagIt validation.")
-                return False
 
-            # check if file root exists
-            if not self.file_root.exists():
-                print(f"Error: FileRoot directory {self.file_root} does not exist.")
-                return False
+        if not self.file_root:
+            warnings.warn("FileRoot is required for BagIt validation. Proceeding without files.", UserWarning)
+            return True
 
-            # check if referenced files exist
-            referenced_files = self._get_file_references()
-            missing_files = []
+        if not self.file_root.exists():
+            warnings.warn(f"FileRoot directory {self.file_root} does not exist. Proceeding without files.", UserWarning)
+            return True
 
-            for file_tag, file_path in referenced_files:
-                full_path = self.file_root / file_path
-                if not full_path.exists():
-                    missing_files.append((file_tag, str(file_path)))
+        referenced_files = self._get_file_references()
+        missing_files = []
 
-            if missing_files:
-                print("Error: Referenced files are missing:")
-                for tag, file in missing_files:
-                    print(f"  - {tag}: {file}")
-                return False
+        for file_tag, file_path in referenced_files:
+            full_path = self.file_root / file_path
+            if not full_path.exists():
+                missing_files.append((file_tag, str(file_path)))
 
-            # check all files in FileRoot must have corresponding tags
-            untagged_files = self._find_untagged_files(referenced_files)
-            if untagged_files:
-                print("Error: Files in FileRoot without corresponding tags:")
-                for file in untagged_files:
-                    print(f"  - {file}")
-                return False
+        if missing_files:
+            warning_msg = "Referenced files are missing (will be excluded from bag):\n"
+            for tag, file in missing_files:
+                warning_msg += f"  - {tag}: {file}\n"
+            warnings.warn(warning_msg.rstrip(), UserWarning)
 
-            # check if all files are readable
-            unreadable_files = []
-            for tag_name, file_path in referenced_files:
-                full_path = self.file_root / file_path
-                if not os.access(full_path, os.R_OK):
-                    unreadable_files.append(str(file_path))
+        untagged_files = self._find_untagged_files(referenced_files)
+        if untagged_files:
+            warning_msg = "Files in FileRoot without corresponding tags (will be excluded from bag):\n"
+            for file in untagged_files:
+                warning_msg += f"  - {file}\n"
+            warnings.warn(warning_msg.rstrip(), UserWarning)
 
-            if unreadable_files:
-                print("Error: Unreadable files:")
-                for file in unreadable_files:
-                    print(f"  - {file}")
-                return False
+        unreadable_files = []
+        for tag_name, file_path in referenced_files:
+            full_path = self.file_root / file_path
+            if full_path.exists() and not os.access(full_path, os.R_OK):
+                unreadable_files.append(str(file_path))
+
+        if unreadable_files:
+            warning_msg = "Unreadable files (will be excluded from bag):\n"
+            for file in unreadable_files:
+                warning_msg += f"  - {file}\n"
+            warnings.warn(warning_msg.rstrip(), UserWarning)
 
         return True
 
     def _get_file_references(self):
         file_references = []
-        seen_files = set()  # to keep track of if there are 2 files with the same name
+        seen_files = set()
+        duplicates = []
 
         for key in self.medford_data:
             if key.endswith("_Primary") or key.endswith("_Copy"):
@@ -125,18 +126,27 @@ class BagItHandler:
                         filename = Path(file_path).name
 
                         if filename in seen_files:
-                            raise ValueError(
-                                f"Duplicate file name detected: '{filename}' "
-                                f"in {key}. File names must be unique across all tags."
-                            )
+                            duplicates.append((key, filename))
+                            continue
 
                         seen_files.add(filename)
                         file_references.append((key, file_path))
 
+        if duplicates:
+            warning_msg = "Duplicate file names detected (all instances will be excluded from bag):\n"
+            for tag, filename in duplicates:
+                warning_msg += f"  - {tag}: {filename}\n"
+            warnings.warn(warning_msg.rstrip(), UserWarning)
+
+            duplicate_filenames = {filename for _, filename in duplicates}
+            file_references = [
+                (tag, path) for tag, path in file_references
+                if Path(path).name not in duplicate_filenames
+            ]
+
         return file_references
 
     def _find_untagged_files(self, referenced_files: List[Tuple[str, str]]):
-        # find files in FileRoot that don't have corresponding tags
         if not self.file_root or not self.file_root.exists():
             return []
 
@@ -151,36 +161,31 @@ class BagItHandler:
 
         return untagged
 
-    def _compile(self):  # returns path to zip file
+    def _compile(self):
         try:
             validated = self._validate()
-            if not validated:
-                raise ValueError("Could not create Bag because of failed validation")
-            # clean up any existing temp directory
+
             if self.temp_dir.exists():
                 shutil.rmtree(self.temp_dir)
 
-            # create temporary directory structure
             self.temp_dir.mkdir(parents=True, exist_ok=True)
             self.data_dir.mkdir(parents=True, exist_ok=True)
 
-            if not self.no_files:
+            if not self.no_files and self.file_root and self.file_root.exists():
                 self._copy_data_files()
 
             self._create_metadata_files()
             self._create_manifest()
             self._create_zip_bag()
 
-            # clean up temporary directory
             shutil.rmtree(self.temp_dir)
 
             print(f"Successfully created BagIt package: {self.bag_path}")
             return self.bag_path
 
         except Exception as e:
-            print(f"Error creating BagIt package: {e}")
+            warnings.warn(f"Error creating BagIt package: {e}", UserWarning)
 
-            # clean up
             if self.temp_dir.exists():
                 shutil.rmtree(self.temp_dir)
             return None
@@ -190,13 +195,16 @@ class BagItHandler:
         for file_tag, file_path in referenced_files:
             source_path = self.file_root / file_path
             if not source_path.exists():
-                raise ValueError(f"File {file_path} does not exist.")
+                warnings.warn(f"File {file_path} does not exist. Skipping.", UserWarning)
+                continue
 
-            # convert Windows paths to forward slashes for the bag
+            if not os.access(source_path, os.R_OK):
+                warnings.warn(f"File {file_path} is not readable. Skipping.", UserWarning)
+                continue
+
             compatible_path = file_path.replace("\\", "/")
             dest_path = self.data_dir / compatible_path
 
-            # # create parent directories if needed TODO think about
             dest_path.parent.mkdir(parents=True, exist_ok=True)
 
             shutil.copy2(source_path, dest_path)
@@ -206,12 +214,11 @@ class BagItHandler:
         with open(metadata_json_path, "w") as f:
             json.dump(self.medford_data, f, indent=2)
 
-        # TODO translate? what does that mean?
         if self.medford_file_path and self.medford_file_path.exists():
             metadata_mfd_path = self.temp_dir / "metadata.mfd"
             shutil.copy2(self.medford_file_path, metadata_mfd_path)
         else:
-            print("Warning: Original MEDFORD file not found")
+            warnings.warn("Original MEDFORD file not found. Proceeding without it.", UserWarning)
 
     def _create_manifest(self):
         manifest_path = self.temp_dir / "manifest.txt"
@@ -229,7 +236,6 @@ class BagItHandler:
         with open(manifest_path, "w") as f:
             f.write("\n".join(manifest_lines))
 
-    # got this code from someone's github TODO need to say code copied from
     def _calculate_checksum(self, file_path):
         hash_md5 = hashlib.md5()
         with open(file_path, "rb") as f:
