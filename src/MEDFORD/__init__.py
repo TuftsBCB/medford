@@ -188,10 +188,13 @@ class MFD:
         self.output_path = output_path
         self.validatorFile = "medford.mvd"
 
+        # Initialize validator
+        # The Validator class will now find medford.mvd using the config module
         try:
-            self.validator = Validator("medford.mvd")  # No ValidationData needed for now
-        except FileNotFoundError:
-            print("Warning: medford.mvd validation file not found. Skipping validation.")
+            self.validator = Validator("medford.mvd")  # Will search in package conf/ directory
+        except FileNotFoundError as e:
+            print(f"Warning: medford.mvd validation file not found. Skipping validation.")
+            print(f"  Details: {e}")
             self.validator = None
 
     def run_medford(self):

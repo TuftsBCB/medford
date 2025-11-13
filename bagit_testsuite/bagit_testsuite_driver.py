@@ -129,7 +129,7 @@ def get_all_paths(directory):
 
 
 def main():
-    input_dir = "../inputs"
+    input_dir = "inputs"
     expected_dir = "expected"
     # output_dir = "outputs"
     test_data_dir = "inputs/test_data"
@@ -162,6 +162,26 @@ def main():
 
         success, stdout, stderr = run_bagit_compiler(input_path)
 
+        # Tests ending with "_err" should succeed with warnings (not fail)
+        if base_name.endswith("_err"):
+            if success and ("Warning" in stderr or "UserWarning" in stderr):
+                print("PASSED (expected warnings)")
+                passed += 1
+            elif not success:
+                print("FAILED (should succeed with warnings, not fail)")
+                print(f"  Error: {stderr}")
+                failed += 1
+            else:
+                print("FAILED (expected warnings but got none)")
+                print(f"  stderr: {stderr}")
+                failed += 1
+            # Clean up any generated bag
+            for file in os.listdir("."):
+                if file.endswith(".zip"):
+                    os.remove(file)
+                    break
+            continue
+
         if not success:
             print("FAILED (compilation error)")
             print(f"  Error: {stderr}")
@@ -179,7 +199,15 @@ def main():
             print("  Error: No .zip file found in output directory")
             failed += 1
             continue
-        
+
+        # Skip tests without expected outputs
+        if not os.path.exists(expected_bag_path):
+            print("SKIPPED (no expected output)")
+            skipped += 1
+            if generated_bag and os.path.exists(generated_bag):
+                os.remove(generated_bag)
+            continue
+
         results = compare_zip_files(expected_bag_path, generated_bag)
 
         if generated_bag and os.path.exists(generated_bag):

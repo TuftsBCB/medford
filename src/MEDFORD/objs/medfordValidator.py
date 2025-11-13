@@ -1,7 +1,9 @@
 import re, datetime
 from pprint import pprint
 from urllib.parse import urlparse
+from pathlib import Path
 import MEDFORD.mfdglobals as mfdglobals
+from MEDFORD.config import find_config_file, get_validator_config
 mfdglobals.init()
 __DEBUG__ = mfdglobals.debug
 
@@ -20,6 +22,12 @@ class Validator:
         """Initialize a Validator instance.
         This includes setting up initial structures of tags that have
         been seen.
+
+        Args:
+            filename: Name of the validator config file. Can be:
+                     - Just the filename (e.g., "medford.mvd") - will look in package conf/
+                     - A Path object
+                     - An absolute path string
         """
         self.validators = {}
 
@@ -27,10 +35,29 @@ class Validator:
         self.file_references = {}
         self.validation_errors = []
 
+        # Find the validator file
+        # If it's already a Path or absolute path, use it directly
+        # Otherwise, search for it in the package conf directory
+        if isinstance(filename, Path) or (isinstance(filename, str) and Path(filename).is_absolute()):
+            config_path = Path(filename)
+        else:
+            # Try to find in package conf/ directory, with fallback to current directory
+            config_path = find_config_file(filename, fallback_search=__DEBUG__)
+            if config_path is None:
+                # If still not found, try the default validator config
+                try:
+                    config_path = get_validator_config()
+                except FileNotFoundError as e:
+                    raise FileNotFoundError(
+                        f"Could not find validator config file: {filename}\n"
+                        f"Searched in package conf/ directory.\n"
+                        f"Original error: {e}"
+                    )
+
         # Read MEDFORD validator file
         # This is a very simple list of Tags and functions to call, in order,
         # with arguments inline.
-        with open(filename, "r") as f:
+        with open(config_path, "r") as f:
             for line in f:
                 line = line.rstrip()
                 # print("line = '{}'".format(line))
