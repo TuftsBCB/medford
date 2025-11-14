@@ -209,7 +209,7 @@ class Validator:
         """An email value is valid.
         Value is the value to be validated as an email address.
         """
-        if mfdglobals.DEBUG:
+        if mfdglobals.debug:
             print("validating email {}".format(value))
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 

@@ -52,11 +52,15 @@ class BagItHandler:
                             return None
                         return file_root_path
                     else:
-                        file_root_path = (
-                            self.base_dir / file_root_value
-                            if self.base_dir
-                            else Path(file_root_value)
-                        )
+                        # If FileRoot matches the base_dir name, use base_dir directly
+                        if self.base_dir and file_root_value == self.base_dir.name:
+                            file_root_path = self.base_dir
+                        else:
+                            file_root_path = (
+                                self.base_dir / file_root_value
+                                if self.base_dir
+                                else Path(file_root_value)
+                            )
                         if not file_root_path.exists():
                             warnings.warn(f"FileRoot directory {file_root_path} does not exist. Proceeding without files.", UserWarning)
                             return None
@@ -180,7 +184,6 @@ class BagItHandler:
 
             shutil.rmtree(self.temp_dir)
 
-            print(f"Successfully created BagIt package: {self.bag_path}")
             return self.bag_path
 
         except Exception as e:

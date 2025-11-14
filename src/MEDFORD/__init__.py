@@ -205,7 +205,12 @@ class MFD:
         # TODO: make LineProcessor take all of the strs/filename and do
         #       the work itself?
         # 1, 2
-        self.object_lines = MFD._get_line_objects(self.filename)
+        try:
+            self.object_lines = MFD._get_line_objects(self.filename)
+        except FileNotFoundError:
+            print(f"Error: File '{self.filename}' not found.")
+            print("Please check that the file exists and the path is correct.")
+            sys.exit(1)
 
         # 3
         self.line_collector = MFD._get_line_collector(self.object_lines)
