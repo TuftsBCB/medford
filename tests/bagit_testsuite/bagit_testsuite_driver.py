@@ -114,9 +114,20 @@ def get_all_paths(directory):
 
 
 def main():
+    # NOTE: This test suite is designed to be run from the PROJECT ROOT
+    # Run as: python tests/bagit_testsuite/bagit_testsuite_driver.py
+    # (NOT from within tests/ directory)
+
+    # Verify we're in the right directory
+    if not os.path.exists("bagit_testsuite/inputs"):
+        print("ERROR: This test must be run from the project root directory.")
+        print("Please run: python tests/bagit_testsuite/bagit_testsuite_driver.py")
+        print(f"Current directory: {os.getcwd()}")
+        return 1
+
     input_dir = "bagit_testsuite/inputs"
     expected_dir = "bagit_testsuite/expected"
-    output_dir = "."  # Changed to current directory
+    output_dir = "."
     test_data_dir = "bagit_testsuite/inputs/test_data"
 
     passed = 0

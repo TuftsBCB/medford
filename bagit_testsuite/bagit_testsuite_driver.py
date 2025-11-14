@@ -129,10 +129,12 @@ def get_all_paths(directory):
 
 
 def main():
-    input_dir = "inputs"
-    expected_dir = "expected"
-    # output_dir = "outputs"
-    test_data_dir = "inputs/test_data"
+    # Get the directory where this script is located
+    script_dir = Path(__file__).parent
+
+    input_dir = script_dir / "inputs"
+    expected_dir = script_dir / "expected"
+    test_data_dir = script_dir / "inputs" / "test_data"
 
     passed = 0
     failed = 0
@@ -147,8 +149,8 @@ def main():
         if base_name == "missing_files":
             continue
 
-        input_path = os.path.join(input_dir, input_file)
-        expected_bag_path = os.path.join(expected_dir, f"{base_name}.zip")
+        input_path = str(input_dir / input_file)
+        expected_bag_path = str(expected_dir / f"{base_name}.zip")
 
         print(f"\nTesting {base_name}: ", end="", flush=True)
 
