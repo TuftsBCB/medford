@@ -11,7 +11,8 @@ from .lines import (
     MacroLine, 
     CommentLine, 
     NovelDetailLine, 
-    ContinueLine
+    ContinueLine,
+    IncludeLine
 )
 
 from .. import mfdglobals
@@ -48,6 +49,9 @@ class DetailStatics:
     atat_use_regex: str = "{}(?P<major>[A-Za-z_]+)-{}(?P<referenced>[A-Za-z_]+)(\\s(?P<name>.+))?$".format(
         token_header, token_header
     )
+    include_use_regex: str = "{}include\\s+(?P<filename>[^\\s]+)\\s+(?P<tag_name>(?:{}[A-Za-z_]+|\\*))(\\s+(?P<selector>.+))?$".format(
+        token_header, token_header
+    )
 
 
 class LineReader:
@@ -78,6 +82,30 @@ class LineReader:
     def is_atat_line(line: str) -> bool:
         """Returns True if the provided string is an At-At line."""
         return re.match(DetailStatics.atat_use_regex, line) is not None
+
+    @staticmethod
+    def is_include_line(line: str) -> bool:
+        """Returns True if the provided string is an include line."""
+        return re.match(DetailStatics.include_use_regex, line) is not None
+
+    @staticmethod
+    def find_include_attributes(line: str) -> Tuple[str, str, str]:
+        """Given an include line, extracts filename, tag_name, and selector.
+        
+        Returns:
+            Tuple of (filename, tag_name, selector)
+        """
+        m = re.match(DetailStatics.include_use_regex, line)
+        if m is not None:
+            filename = m.group("filename")
+            tag_name = m.group("tag_name")
+            selector = m.group("selector") or ""
+            
+            return (filename, tag_name, selector)
+        
+        raise ValueError(
+            f"Attempted to find include attributes on an invalid string: {line}"
+        )
 
     @staticmethod
     def find_macro_name_body(line: str) -> Tuple[str, str]:
@@ -232,6 +260,13 @@ class LineReader:
             mname, mbody = LineReader.find_macro_name_body(line)
             return MacroLine(
                 lineno, line, mname, mbody, poss_inline, poss_tex, poss_macro
+            )
+
+        if LineReader.is_include_line(line):
+            filename, tag_name, selector = LineReader.find_include_attributes(line)
+            return IncludeLine(
+                lineno, line, filename, tag_name, selector, 
+                poss_inline, poss_tex, poss_macro
             )
 
         # atat is currently being redefined.

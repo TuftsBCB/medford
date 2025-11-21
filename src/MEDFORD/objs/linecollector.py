@@ -6,7 +6,8 @@ from .lines import (
     MacroLine, 
     NovelDetailLine, 
     ContinueLine, 
-    CommentLine
+    CommentLine,
+    IncludeLine
 )
 from .linecollections import (
     AtAt, 
@@ -20,6 +21,7 @@ class LineCollector:
     defined_macros: Dict[str, Macro]
     named_blocks: Dict[str, Dict[str, Block]]
     comments: List[CommentLine]
+    include_lines: List[IncludeLine]
     # TODO: what if multiple blocks with the same name?
     #       ADJUSTED: 2 layer dict, first by block major then by name
     # TODO: provide error handler?
@@ -31,17 +33,20 @@ class LineCollector:
         DETAIL = 2
         COMMENT = 3
         ATAT = 4
+        INCLUDE = 5
 
     na = CollectorState.NA
     macro = CollectorState.MACRO
     detail = CollectorState.DETAIL
     comment = CollectorState.COMMENT
     atat = CollectorState.ATAT
+    include = CollectorState.INCLUDE
 
     def __init__(self, lines: List[Line]):
         self.defined_macros = {}
         self.named_blocks = {}
         self.comments = []
+        self.include_lines = []
 
         self._ProcessLines(lines)
 
@@ -74,6 +79,10 @@ class LineCollector:
 
             elif isinstance(line, CommentLine):
                 state = "comment"
+                line_collection.append(line)
+
+            elif isinstance(line, IncludeLine):
+                state = "include"
                 line_collection.append(line)
 
         # finish up
@@ -140,6 +149,10 @@ class LineCollector:
                 self.comments.extend(line_collection)
                 # just throw the comment into the pile
 
+            elif state == "include":
+                # Store include lines for later processing
+                self.include_lines.extend(line_collection)
+
             elif state == "detail":
                 headline = line_collection[0]
                 extralines = None
@@ -201,3 +214,6 @@ class LineCollector:
 
     def get_macros(self) -> Dict[str, Macro]:
         return self.defined_macros
+
+    def get_include_lines(self) -> List[IncludeLine]:
+        return self.include_lines

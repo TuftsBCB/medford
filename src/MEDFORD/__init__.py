@@ -12,6 +12,7 @@ from pathlib import PurePath  # ?
 
 from .objs.linereader import LineReader, Line
 from .objs.linecollector import LineCollector, Macro, Block
+from .objs.includeCollector import IncludeCollector
 from .objs.dictionizer import Dictionizer
 from .models.generics import Entity
 from .objs.linecollections import Detail
@@ -209,6 +210,37 @@ class MFD:
         self.macro_definitions = self.line_collector.get_macros()
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
+
+        # 3.5 - Process @include statements
+        include_lines = self.line_collector.get_include_lines()
+        if include_lines:
+            if mfdglobals.debug:
+                print(f"\nProcessing {len(include_lines)} include statement(s)...")
+            
+            include_collector = IncludeCollector(self.base_dir)
+            
+            # Process all includes and get blocks
+            included_blocks = include_collector.process_includes(include_lines)
+            
+            if mfdglobals.debug:
+                print(f"Included {len(included_blocks)} block(s) from external files")
+            
+            # Check for conflicts between included blocks and main file blocks
+            conflicts = include_collector.check_conflicts_with_main_blocks(self.blocks)
+            
+            # Merge included blocks with main file blocks
+            self.blocks.extend(included_blocks)
+            
+            # Add included blocks to named_blocks structure
+            # This ensures included blocks are available for reference
+            for block in included_blocks:
+                major = block.get_str_major()
+                if major not in self.line_collector.named_blocks:
+                    self.line_collector.named_blocks[major] = {}
+                self.line_collector.named_blocks[major][block.name] = block
+            
+            # Regenerate flattened named_blocks
+            self.named_blocks = self.line_collector.get_1lvl_blocks()
 
         # stop here and check for syntax errors
         if mfdglobals.mv.instance().has_syntax_err():
