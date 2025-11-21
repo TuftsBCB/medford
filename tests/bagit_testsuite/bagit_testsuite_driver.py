@@ -9,18 +9,20 @@ from pathlib import Path
 
 def run_bagit_compiler(input_file):
     try:
-        cmd = [
-            "python3",
-            "src/MEDFORD/medford.py",
-            "-m",
-            "BAGIT",
-            "--write_json",
-            "compile",
-            input_file,
-        ]
-
-        print(f"running command {cmd}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "MEDFORD",
+                "-m",
+                "BAGIT",
+                "--write_json",
+                "compile",
+                input_file,
+            ],
+            capture_output=True,
+            text=True,
+        )
 
         success = result.returncode == 0
         return success, result.stdout, result.stderr
@@ -112,9 +114,20 @@ def get_all_paths(directory):
 
 
 def main():
+    # NOTE: This test suite is designed to be run from the PROJECT ROOT
+    # Run as: python tests/bagit_testsuite/bagit_testsuite_driver.py
+    # (NOT from within tests/ directory)
+
+    # Verify we're in the right directory
+    if not os.path.exists("bagit_testsuite/inputs"):
+        print("ERROR: This test must be run from the project root directory.")
+        print("Please run: python tests/bagit_testsuite/bagit_testsuite_driver.py")
+        print(f"Current directory: {os.getcwd()}")
+        return 1
+
     input_dir = "bagit_testsuite/inputs"
     expected_dir = "bagit_testsuite/expected"
-    output_dir = "."  # Changed to current directory
+    output_dir = "."
     test_data_dir = "bagit_testsuite/inputs/test_data"
 
     passed = 0
@@ -139,17 +152,25 @@ def main():
 
         success, stdout, stderr = run_bagit_compiler(input_path)
 
+        # Tests ending with "_err" should now succeed with warnings (not fail)
+        # because we changed errors to warnings in the bagit handler
         if base_name.endswith("_err"):
-            if not success and "Error creating" in stderr:
-                print("PASSED (expected error)")
+            if success and ("Warning" in stderr or "UserWarning" in stderr):
+                print("PASSED (expected warnings)")
                 passed += 1
-            elif success:
-                print("FAILED (expected error but compilation succeeded)")
+            elif not success:
+                print("FAILED (should succeed with warnings, not fail)")
+                print(f"  Error: {stderr}")
                 failed += 1
             else:
-                print("FAILED (error message doesn't contain 'Error creating')")
-                print(f"  Actual error: {stderr}")
+                print("FAILED (expected warnings but got none)")
+                print(f"  stderr: {stderr}")
                 failed += 1
+            # Clean up any generated bag
+            if os.path.exists(output_dir):
+                for file in os.listdir(output_dir):
+                    if file.endswith(".zip"):
+                        os.remove(os.path.join(output_dir, file))
             continue
 
         if not success:

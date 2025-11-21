@@ -129,10 +129,12 @@ def get_all_paths(directory):
 
 
 def main():
-    input_dir = "inputs"
-    expected_dir = "expected"
-    output_dir = "outputs"
-    test_data_dir = "inputs/test_data"
+    # Get the directory where this script is located
+    script_dir = Path(__file__).parent
+
+    input_dir = script_dir / "inputs"
+    expected_dir = script_dir / "expected"
+    test_data_dir = script_dir / "inputs" / "test_data"
 
     passed = 0
     failed = 0
@@ -147,13 +149,13 @@ def main():
         if base_name == "missing_files":
             continue
 
-        input_path = os.path.join(input_dir, input_file)
-        expected_bag_path = os.path.join(expected_dir, f"{base_name}.zip")
+        input_path = str(input_dir / input_file)
+        expected_bag_path = str(expected_dir / f"{base_name}.zip")
 
         print(f"\nTesting {base_name}: ", end="", flush=True)
 
-        if os.path.exists(output_dir):
-            shutil.rmtree(output_dir)
+        # if os.path.exists(output_dir):
+        #     shutil.rmtree(output_dir)
 
 
         # for file in os.listdir(output_dir):
@@ -162,15 +164,36 @@ def main():
 
         success, stdout, stderr = run_bagit_compiler(input_path)
 
+        # Tests ending with "_err" should succeed with warnings (not fail)
+        if base_name.endswith("_err"):
+            if success and ("Warning" in stderr or "UserWarning" in stderr):
+                print("PASSED (expected warnings)")
+                passed += 1
+            elif not success:
+                print("FAILED (should succeed with warnings, not fail)")
+                print(f"  Error: {stderr}")
+                failed += 1
+            else:
+                print("FAILED (expected warnings but got none)")
+                print(f"  stderr: {stderr}")
+                failed += 1
+            # Clean up any generated bag
+            for file in os.listdir("."):
+                if file.endswith(".zip"):
+                    os.remove(file)
+                    break
+            continue
+
         if not success:
             print("FAILED (compilation error)")
             print(f"  Error: {stderr}")
             failed += 1
             continue
+
         generated_bag = None
-        for file in os.listdir(output_dir):
+        for file in os.listdir("."):
             if file.endswith(".zip"):
-                generated_bag = os.path.join(output_dir, file)
+                generated_bag = file
                 break
 
         if not generated_bag or not os.path.exists(generated_bag):
@@ -179,7 +202,18 @@ def main():
             failed += 1
             continue
 
+        # Skip tests without expected outputs
+        if not os.path.exists(expected_bag_path):
+            print("SKIPPED (no expected output)")
+            skipped += 1
+            if generated_bag and os.path.exists(generated_bag):
+                os.remove(generated_bag)
+            continue
+
         results = compare_zip_files(expected_bag_path, generated_bag)
+
+        if generated_bag and os.path.exists(generated_bag):
+            os.remove(generated_bag)
 
         if results["identical"]:
             print("PASSED")

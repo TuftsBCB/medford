@@ -7,23 +7,17 @@
       ]
     }
   ],
-  "Expedition": [
+  "Method": [
     {
-      "value": "expedition",
-      "ShipName": [
-        "expedition-shipname"
+      "value": "method",
+      "Type": [
+        "method-type"
       ],
-      "CruiseID": [
-        "expedition-cruiseID"
+      "Company": [
+        "method-company"
       ],
-      "MooringID": [
-        "expedition-mooringID"
-      ],
-      "DiveNumber": [
-        "expedition-divenumber"
-      ],
-      "Synonyms": [
-        "expedition-synonyms"
+      "Sample": [
+        "method-sample"
       ]
     }
   ]

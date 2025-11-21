@@ -1,0 +1,31 @@
+{
+  "MEDFORD": [
+    {
+      "value": "Shpillker 2025",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Paper_Primary": [
+    {
+      "value": "Transcriptome deep-sequencing and clustering of expressed isoforms from Favia corals",
+      "Link": [
+        "https://bmcgenomics.biomedcentral.com/articles/10.1186/1471-2164-14-546"
+      ]
+    }
+  ],
+  "Date": [
+    {
+      "value": "2024-01-15",
+      "Note": [
+        "Sample collection"
+      ]
+    }
+  ],
+  "Bag_Name": [
+    {
+      "value": "no_files_bag"
+    }
+  ]
+}

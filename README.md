@@ -1,7 +1,76 @@
 # medford Parser
 
 ## The Medford Parser
-This repository contains all source code for the Medford parser, written in Python (3.8) using the [Pydantic](https://github.com/samuelcolvin/pydantic/) library. The purpose of this parser is to either validate or compile all MEDFORD files to ensure they follow appropriate MEDFORD syntax (described below) such that they can accurately be converted into other output formats for transfer or submission to coral databases.
+This repository contains all source code for the Medford parser, written in Python (3.12+) using the [Pydantic](https://github.com/samuelcolvin/pydantic/) library. The purpose of this parser is to either validate or compile all MEDFORD files to ensure they follow appropriate MEDFORD syntax (described below) such that they can accurately be converted into other output formats for transfer or submission to coral databases.
+
+## Installation & Usage
+
+### Prerequisites
+- Python 3.12 or higher
+- pip (Python package installer)
+
+### Option 1: Installing from Wheel File
+
+If you received a `.whl` (wheel) file , you can install it directly:
+
+```bash
+pip install medford-2.0.1-py3-none-any.whl
+```
+
+### Option 2: Local Build and Installation with `pip`
+
+To build the package locally from source:
+
+1. **Clone the repository**
+
+2. **Install build dependencies**:
+```bash
+pip install build
+```
+
+3. **Build the package**:
+```bash
+python -m build
+```
+
+This will create both a wheel file (`.whl`) and a source distribution (`.tar.gz`) in the `dist/` directory.
+
+4. **Install the built package**:
+```bash
+pip install dist/medford-2.0.1-py3-none-any.whl
+```
+
+### Option 2B: Local Build and Installation with `uv`
+
+A quick summary of using `uv` instead of just `pip`.
+
+```
+uv venv
+source .venv/bin/activate
+uv pip install build
+uv build
+uv pip install dist/medford-2.0.1-py3-none-any.whl
+```
+
+### Running medford
+
+Once installed, you can use the `medford` command-line tool:
+
+**Validate a MEDFORD file:**
+```bash
+medford validate path/to/your/file.mfd
+```
+
+**Compile a MEDFORD file:**
+```bash
+medford compile path/to/your/file.mfd
+```
+
+**Create a BagIt Package:**
+```bash
+medford -m BAGIT validate path/to/your/file.mfd
+medford -m BAGIT compile path/to/your/file.mfd
+```
 
 ## Official Specification
 Please see the official specification for further details, hosted on github [here](https://github.com/TuftsBCB/MEDFORD-Spec).

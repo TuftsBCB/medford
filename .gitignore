@@ -9,3 +9,9 @@ dist/*
 src/*.egg-info
 src/HelperScripts
 problematic_examples.txt
+
+# Build artifacts
+build/
+
+# Test cache
+.pytest_cache/
