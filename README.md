@@ -17,7 +17,7 @@ If you received a `.whl` (wheel) file , you can install it directly:
 pip install medford-2.0.1-py3-none-any.whl
 ```
 
-### Option 2: Local Build and Installation
+### Option 2: Local Build and Installation with `pip`
 
 To build the package locally from source:
 
@@ -38,6 +38,18 @@ This will create both a wheel file (`.whl`) and a source distribution (`.tar.gz`
 4. **Install the built package**:
 ```bash
 pip install dist/medford-2.0.1-py3-none-any.whl
+```
+
+### Option 2B: Local Build and Installation with `uv`
+
+A quick summary of using `uv` instead of just `pip`.
+
+```
+uv venv
+source .venv/bin/activate
+uv pip install build
+uv build
+uv pip install dist/medford-2.0.1-py3-none-any.whl
 ```
 
 ### Running medford
