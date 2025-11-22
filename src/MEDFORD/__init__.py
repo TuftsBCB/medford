@@ -195,6 +195,166 @@ class MFD:
             print("Warning: medford.mvd validation file not found. Skipping validation.")
             self.validator = None
 
+    # --- DEV helper: write the parsed blocks back out for fidelity testing
+    def _render_block(self, block, resolved_macros: Dict[str, str] | None = None) -> str:
+        """
+        Function that outputs parsed blocks for testing:
+        @<MAJOR> <header_value>
+        @<MAJOR>-<minor> <content>
+        """        
+
+        # get Major tag name
+        if getattr(block, "major_tokens", None):
+            major = "_".join(block.major_tokens)
+        else:
+            major = "Block"
+
+        lines = []
+
+        # get major tag header (first detail)
+        header_value = ""
+        if getattr(block, "details", None) and block.details:
+            if resolved_macros is None:
+                header_value = block.details[0].get_raw_content().strip()
+            else:
+                header_value = block.details[0].get_content(resolved_macros).strip()
+        lines.append(f"@{major} {header_value}")
+
+        # add subsequent details of the  minor tags
+        if getattr(block, "details", None):
+            for d in block.details[1:]:
+                if getattr(d, "minor_token", None):
+                    if resolved_macros is None:
+                        content = d.get_raw_content().strip()
+                    else:
+                        content = d.get_content(resolved_macros).strip()
+                    lines.append(f"@{major}-{d.minor_token} {content}")
+        return "\n".join(lines)
+    
+    def _write_blocks(self, blocks, path: str, resolved_macros: Dict[str, str] | None = None) -> None:
+        """
+        Function that writes out parsed blocks:
+        """    
+        comments = list(getattr(self.line_collector, "comments", []) or [])
+
+        # Returns the line number for a comment object.
+        def _cln(x):  
+            return self._obj_lineno(x, -1)
+
+        # Sort comments by line number
+        comments.sort(key=_cln)
+
+        idx = 0
+        with open(path, "w", encoding="utf-8") as f:
+            wrote_any = False
+            prev_blank = False
+
+            # Inserts a blank line in the output only if the previous line was not blank 
+            # helps visually separate blocks/comments.
+            def sep():
+                nonlocal prev_blank, wrote_any
+                if wrote_any and not prev_blank:
+                    f.write("\n")
+                    prev_blank = True
+
+            # Writes a single line to the file; updates flags to track if the last line was blank
+            def write_line(s: str):
+                nonlocal prev_blank, wrote_any
+                s = s.rstrip("\n")
+                f.write(s + "\n")
+                wrote_any = True
+                prev_blank = (s.strip() == "")
+
+            # Writes each line from block's multi-line text using write_line
+            def write_block_text(text: str):
+                for line in text.splitlines():
+                    write_line(line)
+
+            for b in blocks:
+                b_start = self._block_start_lineno(b)
+
+                # comments that occur before or on this block's first line
+                while idx < len(comments) and _cln(comments[idx]) <= b_start:
+                    sep()
+                    write_line(self._comment_text(comments[idx]))
+                    idx += 1
+
+                # write the block itself
+                sep()
+                write_block_text(self._render_block(b, resolved_macros))
+
+            # write the trailing comments after the last block in the file
+            while idx < len(comments):
+                sep()
+                write_line(self._comment_text(comments[idx]))
+                idx += 1
+
+
+    def _comment_text(self, c) -> str:
+        # Try common fields in a safe order
+        if hasattr(c, "get_raw_content") and callable(c.get_raw_content):
+            raw = c.get_raw_content()
+        elif hasattr(c, "raw"):
+            raw = c.raw
+        elif hasattr(c, "content"):
+            raw = c.content
+        elif hasattr(c, "text"):
+            raw = c.text
+        elif hasattr(c, "line"):
+            raw = c.line
+        else:
+            raw = str(c)
+
+        raw = str(raw).rstrip("\n")
+        s = raw.lstrip()
+
+        # Ensure it prints as a proper comment line
+        if s.startswith("#"):
+            return s
+        return "# " + s
+    
+    def _obj_lineno(self, obj, default_if_missing: int) -> int:
+        # Keep the generic fallback
+        for name in ("line_number", "lineno", "lineNo", "line_index", "idx"):
+            v = getattr(obj, name, None)
+            if isinstance(v, int):
+                return v
+        # Try common nested holders
+        for holder in ("line", "source", "src", "origin"):
+            sub = getattr(obj, holder, None)
+            if sub is None:
+                continue
+            for name in ("line_number", "lineno", "lineNo", "line_index", "idx"):
+                v = getattr(sub, name, None)
+                if isinstance(v, int):
+                    return v
+        return default_if_missing
+
+    def _block_start_lineno(self, b):
+        # Prefer Detail.get_linenos()[0] if available
+        if getattr(b, "details", None) and b.details:
+            d0 = b.details[0]
+            # 1) best: Detail.get_linenos()
+            if hasattr(d0, "get_linenos") and callable(d0.get_linenos):
+                try:
+                    lns = d0.get_linenos()
+                    if isinstance(lns, (list, tuple)) and lns:
+                        ln0 = lns[0]
+                        if isinstance(ln0, int):
+                            return ln0
+                except Exception:
+                    pass
+            # 2) fallback: look into the headline object
+            h = getattr(d0, "headline", None)
+            if h is not None:
+                ln = self._obj_lineno(h, None)
+                if isinstance(ln, int):
+                    return ln
+        return self._obj_lineno(b, 10**9)
+
+
+
+
     def run_medford(self):
         """Main function that runs MEDFORD compilation from start to finish."""
         self.em_inst = mfdglobals.validator  # this is just for debug purposes
@@ -241,6 +401,15 @@ class MFD:
             
             # Regenerate flattened named_blocks
             self.named_blocks = self.line_collector.get_1lvl_blocks()
+
+            
+        # output check to see if macros are already expanded before we write
+        # print("[dev] macros collected:", len(getattr(self, "macro_definitions", {}) or {}))
+        # if self.blocks and self.blocks[0].details:
+        #     d0 = self.blocks[0].details[0]
+        #     print("[dev] detail0.has_macros:", getattr(d0, "has_macros", None))
+        #     print("[dev] detail0.used_macro_names:", getattr(d0, "used_macro_names", None))
+
 
         # stop here and check for syntax errors
         if mfdglobals.mv.instance().has_syntax_err():
@@ -303,6 +472,17 @@ class MFD:
         # TODO: export to json, bag
         # TODO: implement all of the old models
         #print("No errors found in the provided MEDFORD file!")
+
+
+        # If user specified --out, dump blocks now (after dictionrizer and validation)
+        if getattr(self, "dev_out_path", None):
+            try:
+                self._write_blocks(self.blocks, self.dev_out_path, resolved_macros=self.dictionizer.resolved_macros)
+                print(f"[dev] Wrote blocks to: {self.dev_out_path}")
+            except Exception as e:
+                print(f"[dev] Failed to write --out file: {e}", file=sys.stdout)
+                print(f"[dev] Failed to write --out file: {e}", file=sys.stderr)
+                sys.exit(1)
         
 
         if self.write_json:
@@ -427,6 +607,11 @@ ap.add_argument(
     "file.",
 )
 ap.add_argument(
+    "--out",
+    metavar="filename.mfd",
+    help="(DEV) write parsed blocks back out as MEDFORD text for fidelity testing."
+)
+ap.add_argument(
     "-d",
     "--debug",
     action="store_true",
@@ -477,6 +662,7 @@ def parse_args_and_go():
         write_json=args.write_json,
         output_path=".",
     )
+    mfd.dev_out_path = args.out  #makes --out value available to run_medford()
     mfd.run_medford()
 
 

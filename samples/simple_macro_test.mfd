@@ -1,0 +1,15 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+# Define an in-line macro
+`@reef_photo REEF_X_PHOTO_
+
+# Define an out-line macro (no proper definition for this still)
+#`@reef_photo_specs @Photo-Type JPEG @Photo-Size 1920x1080
+
+# Call the macros
+@Photo `@{reef_photo}01
+
+@Photo `@{reef_photo}02
+
+@Photo `@{reef_photo}03

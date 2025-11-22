@@ -16,7 +16,7 @@ class Validator:
     # This allows cross-label validations including errant duplications.
     # The validator is driven off of a text file in "Medford Validator Format"
     # (extension .mvd).
-    def __init__(self, filename="medford.mvd"):
+    def __init__(self, filename=None):
         """Initialize a Validator instance.
         This includes setting up initial structures of tags that have
         been seen.
@@ -27,6 +27,9 @@ class Validator:
         self.file_references = {}
         self.validation_errors = []
 
+        if filename is None:
+            filename = mfdglobals.validator_file
+            
         # Read MEDFORD validator file
         # This is a very simple list of Tags and functions to call, in order,
         # with arguments inline.
