@@ -370,12 +370,12 @@ class MFD:
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
 
-        # check to see if macros are already expanded before we write
-        print("[dev] macros collected:", len(getattr(self, "macro_definitions", {}) or {}))
-        if self.blocks and self.blocks[0].details:
-            d0 = self.blocks[0].details[0]
-            print("[dev] detail0.has_macros:", getattr(d0, "has_macros", None))
-            print("[dev] detail0.used_macro_names:", getattr(d0, "used_macro_names", None))
+        # output check to see if macros are already expanded before we write
+        # print("[dev] macros collected:", len(getattr(self, "macro_definitions", {}) or {}))
+        # if self.blocks and self.blocks[0].details:
+        #     d0 = self.blocks[0].details[0]
+        #     print("[dev] detail0.has_macros:", getattr(d0, "has_macros", None))
+        #     print("[dev] detail0.used_macro_names:", getattr(d0, "used_macro_names", None))
 
 
         # stop here and check for syntax errors
@@ -447,7 +447,9 @@ class MFD:
                 self._write_blocks(self.blocks, self.dev_out_path, resolved_macros=self.dictionizer.resolved_macros)
                 print(f"[dev] Wrote blocks to: {self.dev_out_path}")
             except Exception as e:
-                print(f"[dev] Failed to write --out file: {e}")
+                print(f"[dev] Failed to write --out file: {e}", file=sys.stdout)
+                print(f"[dev] Failed to write --out file: {e}", file=sys.stderr)
+                sys.exit(1)
         
 
         if self.write_json:
