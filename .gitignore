@@ -9,3 +9,6 @@ dist/*
 src/*.egg-info
 src/HelperScripts
 problematic_examples.txt
+.DS_Store
+.venv/
+build/
