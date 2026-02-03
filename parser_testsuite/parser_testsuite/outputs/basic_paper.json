@@ -1,0 +1,24 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Paper_Primary": [
+    {
+      "value": "paper",
+      "Link": [
+        "paper-link"
+      ],
+      "PMID": [
+        "paper-pmid"
+      ],
+      "DOI": [
+        "paper-doi"
+      ]
+    }
+  ]
+}

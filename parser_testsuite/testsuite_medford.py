@@ -3,7 +3,6 @@ import json
 import os
 import sys
 import shutil
-from collections import OrderedDict
 
 
 def run_medford(input_file):
@@ -64,10 +63,10 @@ def deep_compare(expected, actual, path="root"):
 
 
 def main():
+
     input_dir = "inputs"
     expected_dir = "expected"
     output_dir = "outputs"
-
     os.makedirs(output_dir, exist_ok=True)
 
     passed = 0

@@ -87,6 +87,40 @@ class TestMaxMacroDepthErr(ProcessToMacros):
             ]
         )
 
+class TestMaxMacroDepthErr(ProcessToMacros):
+    def test_help_message(self):
+        line_objs: Dict[str, Macro] = self.preprocess_lines(
+            [
+                "`@Macro1 content ",
+                "content continue",
+                "`@Macro2 `@Macro1",
+                "`@Macro3 `@Macro2",
+                "`@Macro4 `@Macro3",
+                "`@Macro5 `@Macro4",
+                "`@Macro6 `@Macro5",
+                "`@Macro7 `@Macro6",
+                "`@Macro8 `@Macro7",
+                "`@Macro9 `@Macro8",
+                "`@Macro0 `@Macro9",
+            ]
+        )
+
+        corrected_order: List[Macro] = [
+            line_objs[name]
+            for name in [
+                "Macro0",
+                "Macro9",
+                "Macro8",
+                "Macro7",
+                "Macro6",
+                "Macro5",
+                "Macro4",
+                "Macro3",
+                "Macro2",
+                "Macro1",
+            ]
+        ]
+
         corrected_order: List[Macro] = [
             line_objs[name]
             for name in [

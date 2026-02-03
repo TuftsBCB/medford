@@ -9,12 +9,15 @@
   ],
   "Contributor": [
     {
-      "value": "Michael K. DeSalvo",
+      "value": "contributor name",
       "Association": [
-        "School of Natural Sciences, University of California Merced"
+        "contributor association"
       ],
       "Role": [
-        "Corresponding Author"
+        "contributor role"
+      ],
+      "Email": [
+        "contributor email"
       ]
     }
   ]

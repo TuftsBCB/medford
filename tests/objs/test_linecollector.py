@@ -643,4 +643,6 @@ class TestLineCollection:
 
         ex_block:Block = lc.named_blocks['Contributor']['Polina Shpilker']
         ex_detail:Detail = ex_block.details[1]
+
         assert ex_detail.get_raw_content() == "Tufts University"
+
