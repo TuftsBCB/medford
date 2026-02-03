@@ -1,3 +1,27 @@
-[build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+[project]
+name = "medford"
+version = "2.1.0"
+authors = [
+  {name = "Polina Shpilker", email = "polina.shpilker@tufts.edu"},
+]
+description = "The MEDFORD Parser command line tool for vaidating & compiling medford research metadata files."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.11.7",
+]
+
+[project.urls]
+Repository = "https://github.com/TuftsBCB/medford"
+
+[project.scripts]
+medford = "MEDFORD:parse_args_and_go"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"

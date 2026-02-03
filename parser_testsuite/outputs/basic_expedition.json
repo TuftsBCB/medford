@@ -1,0 +1,30 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Expedition": [
+    {
+      "value": "expedition",
+      "ShipName": [
+        "expedition-shipname"
+      ],
+      "CruiseID": [
+        "expedition-cruiseID"
+      ],
+      "MooringID": [
+        "expedition-mooringID"
+      ],
+      "DiveNumber": [
+        "expedition-divenumber"
+      ],
+      "Synonyms": [
+        "expedition-synonyms"
+      ]
+    }
+  ]
+}

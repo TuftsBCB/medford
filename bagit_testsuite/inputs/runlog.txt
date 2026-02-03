@@ -1,0 +1,125 @@
+processing 
+./absolute_path.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory /tmp/bagit_test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./basic_copy.mfd
+Running MEDFORD validation...
+All validations passed!
+Successfully created BagIt package: basic_copy.zip
+BagIt package created at: basic_copy.zip
+processing 
+./basic_primary.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: Files in FileRoot without corresponding tags:
+  - docs/paper_in_docs.pdf
+  - supplementary/notes.txt
+  - results/experiment.csv
+  - paper/paper.pdf
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./basic_ref.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: Files in FileRoot without corresponding tags:
+  - paper.pdf
+  - docs/paper_in_docs.pdf
+  - supplementary/notes.txt
+  - results/experiment.csv
+  - paper/paper.pdf
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./curr_directory.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: Referenced files are missing:
+  - Paper_Primary: Current directory test
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./missing_files.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: Referenced files are missing:
+  - Paper_Primary: Missing files test
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./missing_files_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: Referenced files are missing:
+  - Data_Primary: nonexistent.csv
+  - Paper_Primary: missing.pdf
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./multiple_files.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: Referenced files are missing:
+  - Paper_Primary: Multi-file test case
+  - Paper_Copy: File paper.pdf
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./no_dir_copy_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory bagit_testsuite/inputs/test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./no_dir_primary_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory bagit_testsuite/inputs/test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./no_file.mfd
+Running MEDFORD validation...
+All validations passed!
+Warning: File root not specified.
+Successfully created BagIt package: no_files_bag.zip
+BagIt package created at: no_files_bag.zip
+processing 
+./no_file_copy_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory bagit_testsuite/inputs/test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./no_file_primary_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory bagit_testsuite/inputs/test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./relDirTest.mfd
+Running MEDFORD validation...
+All validations passed!
+Successfully created BagIt package: basic_copy.zip
+BagIt package created at: basic_copy.zip
+processing 
+./same_name_copy_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory bagit_testsuite/inputs/test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None
+processing 
+./same_name_primary_err.mfd
+Running MEDFORD validation...
+All validations passed!
+Error: FileRoot directory bagit_testsuite/inputs/test_data does not exist.
+Error creating BagIt package: Could not create Bag because of failed validation
+BagIt package created at: None

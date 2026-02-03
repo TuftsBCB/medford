@@ -1,0 +1,8 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Species species
+@Species-Loc species-loc
+@Species-ReefCollection species-reefcollection
+@Species-Cultured species-cultured
+@Species-CultureCollection species-culturecollection
