@@ -1,4 +1,4 @@
-"""Helpers for macro syntax. Exact spec:
+"""Helpers for simple variable macro syntax.
 
 Defining a variable:
   `@name Value

@@ -1,0 +1,10 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+# Template without defaults - name and dept required
+@>contrib_bare name dept
+>@contributor {name}
+>@contributor-department {dept}
+
+# Invoke without providing required params - should error
+@<contrib_bare

@@ -12,6 +12,7 @@ from pathlib import PurePath  # ?
 
 from .objs.linereader import LineReader, Line
 from .objs.linecollector import LineCollector, Macro, Block
+from .objs.template_utils import expand_templates
 from .objs.includeCollector import IncludeCollector
 from .objs.dictionizer import Dictionizer
 from .models.generics import Entity
@@ -343,12 +344,14 @@ class MFD:
                     sys.exit(1)
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line]:
-        object_lines = []
         with open(filename, "r", encoding="utf-8") as f:
-            for idx, line in enumerate(f.readlines()):
-                p_line = LineReader.process_line(line, idx)
-                if p_line is not None:
-                    object_lines.append(p_line)
+            raw_lines = f.readlines()
+        expanded_lines = expand_templates(raw_lines)
+        object_lines = []
+        for idx, line in enumerate(expanded_lines):
+            p_line = LineReader.process_line(line, idx)
+            if p_line is not None:
+                object_lines.append(p_line)
 
         return object_lines
 

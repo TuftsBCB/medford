@@ -1,0 +1,11 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+# Simple macro syntax test
+`@author_name Alva L. Couch
+`@institution {Tufts University}
+`@chaos chaos {reigns}
+
+@Contributor `author_name
+@Contributor-Association `{institution}
+@Contributor-Notes The value of chaos is: `chaos
