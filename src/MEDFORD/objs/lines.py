@@ -299,8 +299,8 @@ class MacroLine(ContentMixin, Line):
         self.macro_name = macro_name
         self.raw_content = macro_body
 
-        # [1:] is to skip the macro that this line itself is defining
-        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro[1:])
+        # Use pattern is `name / `{name}; def is `@name so no self-use to skip
+        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
     def __eq__(self, other) -> bool:
         if (

@@ -74,10 +74,9 @@ class TestLineCollection:
         assert lc.named_blocks["Major"]["NameOfBlock"] == blocks[0]
 
     def test_process_one_line_detail_has_macro(self):
-        # Discovered I never actually flagged Details as having Macros.
-        # This test ensures that a detail correctly has that flag set.
+        # Macro use: `name or `{name} (no @).
         test_line: Optional[Line] = LineReader.process_line(
-            "@Major-minor NameOfBlock `@macro", 0
+            "@Major-minor NameOfBlock `macro", 0
         )
         assert test_line is not None
         assert isinstance(test_line, NovelDetailLine)
@@ -85,7 +84,7 @@ class TestLineCollection:
         confirmed_line: NovelDetailLine = test_line
 
         exdet = Detail(confirmed_line, None)
-        assert exdet.has_macros == True
+        assert exdet.has_macros is True
         assert exdet.used_macro_names == ["macro"]
 
     #########################################
@@ -114,6 +113,7 @@ class TestLineCollection:
         # assert len(lc.comments) == 1
 
     def test_process_two_line_macro(self):
+        # Simple macros are single-line only; continue line is ignored.
         test_lines: List[str] = ["`@Macro value", " continue"]
         test_Line_1: Optional[Line] = LineReader.process_line(test_lines[0], 0)
         test_Line_2: Optional[Line] = LineReader.process_line(test_lines[1], 1)
@@ -131,8 +131,7 @@ class TestLineCollection:
         assert len(lc.defined_macros.keys()) == 1
         assert len(lc.comments) == 0
 
-        # TODO : test that these constructors work as intended...
-        ex_m = Macro(confirmed_1, [confirmed_2])
+        ex_m = Macro(confirmed_1, None)
         assert lc.defined_macros["Macro"] == ex_m
 
     def test_process_two_line_detail(self):
@@ -292,9 +291,7 @@ class TestLineCollection:
         assert isinstance(confirmed_lines[1], ContinueLine)
         assert isinstance(confirmed_lines[2], MacroLine)
         assert isinstance(confirmed_lines[3], MacroLine)
-        assert lc.defined_macros["Macro1"] == Macro(
-            confirmed_lines[0], [confirmed_lines[1]]
-        )
+        assert lc.defined_macros["Macro1"] == Macro(confirmed_lines[0], None)
         assert lc.defined_macros["Macro2"] == Macro(confirmed_lines[2], None)
         assert lc.defined_macros["Macro3"] == Macro(confirmed_lines[3], None)
 
@@ -344,7 +341,7 @@ class TestLineCollection:
 
     # TODO: add these tests to a new file named test_obj_linecollections?
     def test_simple_macro_replace(self):
-        test_lines: List[str] = ["`@Macro value", "@Major `@Macro"]
+        test_lines: List[str] = ["`@Macro value", "@Major `Macro"]
         test_Lines: List[Optional[Line]] = []
         for idx, l in enumerate(test_lines):
             test_Lines.append(LineReader.process_line(l, idx))
@@ -361,10 +358,11 @@ class TestLineCollection:
 
         blocks: List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].head_detail.get_content({"Macro":resolved}) == "value" # type: ignore
+        assert blocks[0].head_detail.get_content({"Macro": resolved}) == "value"  # type: ignore
 
     def test_multiline_macro_replace(self):
-        test_lines: List[str] = ["`@Macro value", " value 2", "@Major `@Macro"]
+        # Simple macros are single-line; continue " value 2" is ignored.
+        test_lines: List[str] = ["`@Macro value", " value 2", "@Major `Macro"]
         test_Lines: List[Optional[Line]] = []
         for idx, l in enumerate(test_lines):
             test_Lines.append(LineReader.process_line(l, idx))
@@ -377,17 +375,17 @@ class TestLineCollection:
         lc: LineCollector = LineCollector(confirmed_lines)
         assert len(lc.defined_macros.keys()) == 1
         resolved = lc.defined_macros["Macro"].resolve(lc.defined_macros)
-        assert resolved == "value value 2"
+        assert resolved == "value"
 
         blocks: List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].head_detail.get_content({"Macro":resolved}) == "value value 2" # type: ignore
+        assert blocks[0].head_detail.get_content({"Macro": resolved}) == "value"  # type: ignore
 
     def test_multilayer_macro_replace(self):
         test_lines: List[str] = [
             "`@Macro1 value",
-            "`@Macro2 `@Macro1",
-            "@Major `@Macro2",
+            "`@Macro2 `Macro1",
+            "@Major `Macro2",
         ]
         test_Lines: List[Optional[Line]] = []
         for idx, l in enumerate(test_lines):
@@ -411,12 +409,12 @@ class TestLineCollection:
         assert len(blocks) == 1
         assert blocks[0].head_detail.get_content(resolved_macros) == "value"
     
-    def test_multilayer_macro_replace_2(self) :
+    def test_multilayer_macro_replace_2(self):
         test_lines: List[str] = [
             "`@Macro1 value",
-            "`@Macro2 21`@Macro1",
-            "@Major 23`@{Macro2}32",
-            "@Majortwo 23{`@Macro2}32",
+            "`@Macro2 21`Macro1",
+            "@Major 23`{Macro2}32",
+            "@Majortwo 23{`Macro2}32",
         ]
         test_Lines: List[Optional[Line]] = []
         for idx, l in enumerate(test_lines):
@@ -441,11 +439,11 @@ class TestLineCollection:
         assert blocks[0].head_detail.get_content(resolved_macros) == "2321value32"
         assert blocks[1].head_detail.get_content(resolved_macros) == "23{21value}32"
     
-    def test_multilayer_macro_replace_3(self) :
+    def test_multilayer_macro_replace_3(self):
         test_lines: List[str] = [
             "`@Macro1 value",
-            "`@Macro2 21`@Macro1",
-            "@Major 23`@Macro2"
+            "`@Macro2 21`Macro1",
+            "@Major 23`Macro2",
         ]
         test_Lines : List[Optional[Line]] = []
         for idx, l in enumerate(test_lines) :
@@ -470,13 +468,11 @@ class TestLineCollection:
         assert blocks[0].head_detail.get_content(resolved_macros) == "2321value"
 
     def test_multiline_multilayer_macro_replace(self):
+        # Simple macros single-line; Macro2 uses `Macro in body.
         test_lines: List[str] = [
             "`@Macro value",
-            " value 2",
-            "`@Macro2 hello",
-            " `@Macro hello",
-            " hello",
-            "@Major `@Macro2",
+            "`@Macro2 hello `Macro",
+            "@Major `Macro2",
         ]
         test_Lines: List[Optional[Line]] = []
         for idx, l in enumerate(test_lines):
@@ -492,12 +488,12 @@ class TestLineCollection:
         resolved_macros: Dict[str, str] = {}
         for m in lc.defined_macros.keys():
             resolved_macros[m] = lc.defined_macros[m].resolve(lc.defined_macros)  # type: ignore
-        assert resolved_macros["Macro"] == "value value 2"
-        assert resolved_macros["Macro2"] == "hello value value 2 hello hello"
+        assert resolved_macros["Macro"] == "value"
+        assert resolved_macros["Macro2"] == "hello value"
 
         blocks: List[Block] = lc.get_flat_blocks()
         assert len(blocks) == 1
-        assert blocks[0].head_detail.get_content(resolved_macros) == "hello value value 2 hello hello"
+        assert blocks[0].head_detail.get_content(resolved_macros) == "hello value"
 
     #########################################
     # Free-for-all. Yipee!                  #
@@ -512,14 +508,14 @@ class TestLineCollection:
         #       for sure be tested eventually.
         test_lines: List[str] = [
             "`@Tufts 177 College Ave",  # 0
-            "Medford, MA 02155",  # 1
+            "Medford, MA 02155",  # 1 (continue ignored; simple macros single-line)
             "# Tufts address",  # 2
             "`@CheesecakeRes success",  # 3
-            "@Contributor Polina Shpilker",  # TODO : make sure references can handle spaces # 4
-            "@Contributor-Association Tufts University `@Tufts",  # 5
+            "@Contributor Polina Shpilker",  # 4
+            "@Contributor-Association Tufts University `Tufts",  # 5
             "@Contributor-Email polina.shpilker@tufts.edu",  # 6
             "@Contributor-Notes Contemplating cheesecake recipes",  # 7
-            "The peanut butter cheesecake was a `@{CheesecakeRes}.",  # 8
+            "The peanut butter cheesecake was a `{CheesecakeRes}.",  # 8
             "@Contributor-Notes No, I couldn't think of a better example.",  # 9
             "# Here's where I'd put my multiline comment...",  # 10
             "# ... if I had one!",  # 11
@@ -568,7 +564,7 @@ class TestLineCollection:
         assert isinstance(confirmed_lines[14], ContinueLine)
         assert isinstance(confirmed_lines[15], NovelDetailLine)
 
-        macro1: Macro = Macro(confirmed_lines[0], [confirmed_lines[1]])
+        macro1: Macro = Macro(confirmed_lines[0], None)
         macro2: Macro = Macro(confirmed_lines[3], None)
 
         detail_1: List[Detail] = []

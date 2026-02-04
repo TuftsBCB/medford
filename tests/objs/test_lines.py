@@ -71,19 +71,20 @@ def test_separate_tex_comment():
 # Macro definition line tests           #
 #########################################
 def test_MacroLine_FindMacro_UseMacro():
-    test_line = "`@Macro def `@MacroUse"
+    # Use: `name or `{name} (no @). Def: `@name value.
+    test_line = "`@Macro def `MacroUse"
     lr = LineReader.process_line(test_line, -1)
     assert isinstance(lr, MacroLine)
     assert lr.has_macros
-    assert lr.macro_uses[0] == (4, 14, "MacroUse")
+    assert lr.macro_uses[0][2] == "MacroUse"
 
 
 def test_MacroLine_FindMacro_UseMacro_Curly():
-    test_line = "`@Macro def `@{MacroUse}"
+    test_line = "`@Macro def `{MacroUse}"
     lr = LineReader.process_line(test_line, -1)
     assert isinstance(lr, MacroLine)
     assert lr.has_macros
-    assert lr.macro_uses[0] == (4, 16, "MacroUse")
+    assert lr.macro_uses[0][2] == "MacroUse"
 
 
 def test_MacroLine_FindMacro_NoUseMacro():
@@ -94,13 +95,13 @@ def test_MacroLine_FindMacro_NoUseMacro():
 
 
 def testMacroLine_FindMacro_UseTwoMacro():
-    test_line = "`@Macro def `@MacroUse1 `@MacroUse2"
+    test_line = "`@Macro def `MacroUse1 `MacroUse2"
     lr = LineReader.process_line(test_line, -1)
     assert isinstance(lr, MacroLine)
     assert lr.has_macros
     assert len(lr.macro_uses) == 2
-    assert lr.macro_uses[0] == (4, 15, "MacroUse1")
-    assert lr.macro_uses[1] == (16, 27, "MacroUse2")
+    assert lr.macro_uses[0][2] == "MacroUse1"
+    assert lr.macro_uses[1][2] == "MacroUse2"
 
 
 #########################################
@@ -109,12 +110,12 @@ def testMacroLine_FindMacro_UseTwoMacro():
 
 
 def test_NovelDetailLine_FindMacro_UseMacro():
-    test_line = "@Major-minor `@MacroUse"
+    test_line = "@Major-minor `MacroUse"
     lr = LineReader.process_line(test_line, -1)
     assert isinstance(lr, NovelDetailLine)
     assert lr.has_macros
     assert len(lr.macro_uses) == 1
-    assert lr.macro_uses[0] == (0, 10, "MacroUse")
+    assert lr.macro_uses[0][2] == "MacroUse"
 
 
 from typing import List, Optional

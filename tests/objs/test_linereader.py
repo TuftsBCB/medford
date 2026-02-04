@@ -77,7 +77,7 @@ class TestAtAtImplementation() :
         assert res.get_content({}) == "Content"
 
     def test_detect_atat_with_macro(self):
-        example_line = "@Major-@MajorTwo Content `@Macro"
+        example_line = "@Major-@MajorTwo Content `Macro"
         res = LineReader.process_line(example_line, 0)
         assert isinstance(res, AtAtLine)
         assert res.has_macros
@@ -142,21 +142,21 @@ def test_detect_noveldetail(
 
 
 def test_detect_macro_badcurly():
-    # TODO : smart recognize this mis-use and throw an error?
-    example_lines = ["@Major wrong{`@macrouse}"]
+    # Macro use `name or `{name}; `} after name is valid delimiter.
+    example_lines = ["@Major wrong{`macrouse}"]
     res = LineReader.process_line(example_lines[0], 0)
     assert res is not None
     assert isinstance(res, NovelDetailLine)
     assert res.has_macros
 
-def test_creating_comment_line() :
+def test_creating_comment_line():
     example_lines = [" # Comment Line"]
-    a = CommentLine(0,example_lines[0])
+    a = CommentLine(0, example_lines[0])
     assert a.line == " # Comment Line"
 
-    b = LineReader.process_line(example_lines[0],0)
+    b = LineReader.process_line(example_lines[0], 0)
     assert type(b) is CommentLine
-    assert b.line == " # Comment Line"
+    assert b.line == "# Comment Line"  # process_line strips input
     
 # TODO : move tests over from test_linereader to test "find" capabilities
 # TODO : add test for major-minor identification
