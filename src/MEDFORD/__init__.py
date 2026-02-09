@@ -17,6 +17,7 @@ from .models.generics import Entity
 from .objs.linecollections import Detail
 from .objs.bagitHandler import BagItHandler
 from .objs.medfordValidator import Validator
+from .objs.crossref_validator import CrossRefValidator
 
 import argparse
 import json
@@ -209,6 +210,10 @@ class MFD:
         self.macro_definitions = self.line_collector.get_macros()
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
+
+        # Cross-tag reference validation (stage 3)
+        crossref_validator = CrossRefValidator(self.line_collector.named_blocks)
+        crossref_validator.validate()
 
         # stop here and check for syntax errors
         if mfdglobals.mv.instance().has_syntax_err():

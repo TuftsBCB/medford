@@ -403,3 +403,59 @@ class AtAtReferencedDoesNotExist(MFDErr):
             raise ValueError(
                 "Attempted to get a head lineno of a {self.__name__} error that does not have an atat object."
             )
+
+
+class MissingCrossReferenceError(MFDErr):
+
+    parent_major_token: str
+    reference_type: str
+    referenced_value: str
+    available_names: List[str]
+
+    lineno_head: int
+    lineno_range: Tuple[int, int]
+    lineno_all: List[int]
+
+    def __init__(self, detail_inp, reference_type: str, referenced_value: str,
+                 available_names: List[str]):
+        self.errtype = ErrType.SYNTAX  #stops validation
+
+        from MEDFORD.objs.linecollections import Detail
+
+        if not isinstance(detail_inp, Detail):
+            raise ValueError("MissingCrossReferenceError requires a Detail object.")
+
+        self.detail: Detail = detail_inp
+        self.parent_major_token = "_".join(detail_inp.major_tokens)
+        self.reference_type = reference_type
+        self.referenced_value = referenced_value
+        self.available_names = available_names
+
+        self.lineno_all = detail_inp.get_linenos()
+        self.lineno_range = (min(self.lineno_all), max(self.lineno_all))
+        self.lineno_head = self.lineno_range[0]
+
+        message = (
+            f"Line {self.lineno_head}: @{self.parent_major_token}-{reference_type} "
+            f"references '{referenced_value}' but no @{reference_type} with that name exists."
+        )
+
+        if available_names:
+            helpmsg = (
+                f"Available @{reference_type} blocks: {', '.join(available_names)}.\n"
+                f"Either add: @{reference_type} {referenced_value}\n"
+                f"Or use an existing name."
+            )
+        else:
+            helpmsg = (
+                f"No @{reference_type} blocks are defined. Add:\n"
+                f"  @{reference_type} {referenced_value}"
+            )
+
+        super().__init__(type(self).__name__, message, helpmsg)
+
+    def get_head_lineno(self) -> int:
+        return self.lineno_head
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return self.lineno_range
