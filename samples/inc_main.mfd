@@ -1,0 +1,11 @@
+@MEDFORD Testing File (Main)
+@MEDFORD-Version 1.0
+
+`@paper_prefix PAPER_
+
+@Paper `@{paper_prefix}A
+@Note Before Include
+
+@include inc.mfd @Photo
+
+@Note After include
