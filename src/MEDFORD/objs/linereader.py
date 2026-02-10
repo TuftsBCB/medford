@@ -244,6 +244,7 @@ class LineReader:
 
         Output are Line objects of their relevant subclass, which includes `CommentLine`s, `MacroLine`s, `NovelDetailLine`s, and `ContinueLine`s.
         Currently only returns None in the case of an At-At line (which are currently being ignored entirely) or if the line is empty."""
+        
         if line.strip() == "":
             return None
         
