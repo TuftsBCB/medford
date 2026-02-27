@@ -68,22 +68,35 @@ class OutWriter:
         comments = list(getattr(self.line_collector, "comments", []) or [])
 
         def _cln(x: Any) -> int:
+            """
+            Gets a line number for a comment or block. Uses best effort to find a line number
+            from common fields, or returns a default if not found.
+            """
             return self._obj_lineno(x, -1)
 
+        # sort the comments so that they're ready for interleaving with blocks
         comments.sort(key=_cln)
 
-        idx = 0
+        idx = 0 # establish pointer into comments list for interleaving
         with open(path, "w", encoding="utf-8") as f:
             wrote_any = False
             prev_blank = False
 
             def sep():
+                """
+                Writes a blank line if we just wrote a non-blank line
+                to help separate comments and blocks.
+                """
                 nonlocal prev_blank, wrote_any
                 if wrote_any and not prev_blank:
                     f.write("\n")
                     prev_blank = True
 
             def write_line(s: str):
+                """
+                Writes a line. Tracks whether the line was blank so that
+                sep() knows whether a seperator is still needed.
+                """
                 nonlocal prev_blank, wrote_any
                 s = s.rstrip("\n")
                 f.write(s + "\n")
@@ -91,23 +104,29 @@ class OutWriter:
                 prev_blank = (s.strip() == "")
 
             def write_block_text(text: str):
+                """"
+                Splits a block's text on newlines and writes each line 
+                separately to preserve blank lines and how we track them for sep() purposes.
+                """
                 for line in text.splitlines():
                     write_line(line)
 
             for b in blocks:
                 b_start = self._block_start_lineno(b)
 
-                # Comments that occur before or on this block's first line
+                # For each block, write comments whose line numbers
+                # are at or before the block's starting line number
                 while idx < len(comments) and _cln(comments[idx]) <= b_start:
                     sep()
                     write_line(self._comment_text(comments[idx]))
                     idx += 1
 
-                # Write the block itself
+                # followed by the block itself
                 sep()
                 write_block_text(self.render_block(b, resolved_macros))
 
-            # Trailing comments after last block
+            # Any comments that appear after the last block are written as
+            # trailing comments at the end of the file
             while idx < len(comments):
                 sep()
                 write_line(self._comment_text(comments[idx]))
@@ -134,7 +153,8 @@ class OutWriter:
         # Ensure it prints as a proper comment line
         if s.startswith("#"):
             return s
-        return "# " + s
+        else:
+            return "# " + s
 
     def _obj_lineno(self, obj: Any, default_if_missing: int) -> int:
         for name in ("line_number", "lineno", "lineNo", "line_index", "idx"):
