@@ -1,0 +1,10 @@
+The Expected RDF/XML contains two leading spaces at the beginning of the first line and the last line. 
+And the lines between the Expected RDF/XML contain four leading spaces. 
+
+Example:  
+  <rdf:Description>
+    <rdf:type rdf:resource="https://www.eecs.tufts.edu/~wlou01/mf/elements/code" />
+    <mfterms:isRef>true</mfterms:isRef>
+    <dcterms:title>HiRise</dcterms:title>
+    <dcterms:subject>Assembly of genome scaffolds</dcterms:subject>
+  </rdf:Description>
