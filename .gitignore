@@ -6,6 +6,10 @@ __pycache__/*
 *.zip
 samples/pshpil_rnaseq_example/pshpil_rnaseq.mfd
 dist/*
+build/*
 src/*.egg-info
 src/HelperScripts
 problematic_examples.txt
+.DS_Store
+.venv/
+build/

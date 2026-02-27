@@ -393,3 +393,53 @@ class ContinueLine(ContentMixin, Line):
             return super(ContinueLine, self).__eq__(other)
 
         return False
+
+
+class IncludeLine(ContentMixin, Line):
+    """Line representing an @include statement.
+    
+    Parses @include <filename.mfd> <Tagname> <Selector> syntax.
+    Examples:
+    - @include foo.mfd @contributor Alva L. Couch
+    - @include foo.mfd @contributor
+    """
+    
+    filename: str
+    tag_name: str
+    selector: str
+    
+    def __init__(
+        self,
+        lineno: int,
+        line: str,
+        filename: str,
+        tag_name: str,
+        selector: str,
+        poss_inline,
+        poss_tex,
+        poss_macro,
+    ):
+        super(IncludeLine, self).__init__(lineno, line)
+        self.filename = filename
+        self.tag_name = tag_name
+        self.selector = selector
+        # raw_content should be the payload part (after @include) for content processing
+        # Extract the part after "@include " from the original line
+        include_prefix = "@include "
+        if line.startswith(include_prefix):
+            self.raw_content = line[len(include_prefix):].strip()
+        else:
+            self.raw_content = f"{filename} {tag_name} {selector}".strip()
+        
+        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
+    
+    def __eq__(self, other) -> bool:
+        if (
+            type(self) == type(other)
+            and self.filename == other.filename
+            and self.tag_name == other.tag_name
+            and self.selector == other.selector
+        ):
+            return super(IncludeLine, self).__eq__(other)
+        
+        return False

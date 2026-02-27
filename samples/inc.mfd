@@ -1,0 +1,7 @@
+@MEDFORD Testing File (included in main file)
+@MEDFORD-Version 1.0
+
+`@reef_photo REEF_X_PHOTO_
+@Photo `@{reef_photo}01
+@Photo `@{reef_photo}02
+@Photo `@{reef_photo}03
