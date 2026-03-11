@@ -41,8 +41,8 @@ def test_lead_spacing_not_ignored(tmp_path) :
     with pytest.raises(ValueError) :
         provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
     return
-from MEDFORD.medford import provide_args_and_go, ParserMode, OutputMode
-import pytest
+#from MEDFORD.medford import provide_args_and_go, ParserMode, OutputMode
+#import pytest
 
 # example error case:
 # no Contributor tag -> crash

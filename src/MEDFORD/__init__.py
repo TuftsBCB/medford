@@ -37,6 +37,8 @@ from .models import models_get_major_minors
 
 from . import mfdglobals
 
+from .objs.outwriter import OutWriter
+
 
 
 # order of ops:
@@ -196,6 +198,7 @@ class MFD:
             print("Warning: medford.mvd validation file not found. Skipping validation.")
             self.validator = None
 
+
     def run_medford(self):
         """Main function that runs MEDFORD compilation from start to finish."""
         self.em_inst = mfdglobals.validator  # this is just for debug purposes
@@ -220,28 +223,23 @@ class MFD:
             
             include_collector = IncludeCollector(self.base_dir)
             
-            # Process all includes and get blocks
-            included_blocks = include_collector.process_includes(include_lines)
-            
-            if mfdglobals.debug:
-                print(f"Included {len(included_blocks)} block(s) from external files")
+            # Insert included blocks where the @include appears in the main file
+            self.blocks = include_collector.insert_blocks_at_include_positions(self.blocks, include_lines)
             
             # Check for conflicts between included blocks and main file blocks
-            conflicts = include_collector.check_conflicts_with_main_blocks(self.blocks)
+            #conflicts = include_collector.check_conflicts_with_main_blocks(self.blocks)
             
-            # Merge included blocks with main file blocks
-            self.blocks.extend(included_blocks)
-            
-            # Add included blocks to named_blocks structure
-            # This ensures included blocks are available for reference
-            for block in included_blocks:
-                major = block.get_str_major()
-                if major not in self.line_collector.named_blocks:
-                    self.line_collector.named_blocks[major] = {}
-                self.line_collector.named_blocks[major][block.name] = block
-            
+            self.line_collector.named_blocks = {}
+            for b in self.blocks:
+                major = b.get_str_major()
+                self.line_collector.named_blocks.setdefault(major, {})
+                self.line_collector.named_blocks[major][b.name] = b
+
+            self.named_blocks = self.line_collector.get_1lvl_blocks()
+
             # Regenerate flattened named_blocks
             self.named_blocks = self.line_collector.get_1lvl_blocks()
+
 
         # stop here and check for syntax errors
         if mfdglobals.mv.instance().has_syntax_err():
@@ -304,6 +302,23 @@ class MFD:
         # TODO: export to json, bag
         # TODO: implement all of the old models
         #print("No errors found in the provided MEDFORD file!")
+
+
+        # If user specified --out, dump blocks now (after dictionrizer and validation)
+        if getattr(self, "dev_out_path", None):
+            try:
+
+                OutWriter(self.line_collector).write_blocks(
+                    self.blocks,
+                    self.dev_out_path,
+                    resolved_macros=self.dictionizer.resolved_macros,
+                )
+                print(f"[dev] Wrote blocks to: {self.dev_out_path}")
+            except Exception as e:
+                print(f"[dev] Failed to write --out file: {e}", file=sys.stdout)
+                print(f"[dev] Failed to write --out file: {e}", file=sys.stderr)
+                sys.exit(1)
+
         
 
         if self.write_json:
@@ -430,6 +445,11 @@ ap.add_argument(
     "file.",
 )
 ap.add_argument(
+    "--out",
+    metavar="filename.mfd",
+    help="(DEV) write parsed blocks back out as MEDFORD text for fidelity testing."
+)
+ap.add_argument(
     "-d",
     "--debug",
     action="store_true",
@@ -480,6 +500,7 @@ def parse_args_and_go():
         write_json=args.write_json,
         output_path=".",
     )
+    mfd.dev_out_path = args.out  #makes --out value available to run_medford()
     mfd.run_medford()
 
 

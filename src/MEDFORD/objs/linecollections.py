@@ -173,6 +173,13 @@ class Macro(LineCollection):
         else:
             cdepth: int = depth
 
+<<<<<<< HEAD
+=======
+        # debug print
+        #print(self.name)
+        #print(cdepth)
+
+>>>>>>> origin/dev
         if self._is_resolved:
             return self.resolution
 
