@@ -1,0 +1,8 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Paper Test Paper
+@include shared_data.mfd @Contributor Alice Smith
+
+@Data Test Data
+

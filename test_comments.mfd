@@ -1,0 +1,13 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Paper Test Paper
+@Paper-Title Testing Comments
+
+# This is a comment line
+@Contributor Alice Smith
+@Contributor-Email alice@example.com
+
+@Data Test Data
+@Data-Description This is test data # This is an inline comment
+

@@ -1,0 +1,12 @@
+@Contributor Alice Smith
+@Contributor-Email alice@university.edu
+@Contributor-Role Principal Investigator
+@Contributor-ORCID 0000-0000-0000-0001
+
+@Contributor Bob Jones
+@Contributor-Email bob@university.edu
+@Contributor-Role Co-Investigator
+
+@Method PCR Analysis
+@Method-Description Polymerase Chain Reaction technique
+@Method-Equipment Thermal cycler

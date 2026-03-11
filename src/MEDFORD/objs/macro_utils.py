@@ -55,7 +55,6 @@ def parse_simple_macro_def(line: str) -> Tuple[str, str]:
     rest = line[2:].lstrip()
     if not rest:
         raise ValueError("Missing macro name and value after `@")
-    # name: [A-Za-z0-9_]+
     i = 0
     while i < len(rest) and (rest[i].isalnum() or rest[i] == "_"):
         i += 1
@@ -68,7 +67,6 @@ def parse_simple_macro_def(line: str) -> Tuple[str, str]:
     if rest.startswith("{"):
         value, _ = parse_braced_value(rest)
         return (name, value)
-    # Unbraced: rest of line; strip inline # comment
     idx = rest.find("#")
     if idx >= 0:
         rest = rest[:idx].rstrip()

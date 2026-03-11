@@ -1,0 +1,10 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+@Paper Demo Paper
+@Paper-Title Testing Include Functionality
+
+# @include shared_data.mfd @Contributor Alice Smith  # COMMENTED OUT
+
+@Data Main Dataset
+@Data-Description This is the main dataset

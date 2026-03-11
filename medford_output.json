@@ -1,0 +1,21 @@
+{
+  "MEDFORD": [
+    {
+      "value": "description",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "contributor": [
+    {
+      "value": "Alva Couch",
+      "institution": [
+        "Tufts University"
+      ],
+      "department": [
+        "Engineering"
+      ]
+    }
+  ]
+}

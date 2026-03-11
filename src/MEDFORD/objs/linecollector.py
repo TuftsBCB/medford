@@ -214,3 +214,4 @@ class LineCollector:
 
     def get_include_lines(self) -> List[IncludeLine]:
         return self.include_lines
+        

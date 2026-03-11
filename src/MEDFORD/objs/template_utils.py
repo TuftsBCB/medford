@@ -67,7 +67,6 @@ def expand_templates(raw_lines: List[str]) -> List[str]:
             i += 1
             continue
 
-        # Template def: @>name p1 p2 or @>name p1={v1}
         if re.match(r"@>[A-Za-z]", s):
             s = _strip_comment(s).strip()
             name = re.match(r"@>([A-Za-z0-9_]+)", s).group(1)
@@ -81,7 +80,6 @@ def expand_templates(raw_lines: List[str]) -> List[str]:
             templates[name] = TemplateDef(name, params, body)
             continue
 
-        # Template invocation: @<name or @<name p1={v1}
         if re.match(r"@<[A-Za-z]", s):
             s = _strip_comment(s).strip()
             name = re.match(r"@<([A-Za-z0-9_]+)", s).group(1)
@@ -101,7 +99,6 @@ def expand_templates(raw_lines: List[str]) -> List[str]:
             i += 1
             continue
 
-        # Orphan body line (skip)
         if s.startswith(">"):
             i += 1
             continue
