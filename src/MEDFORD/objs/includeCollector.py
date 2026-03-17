@@ -202,31 +202,68 @@ class IncludeCollector:
         
         return matching_blocks
     
-    def process_include(self, include_line: IncludeLine) -> List:
+    def process_include(self, include_line: IncludeLine, _register: bool = True) -> List:
         """Process a single include and return matching blocks (no duplicates).
-        
+        This function takes an @include line, reads the target file to be included,
+        and recursively expands any nested @include statements found withing
+        that file.
+
+        _register=True (default): Used in the outermost call from the main file.
+                Each block is checked against included_blocks to avoid duplicate includes.
+        _register=False: Used for nested/recursive calls when expanding includes within includes.
+                In this mode, included_blocks tracking is skpeed entirely to allow all blocks to
+                be returned without filtering, and let the outermost call handle deduplication.
+
         Raises FileNotFoundError if file missing, ValueError if circular include.
         """
         file_path = self.resolve_file_path(include_line.filename)
         file_str = str(file_path.resolve())
-        
+
+        # Check if the file to process is already in the current include stack
         if file_str in self.circular_includes:
             raise ValueError(f"Circular include detected: {file_str}")
-        
+
         self.circular_includes.add(file_str)
-        
+
         try:
+            # This parsing returns 'blocks' and 'include_lines'
             file_structure = self.parse_file(file_path)
+
+            # Recursively expand any @include statements found inside this file
+            # before filtering, so that nested blocks are visible to find_matching_blocks.
+            # Use _register=False so nested blocks are not pre-registered in included_blocks.
+            nested_includes = file_structure.get('include_lines', [])
+            if nested_includes:
+
+                # Pass _register=False here so that the recursive calls
+                # do not apply dedup tracking to the nested blocks.
+                expanded_blocks = self.insert_blocks_at_include_positions(
+                    file_structure['blocks'], nested_includes, _register=False
+                )
+                expanded_structure = dict(file_structure)
+                expanded_structure['blocks'] = expanded_blocks
+            else:
+                # If no nested includes exist, then the original file_structure
+                # is already fully expanded and can be used as-is.
+                expanded_structure = file_structure
+
+            # Filter the blocks according to the tag_name and selector in the @include line
             matching_blocks = self.find_matching_blocks(
-                file_structure, 
-                include_line.tag_name, 
+                expanded_structure,
+                include_line.tag_name,
                 include_line.selector
             )
-            
+
+            # When called for nested expansion, skip dedup tracking
+            if not _register:
+                return list(matching_blocks)
+
+            # For the outermost call, check each block against included_blocks
+            # to avoid duplicates across the final output.
             filtered_blocks = []
             for block in matching_blocks:
                 block_key = f"{block.get_str_major()}@{block.name.strip()}"
-                
+
                 if block_key in self.included_blocks:
                     prev_source = self.included_blocks[block_key]
                     if prev_source == file_str:
@@ -239,12 +276,16 @@ class IncludeCollector:
                         self.duplicate_warnings.append(error)
                         print(error)
                     continue
-                
+
+                # if block is new, record it in included_blocks and include it in the output
                 self.included_blocks[block_key] = file_str
                 filtered_blocks.append(block)
-            
+
             return filtered_blocks
         finally:
+            # Remove the current file from the circular_includes set to allow
+            # it to be included again in a different context without falsely 
+            # triggering circular detection.
             self.circular_includes.discard(file_str)
     
     def process_includes(self, include_lines: List[IncludeLine]) -> List:
@@ -340,12 +381,15 @@ class IncludeCollector:
 
         return self._obj_lineno(block, 10**9)
 
-    def insert_blocks_at_include_positions(self, main_blocks: List, include_lines: List[IncludeLine]) -> List:
+    def insert_blocks_at_include_positions(self, main_blocks: List, include_lines: List[IncludeLine], _register: bool = True) -> List:
         """
         For each IncludeLine (in main-file order):
         - expands it into blocks (via process_include)
         - inserts those blocks into the block list where the @include appeared
         Returns a NEW list of blocks.
+
+        _register is forwarded to process_include. Pass False for nested/recursive
+        calls so that included_blocks dedup tracking is not applied prematurely.
         """
         if not include_lines:
             return list(main_blocks)
@@ -357,7 +401,7 @@ class IncludeCollector:
 
         for il in include_lines_sorted:
             try:
-                new_blocks = self.process_include(il)
+                new_blocks = self.process_include(il, _register=_register)
             except Exception as e:
                 print(f"Warning: {e}")
                 continue

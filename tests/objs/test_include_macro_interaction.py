@@ -196,6 +196,46 @@ def test_out_idempotent_with_include_and_macro(tmp_path):
     # Idempotence check
     assert _normalize(first_run) == _normalize(second_run), "Output changed after second compile"
 
+def test_nested_include_out(tmp_path):
+    """
+    Nested @include: main includes level1.mfd, which itself includes level2.mfd.
+    --out should fully expand all levels and we should have no @include statements.
+    """
+    level2 = textwrap.dedent("""\
+        @MEDFORD level2
+        @MEDFORD-Version 1.0
+
+        @Contributor DeepPerson
+    """)
+    level1 = textwrap.dedent("""\
+        @MEDFORD level1
+        @MEDFORD-Version 1.0
+
+        @include level2.mfd @Contributor
+        @Contributor MiddlePerson
+    """)
+    main_content = textwrap.dedent("""\
+        @MEDFORD main
+        @MEDFORD-Version 1.0
+
+        @include level1.mfd @Contributor
+    """)
+    (tmp_path / "level2.mfd").write_text(level2, encoding="utf-8")
+    (tmp_path / "level1.mfd").write_text(level1, encoding="utf-8")
+    main_path = tmp_path / "main.mfd"
+    main_path.write_text(main_content, encoding="utf-8")
+    out_path = tmp_path / "out.mfd"
+
+    code, out, err = _run_medford_compile(main_path, out_path, cwd=tmp_path)
+    assert code == 0, f"compile failed:\nSTDOUT:\n{out}\nSTDERR:\n{err}"
+
+    output_text = out_path.read_text(encoding="utf-8")
+    #print("Output text:\n", output_text)
+    assert "@include" not in output_text, "@include directive leaked into --out output"
+    assert "DeepPerson" in output_text, "deeply nested block not found in --out output"
+    assert "MiddlePerson" in output_text, "level1 block not found in --out output"
+
+
 def test_macro_expands_to_include_behavior(tmp_path):
     """
     a macro expands to an '@include ...' directive.
