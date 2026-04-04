@@ -1,0 +1,14 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+# Template macro with defaults
+@>contrib_tufts name={Alva Couch} dept={Engineering}
+>@contributor {name}
+>@contributor-institution Tufts University
+>@contributor-department {dept}
+
+# Invoke with explicit args
+@<contrib_tufts name={Alva Couch} dept={Computer Science}
+
+# Invoke with defaults only
+@<contrib_tufts

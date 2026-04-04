@@ -7,13 +7,14 @@ import re
 from typing import Tuple, List, Optional
 from ..submodules.mfdvalidator.errors import MissingAtAtName
 from .lines import (
-    Line, 
-    MacroLine, 
-    CommentLine, 
-    NovelDetailLine, 
+    Line,
+    MacroLine,
+    CommentLine,
+    NovelDetailLine,
     ContinueLine,
-    IncludeLine
+    IncludeLine,
 )
+from .macro_utils import parse_simple_macro_def
 
 from .. import mfdglobals
 
@@ -25,7 +26,7 @@ class DetailStatics:
     """Class that contains various static markers for reference across different functions in LineReader.
     Contains symbols such as the macro header symbol, which is used to determine whether a macro is being used and/or defined."""
 
-    macro_header: str = "`@"
+    macro_def_header: str = "`@"
     comment_header: str = "#"
     token_header: str = "@"
     _latex_marker: str = "$$"
@@ -33,16 +34,14 @@ class DetailStatics:
         _latex_marker
     )  # ensures that the LaTeX symbol is parsed by regex correctly.
 
-    # TODO : need to turn into f-strings carefully;
-    #       have to check if I need to use f or fr to make sure \ work properly
-    #       also, need to double all {} for them to be taken literally.
     major_minor_reg: str = "{}(?P<major>[A-Za-z_]+)(-(?P<minor>[A-Za-z]+))?\\s".format(
         token_header
     )
 
-    # TODO: make macro name regex reusable
-    macro_use_regex: str = "((?P<r1>{}\\{{(?P<mname_closed>[a-zA-Z0-9_]+)\\}})|(?P<r2>{}(?P<mname_open>[a-zA-Z0-9]+))(\\s|$|\\}}))".format(
-        macro_header, macro_header
+    # Macro use: `name or `{name} (no @). Definition is `@name so we avoid matching `@.
+    macro_use_regex: str = (
+        r"`(?!@)(?:(?P<r1>\{(?P<mname_closed>[a-zA-Z0-9_]+)\})|"
+        r"(?P<r2>(?P<mname_open>[a-zA-Z0-9_]+))(?=\s|$|\}))"
     )
     comment_use_regex: str = "(?=({}\\s.+))".format(comment_header)
     latex_use_regex: str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
@@ -75,8 +74,8 @@ class LineReader:
 
     @staticmethod
     def is_macro_def_line(line: str) -> bool:
-        """Returns True if the provided string is a macro definition line."""
-        return re.match(f"{DetailStatics.macro_header}[A-Za-z]", line) is not None
+        """Returns True if the provided string is a simple macro definition line (`@name value)."""
+        return re.match(rf"{re.escape(DetailStatics.macro_def_header)}[A-Za-z]", line) is not None
 
     @staticmethod
     def is_atat_line(line: str) -> bool:
@@ -109,17 +108,8 @@ class LineReader:
 
     @staticmethod
     def find_macro_name_body(line: str) -> Tuple[str, str]:
-        """Given a string, attempts to identify a macro name and its macro definition. If successful, returns them as a tuple."""
-        m = re.match(
-            f"{DetailStatics.macro_header}(?P<mname>[A-Za-z0-9_]+)\\s(?P<mbody>.+)$",
-            line,
-        )
-        if m is not None:
-            return (m.group("mname"), m.group("mbody"))
-
-        raise ValueError(
-            f"Attempted to find macro name and body on an invalid string: {line}"
-        )
+        """Parse simple macro definition: `@name Value or `@name {value}. Returns (name, value)."""
+        return parse_simple_macro_def(line)
 
     @staticmethod
     def is_novel_token_line(line: str) -> bool:
@@ -208,19 +198,11 @@ class LineReader:
 
     @staticmethod
     def find_macro_uses(line: str) -> List[Macro]:
-        """Returns all possible macro uses in a string line."""
+        """Returns all macro uses in a line: `name or `{name} (not `@). Uses full match span."""
         locations = []
-        all_poss_macros = re.finditer(DetailStatics.macro_use_regex, line)
-        # Checks both possible macro use types, 'closed' (e.g. `@{macro}) and 'open' (e.g. `@macro)
-        for match in all_poss_macros:
-            if match.group("r1") is not None:
-                locations.append(
-                    (match.start("r1"), match.end("r1"), match.group("mname_closed"))
-                )
-            else:
-                locations.append(
-                    (match.start("r2"), match.end("r2"), match.group("mname_open"))
-                )
+        for m in re.finditer(DetailStatics.macro_use_regex, line):
+            name = m.group("mname_closed") if m.group("r1") else m.group("mname_open")
+            locations.append((m.start(), m.end(), name))
         return locations
 
     @staticmethod

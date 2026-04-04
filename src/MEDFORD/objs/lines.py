@@ -198,7 +198,6 @@ class ContentMixin:
                 self.macro_uses = poss_macro[: ind_last + 1]
 
     def replace_macros(self, macro_defs: Dict[str, str]) -> None:
-        # TODO: add tests to make sure macro_uses is in first->last order
         if not self.has_macros or len(self.macro_uses) == 0:
             raise ValueError("Attempted to replace macros in a line without macros.")
 
@@ -226,7 +225,9 @@ class ContentMixin:
             n_macro_uses: int = len(self.macro_uses)
             out = temp_content
             for i in range(0, n_macro_uses):
-                cur_macro: Tuple[int, int, str] = self.macro_uses[n_macro_uses - i - 1]
+                cur_macro: Tuple[int, int, str] = self.macro_uses[
+                    n_macro_uses - i - 1
+                ]
                 cur_macro_pos: Tuple[int, int] = (cur_macro[0], cur_macro[1])
                 cur_macro_name: str = cur_macro[2]
 
@@ -299,8 +300,8 @@ class MacroLine(ContentMixin, Line):
         self.macro_name = macro_name
         self.raw_content = macro_body
 
-        # [1:] is to skip the macro that this line itself is defining
-        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro[1:])
+        # Use pattern is `name / `{name}; def is `@name so no self-use to skip
+        self.resolve_comm_tex_macro_logic(poss_inline, poss_tex, poss_macro)
 
     def __eq__(self, other) -> bool:
         if (

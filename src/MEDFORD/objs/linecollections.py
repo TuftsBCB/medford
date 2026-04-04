@@ -159,12 +159,6 @@ class Macro(LineCollection):
         self.name = headline.macro_name
 
     def get_raw_content(self) -> str:
-        """Returns the raw substitution string of the macro.
-
-        Specifically, returns the exact string content of the macro,
-        without attempting to substitute for referenced macro names or
-        other post-processing.
-        """
         outstr = self.headline.raw_content
         if self.extralines is not None:
             for el in self.extralines:
@@ -174,23 +168,18 @@ class Macro(LineCollection):
     def resolve(
         self, macro_definitions: Dict[str, "Macro"], depth: Optional[int] = None
     ) -> Union[str, List["Macro"]]:
-        """Resolve the content of the macro, up to 10 recursions.
-
-        Given a list of macros that have currently been defined, and the
-        current recursion depth of resolution, either returns the resolved
-        macro string or, in failure case, a list of all macros that were
-        used to reach failure.
-        """
-        # TODO : add a new way to track max resolutions.
         if depth is None:
             cdepth: int = 0
         else:
             cdepth: int = depth
 
+<<<<<<< HEAD
+=======
         # debug print
         #print(self.name)
         #print(cdepth)
 
+>>>>>>> origin/dev
         if self._is_resolved:
             return self.resolution
 
@@ -211,16 +200,13 @@ class Macro(LineCollection):
             for m in self.used_macro_names:
                 r = macro_definitions[m].resolve(macro_definitions, cdepth + 1)
 
-                # error branch
                 if isinstance(r, List):
-                    r.insert(0, self)
                     if cdepth == 0:
                         mfdglobals.validator.add_error(MaxMacroDepthExceeded(r))
                         return "ERROR"
 
                     return r
 
-                # macro resolved successfully
                 if isinstance(r, str):
                     resolved_macros[m] = r
                     cur_res_depth = macro_definitions[m]._n_resolutions + 1

@@ -145,6 +145,25 @@ class MissingContent(MFDErr):
 
 
 
+class TemplateParamMissing(MFDErr):
+    """Template requires a param that has no default and was not provided."""
+
+    def __init__(self, template_name: str, param_name: str, lineno: int = -1):
+        self.errtype = ErrType.SYNTAX
+        msg = f"Template '{template_name}' requires param '{param_name}' but it has no default and was not provided at invocation."
+        helpmsg = "Provide the param at invocation, e.g. @<template_name param={value}"
+        super().__init__(type(self).__name__, msg, helpmsg)
+        self.template_name = template_name
+        self.param_name = param_name
+        self.lineno = lineno
+
+    def get_head_lineno(self) -> int:
+        return self.lineno
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return (self.lineno, self.lineno)
+
+
 class MaxMacroDepthExceeded(MFDErr):
     lineno_all_flat: List[int]  # list of ALL involved line no's
     lineno_all_2d: List[List[int]]  # list of all involved line no's, split by macro

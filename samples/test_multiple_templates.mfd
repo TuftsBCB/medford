@@ -1,0 +1,34 @@
+@MEDFORD description
+@MEDFORD-Version 1.0
+
+# Template 1: contributor from Tufts
+@>contrib_tufts name={Alva Couch} dept={Engineering}
+>@contributor {name}
+>@contributor-institution Tufts University
+>@contributor-department {dept}
+
+# Template 2: contributor from MIT
+@>contrib_mit name dept
+>@contributor {name}
+>@contributor-institution MIT
+>@contributor-department {dept}
+
+# Template 3: simple contributor with default name
+@>contrib_simple name={Anonymous}
+>@contributor {name}
+>@contributor-association None
+
+# Use template 1 with custom args
+@<contrib_tufts name={Bob Smith} dept={Computer Science}
+
+# Use template 2 with required args
+@<contrib_mit name={Alice Jones} dept={Biology}
+
+# Use template 1 with defaults only
+@<contrib_tufts
+
+# Use template 3 with default
+@<contrib_simple
+
+# Use template 3 with custom name
+@<contrib_simple name={Carol Chen}

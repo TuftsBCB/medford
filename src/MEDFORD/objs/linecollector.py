@@ -138,11 +138,8 @@ class LineCollector:
             #   to handle macro stuff
             if state == "macro":
                 headline = line_collection[0]
-                extralines = None
-                if len(line_collection) > 1:
-                    extralines = line_collection[1:]
-
-                m = Macro(headline, extralines)
+                # Simple macros are single-line only; ignore any continue lines
+                m = Macro(headline, None)
                 self.defined_macros[m.name] = m
 
             elif state == "comment":
@@ -217,3 +214,4 @@ class LineCollector:
 
     def get_include_lines(self) -> List[IncludeLine]:
         return self.include_lines
+        
