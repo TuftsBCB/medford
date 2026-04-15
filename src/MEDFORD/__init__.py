@@ -361,6 +361,12 @@ class MFD:
     def _get_line_objects(cls, filename: str) -> List[Line]:
         with open(filename, "r", encoding="utf-8") as f:
             raw_lines = f.readlines()
+        
+        # Previously, the parser wasn't handling the underscores infront of
+        # the @__BUILD_DATE tag correctly, causing it to crash on re-compilation
+        # Strip any @__BUILD_DATE lines so that re-compiling an --out file
+        # does not crash the parser (the tag is re-written by OutWriter).
+        raw_lines = [ln for ln in raw_lines if not ln.lstrip().startswith("@__BUILD_DATE")]
         expanded_lines = expand_templates(raw_lines)
         object_lines = []
         for idx, line in enumerate(expanded_lines):
