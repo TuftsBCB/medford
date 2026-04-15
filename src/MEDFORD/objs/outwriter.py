@@ -1,5 +1,6 @@
 # src/MEDFORD/objs/outwriter.py
 
+import datetime
 from typing import Dict, Optional, Any, List
 
 
@@ -50,6 +51,10 @@ class OutWriter:
 
         return "\n".join(lines)
 
+    def _is_build_date_block(self, block: Any) -> bool:
+        tokens = getattr(block, "major_tokens", None)
+        return bool(tokens and len(tokens) == 1 and tokens[0] == "__BUILD_DATE")
+
     def write_blocks(
         self,
         blocks: List[Any],
@@ -65,6 +70,11 @@ class OutWriter:
         - Then write block
         - Finally write trailing comments
         """
+        # Remove any pre-existing @__BUILD_DATE block so it is not duplicated on recompilation
+        blocks = [b for b in blocks if not self._is_build_date_block(b)]
+        # Generate UTC datetime string
+        build_date = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
         comments = list(getattr(self.line_collector, "comments", []) or [])
 
         def _cln(x: Any) -> int:
@@ -105,11 +115,14 @@ class OutWriter:
 
             def write_block_text(text: str):
                 """"
-                Splits a block's text on newlines and writes each line 
+                Splits a block's text on newlines and writes each line
                 separately to preserve blank lines and how we track them for sep() purposes.
                 """
                 for line in text.splitlines():
                     write_line(line)
+
+            # Put  build date as the very first tag in at the top of the file
+            write_line(f"@__BUILD_DATE {build_date}")
 
             for b in blocks:
                 b_start = self._block_start_lineno(b)

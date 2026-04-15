@@ -26,6 +26,14 @@ def _normalize(s: str) -> str:
     lines = [ln.rstrip() for ln in s.strip().splitlines()]
     return "\n".join(lines)
 
+
+def _normalize_no_builddate(s: str) -> str:
+    """Like _normalize but strips @__BUILD_DATE lines so idempotency checks
+    are not broken by the timestamp changing between runs."""
+    lines = [ln.rstrip() for ln in s.strip().splitlines()
+             if not ln.startswith("@__BUILD_DATE")]
+    return "\n".join(lines)
+
 # --- tests -----------------------------------------------------
 
 # Test that --out creates a file with content
@@ -56,8 +64,8 @@ def test_out_writes_file(tmp_path):
     text = out_path.read_text(encoding="utf-8")
     assert text.strip() != "", "output file is unexpectedly empty"
 
-    # (Optional) sanity check: first line still looks MEDFORD-y
-    assert text.splitlines()[0].startswith("@MEDFORD")
+    # check: first line is the build date tag
+    assert text.splitlines()[0].startswith("@__BUILD_DATE")
 
 
 # Tests that --out is idempotent with a small file (compiling the output file again produces the same file)
@@ -90,8 +98,9 @@ def test_out_idempotent_smallfile(tmp_path):
     # Read the output file after the second run
     final_text = out_path.read_text(encoding="utf-8")
 
-    # Assert: The content remains unchanged after the second run
-    assert _normalize(first_run) == _normalize(final_text), "Output file content changed after second run"
+    # Content (excluding the build date, which changes each run) is unchanged after the second run
+    assert _normalize_no_builddate(first_run) == _normalize_no_builddate(final_text), \
+        "Output file content changed after second run"
 
 # Tests that --out is idempotent with a large file (compiling the output file again produces the same file)
 def test_out_idempotent_largefile(tmp_path):
@@ -118,8 +127,9 @@ def test_out_idempotent_largefile(tmp_path):
     # Read the output file after the second run
     final_text = out_path.read_text(encoding="utf-8")
 
-    # Assert: The content remains unchanged after the second run
-    assert _normalize(first_run) == _normalize(final_text), "Output file content changed after second run"
+    # Content (excluding the build date, which changes each run) is unchanged after the second run
+    assert _normalize_no_builddate(first_run) == _normalize_no_builddate(final_text), \
+        "Output file content changed after second run"
 
 # Tests for invalid --out path handling
 def test_out_invalid_path(tmp_path):
@@ -159,11 +169,11 @@ def test_out_with_macros(tmp_path):
         `@reef_photo REEF_X_PHOTO_
 
         # Call the macros
-        @Photo `@{reef_photo}01
+        @Photo `{reef_photo}01
 
-        @Photo `@{reef_photo}02
+        @Photo `{reef_photo}02
 
-        @Photo `@{reef_photo}03
+        @Photo `{reef_photo}03
         """
 
     input_path = tmp_path / "input_with_macros.mfd"
@@ -196,11 +206,11 @@ def test_out_with_macros_idempotent(tmp_path):
         `@reef_photo REEF_X_PHOTO_
 
         # Call the macros
-        @Photo `@{reef_photo}01
+        @Photo `{reef_photo}01
 
-        @Photo `@{reef_photo}02
+        @Photo `{reef_photo}02
 
-        @Photo `@{reef_photo}03
+        @Photo `{reef_photo}03
         """
 
     input_path = tmp_path / "input_with_macros.mfd"
@@ -222,5 +232,74 @@ def test_out_with_macros_idempotent(tmp_path):
 
     final_text = out_path.read_text(encoding="utf-8")
 
-    # Assert: The content remains unchanged after the second run
-    assert _normalize(first_run) == _normalize(final_text), "Output file content changed after second run with macros"
+    # Content (excluding the build date, which changes each run) is unchanged after the second run
+    assert _normalize_no_builddate(first_run) == _normalize_no_builddate(final_text), \
+        "Output file content changed after second run with macros"
+
+
+# Tests that --out writes @__BUILD_DATE as the first line with a UTC timestamp
+def test_out_build_date_present(tmp_path):
+    sample = textwrap.dedent("""\
+        @MEDFORD description
+        @MEDFORD-Version 1.0
+
+        @Title Build Date Test
+        @Contributor Jane Doe
+    """)
+
+    input_path = tmp_path / "input.mfd"
+    input_path.write_text(sample, encoding="utf-8")
+    out_path = tmp_path / "out.mfd"
+
+    code, _, stderr = _run_medford_compile(input_path, str(out_path))
+    assert code == 0, f"compile failed:\n{stderr}"
+
+    lines = out_path.read_text(encoding="utf-8").splitlines()
+
+    # First line must be the build date tag
+    assert lines[0].startswith("@__BUILD_DATE"), \
+        f"Expected @__BUILD_DATE as first line, got: {lines[0]!r}"
+
+    # The build date line must end with " UTC"
+    assert lines[0].endswith("UTC"), \
+        f"Build date line does not end with UTC: {lines[0]!r}"
+
+
+# Tests that re-compiling an --out file replaces the old build date rather than duplicating it
+def test_out_build_date_overwritten(tmp_path):
+    import time
+
+    sample = textwrap.dedent("""\
+        @MEDFORD description
+        @MEDFORD-Version 1.0
+
+        @Title Overwrite Test
+        @Contributor Jane Doe
+    """)
+
+    input_path = tmp_path / "input.mfd"
+    input_path.write_text(sample, encoding="utf-8")
+    out_path = tmp_path / "out.mfd"
+
+    # First compile
+    code1, _, stderr1 = _run_medford_compile(input_path, str(out_path))
+    assert code1 == 0, f"first compile failed:\n{stderr1}"
+    first_date_line = out_path.read_text(encoding="utf-8").splitlines()[0]
+
+    # Adding some delay so the timestamp is guaranteed to differ
+    time.sleep(1.1)
+
+    # Second compile using the output of the first compile as input
+    code2, _, stderr2 = _run_medford_compile(out_path, str(out_path))
+    assert code2 == 0, f"second compile failed:\n{stderr2}"
+
+    text = out_path.read_text(encoding="utf-8")
+    build_date_lines = [ln for ln in text.splitlines() if ln.startswith("@__BUILD_DATE")]
+
+    # Only one build date tag must exist
+    assert len(build_date_lines) == 1, \
+        f"Expected exactly 1 @__BUILD_DATE line, found {len(build_date_lines)}: {build_date_lines}"
+
+    # The date must have been updated
+    assert build_date_lines[0] != first_date_line, \
+        "Build date was not updated on recompilation"
