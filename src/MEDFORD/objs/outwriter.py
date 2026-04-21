@@ -19,6 +19,8 @@ class OutWriter:
 
         @<MAJOR> <header_value>
         @<MAJOR>-<minor> <content>
+
+        If ``resolved_macros`` is set, backtick macro uses in values are expanded; otherwise raw text is used.
         """
         # Major tag name
         if getattr(block, "major_tokens", None):
@@ -58,6 +60,8 @@ class OutWriter:
     ) -> None:
         """
         Writes blocks to `path`, inserting comments in approximate original positions.
+
+        ``resolved_macros`` is forwarded to ``render_block`` so emitted detail text can show expanded macros.
 
         Strategy:
         - Sort comments by line number (best effort)

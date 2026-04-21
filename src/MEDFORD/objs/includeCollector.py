@@ -314,8 +314,9 @@ class IncludeCollector:
     
     def expand_macros_in_includes(self, include_lines: List[IncludeLine]) -> List:
         """Process includes and return blocks.
-        
-        Note: Macro expansion is handled by Dictionizer later in the pipeline.
+
+        Included files expand their own macros inside ``parse_file`` before blocks are built;
+        the main file still uses ``Dictionizer`` for its macro definitions.
         """
         return self.process_includes(include_lines)
     
