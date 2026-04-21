@@ -46,6 +46,7 @@ class LineCollection:
         headline: Union[MacroLine, NovelDetailLine, AtAtLine],
         extralines: Optional[List[ContinueLine]],
     ):
+        """Attach headline and continuation lines; set ``has_macros`` / ``used_macro_names`` from macro references."""
         self.headline = headline
         self.extralines = extralines
 
@@ -155,10 +156,12 @@ class Macro(LineCollection):
     MAX_DEPTH: int = 10
 
     def __init__(self, headline: MacroLine, extralines: Optional[List[ContinueLine]]):
+        """Build a macro from its definition line (and optional continuations); ``name`` comes from the headline."""
         super(Macro, self).__init__(headline, extralines)
         self.name = headline.macro_name
 
     def get_raw_content(self) -> str:
+        """Return the macro body as written in the file, without resolving nested macro references."""
         outstr = self.headline.raw_content
         if self.extralines is not None:
             for el in self.extralines:
@@ -168,18 +171,20 @@ class Macro(LineCollection):
     def resolve(
         self, macro_definitions: Dict[str, "Macro"], depth: Optional[int] = None
     ) -> Union[str, List["Macro"]]:
+        """Expand this macro to a string, recursively substituting any macros it references.
+
+        Uses ``macro_definitions`` for nested bodies, enforces a maximum nesting depth, and
+        caches the result on this object when resolution succeeds. On depth violation, records
+        a validation error and may return the string ``ERROR`` or a list of macros for the caller to report.
+        """
         if depth is None:
             cdepth: int = 0
         else:
             cdepth: int = depth
 
-<<<<<<< HEAD
-=======
         # debug print
-        #print(self.name)
-        #print(cdepth)
-
->>>>>>> origin/dev
+        # print(self.name)
+        # print(cdepth)
         if self._is_resolved:
             return self.resolution
 
@@ -236,6 +241,7 @@ class Macro(LineCollection):
         raise ValueError("Somehow has_macros is True but used_macro_names is None.")
 
     def _get_resolution_chain(self) -> List["Macro"]:
+        """Return this macro and the deepest nested macro involved in its resolution (for error messages)."""
         tmp: List["Macro"] = [self]
         if self._deepest_res_macro is not None:
             tmp.append(self._deepest_res_macro)
@@ -315,6 +321,7 @@ class Detail(LineCollection):
         return out
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str:
+        """Return this detail's text with macro placeholders replaced using ``resolved_macros``."""
         if mfdglobals.debug:
             print("\n=== get_content called ===", file=sys.stderr)
             print(f"Major tokens: {self.major_tokens}", file=sys.stderr)
@@ -411,6 +418,7 @@ class Block:
     atats: List[str]
 
     def __init__(self, details: List[Detail]):
+        """Build one block from its details and collect distinct macro names used in any detail."""
         if len(details) == 0:
             raise ValueError("Attempted to create a block with no details.")
 

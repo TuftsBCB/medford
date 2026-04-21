@@ -359,6 +359,7 @@ class MFD:
                     sys.exit(1)
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line]:
+        """Read the file, apply multi-line template macro expansion, then return parsed ``Line`` objects."""
         with open(filename, "r", encoding="utf-8") as f:
             raw_lines = f.readlines()
         expanded_lines = expand_templates(raw_lines)
@@ -394,6 +395,7 @@ class MFD:
     def _get_dictionizer(
         cls, macro_definitions: Dict[str, Macro], name_dictionary: Dict[str, Block]
     ) -> Dictionizer:
+        """Build a dictionizer that resolves ``macro_definitions`` and can expand macro uses in block metadata."""
         return Dictionizer(macro_definitions, name_dictionary)
 
 
