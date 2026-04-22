@@ -1,9 +1,18 @@
 import re, datetime
 from pprint import pprint
 from urllib.parse import urlparse
+import yaml
 import MEDFORD.mfdglobals as mfdglobals
 mfdglobals.init()
 __DEBUG__ = mfdglobals.debug
+
+# Primitive type names that can be validated directly.
+# Any type name starting with a capital letter is a complex/structured type
+# (e.g. Contributor, Institution) and should be ignored at this level.
+_PRIMITIVE_TYPES = {"string", "text", "email", "uri", "phone", "number", "integer", "date"}
+
+# Allow "string" as an alias for the "text" validator method.
+_TYPE_ALIASES = {"string": "text"}
 
 
 class Validator:
@@ -14,9 +23,8 @@ class Validator:
 
     # The instance of Validator keeps track of which labels have been seen.
     # This allows cross-label validations including errant duplications.
-    # The validator is driven off of a text file in "Medford Validator Format"
-    # (extension .mvd).
-    def __init__(self, filename="medford.mvd"):
+    # The validator is driven off of a YAML file (medford.yaml).
+    def __init__(self, filename="medford.yaml"):
         """Initialize a Validator instance.
         This includes setting up initial structures of tags that have
         been seen.
@@ -27,41 +35,47 @@ class Validator:
         self.file_references = {}
         self.validation_errors = []
 
-        # Read MEDFORD validator file
-        # This is a very simple list of Tags and functions to call, in order,
-        # with arguments inline.
+        # Read MEDFORD YAML validator spec.
+        # Format:
+        #   TagName:
+        #     type: <typename>        # string | text | email | uri | phone | number | integer | date
+        #                             # Capitalized types (e.g. Contributor) are skipped.
+        #   "*-URI":                  # wildcard: matches any tag whose minor token is URI
+        #     type: uri
         with open(filename, "r") as f:
-            for line in f:
-                line = line.rstrip()
-                # print("line = '{}'".format(line))
+            spec = yaml.safe_load(f)
 
-                # skip blank lines
-                if re.match("^\\s*$", line):
-                    continue
-                # skip comment lines
-                if re.match("^\\s*#", line):
-                    continue
-                stuff = line.split(" ", maxsplit=1)
-                # skip lines that contain a tag without any validation
-                # functions.
-                if len(stuff) < 2:
-                    print("line {}: no validation functions found.".format(line))
-                    continue
+        if spec is None:
+            spec = {}
+
+        for tag, rules in spec.items():
+            if not isinstance(rules, dict):
+                print("Skipping tag '{}': expected a mapping of rules.".format(tag))
+                continue
+
+            # Process each rule key.  The most common key is "type"; the
+            # comparison operators (gt, lt, ge, le, eq) may also appear.
+            for key, val in rules.items():
+                # Translate symbolic operators to canonical names
+                canon_key = self.translations.get(key, key)
+
+                if canon_key == "type":
+                    type_name = str(val)
+                    # Skip complex/structured types (e.g. Contributor)
+                    if type_name and type_name[0].isupper():
+                        continue
+                    method = _TYPE_ALIASES.get(type_name, type_name)
+                    entry = [method]
                 else:
-                    tag = stuff[0]  # hardcoded HERE
-                    rule = stuff[1]
-                    parts = rule.split(",")
-                    # pprint(parts)
-                    for p in parts:
-                        p = p.strip().rstrip()
-                        one = re.split("\\s+", p)
-                        # translate numerical operators to canonical names
-                        if one[0] in self.translations:
-                            one[0] = self.translations[one[0]]
-                        if tag in self.validators:
-                            self.validators[tag].append(list(one))
-                        else:
-                            self.validators[tag] = [one]
+                    # Comparison validator: e.g. gt: 0  →  ["gt", "0"]
+                    method = canon_key
+                    entry = [method, str(val)]
+
+                if tag in self.validators:
+                    self.validators[tag].append(entry)
+                else:
+                    self.validators[tag] = [entry]
+
         if __DEBUG__:
             pprint(self.validators)
 
@@ -248,6 +262,14 @@ class Validator:
             return None
         except ValueError:
             return "Value '{}' is not an integer".format(value)
+
+    def phone(self, tag, value, *args):
+        digits = re.sub(r"[\s\(\)\-\.\+]", "", value)
+        if not digits.isdigit():
+            return f"Invalid phone number (non-numeric characters): '{value}'"
+        if not (7 <= len(digits) <= 15):
+            return f"Invalid phone number (must be 7–15 digits): '{value}'"
+        return None
 
     def uri(self, tag, value, *args):
         if __DEBUG__:
