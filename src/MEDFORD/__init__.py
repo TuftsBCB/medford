@@ -8,7 +8,7 @@ from typing import List, Dict
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from enum import Enum
-from pathlib import PurePath  # ?
+from pathlib import Path, PurePath  # ?
 
 from .objs.linereader import LineReader, Line
 from .objs.linecollector import LineCollector, Macro, Block
@@ -187,10 +187,10 @@ class MFD:
         self.base_dir = base_dir
         self.write_json = write_json
         self.output_path = output_path
-        self.validatorFile = "medford.mvd"
+        self.validatorFile = "medford.yaml"
 
         try:
-            self.validator = Validator("medford.mvd")  # No ValidationData needed for now
+            self.validator = Validator("medford.yaml")
         except FileNotFoundError:
             print("Warning: medford.mvd validation file not found. Skipping validation.")
             self.validator = None
@@ -211,8 +211,8 @@ class MFD:
         self.blocks = self.line_collector.get_flat_blocks()
         self.named_blocks = self.line_collector.get_1lvl_blocks()
 
-        # Cross-tag reference validation (stage 3)
-        crossref_validator = CrossRefValidator(self.line_collector.named_blocks)
+        # Cross-tag reference validation (stage 3) TODO might need to fix file path to yaml file
+        crossref_validator = CrossRefValidator(self.line_collector.named_blocks, yaml_path=str(Path(__file__).parent.parent.parent / "medford.yaml"))
         crossref_validator.validate()
 
         # stop here and check for syntax errors

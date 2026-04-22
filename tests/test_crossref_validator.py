@@ -11,7 +11,11 @@ from MEDFORD.objs.crossref_validator import CrossRefValidator
 from MEDFORD.objs.linecollections import Block, Detail
 from MEDFORD.objs.linereader import LineReader, Line
 from MEDFORD.objs.linecollector import LineCollector
-from MEDFORD.submodules.mfdvalidator.errors import MissingCrossReferenceError
+from MEDFORD.submodules.mfdvalidator.errors import (
+    MissingCrossReferenceError,
+    MissingRequiredCrossRefSubtag,
+    MissingDesirableCrossRefSubtag,
+)
 
 
 def lines_to_named_blocks(lines: list[str]) -> dict:
@@ -58,9 +62,6 @@ class TestCrossRefValidator:
         assert mfdglobals.validator.has_syntax_err()
 
     def test_local_override_no_error(self):
-        # This test simulates a block that has local contributor details
-        # In practice, the MEDFORD parser may not support @Paper-Contributor-Email syntax
-        # but the validator logic handles it if those minor tokens exist
         validator = CrossRefValidator({})
 
         # Test the _has_local_subtags method directly
@@ -183,6 +184,96 @@ class TestCrossRefValidator:
         result = validator.validate()
 
         assert result is True
+        assert not mfdglobals.validator.has_syntax_err()
+
+
+class TestCrossRefValidatorWithConfig:
+    """Tests for Required/Desirable/Optional cross-reference"""
+
+    def setup_method(self):
+        mfdglobals.ForceNewValidator()
+
+    def test_required_crossref_absent_is_error(self):
+        # Paper.publisher is Required (Type: Institution) in medford.yaml
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Journal Nature",
+            # No @Paper-publisher line
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert mfdglobals.validator.has_other_err()
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_desirable_crossref_absent_is_warning(self):
+        lines = [
+            "@Contributor John Smith",
+            "@Contributor-Email john@example.com",
+            # No @Contributor-Institution line
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert mfdglobals.validator.has_other_err()
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_optional_crossref_absent_is_silent(self):
+        lines = [
+            "@Paper My Paper",
+            # No @Paper-author line
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        # publisher is Required, so we do expect an other_err for that.
+        # author absence should NOT add a separate error on top of publisher's.
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_bad_reference_always_syntax_error(self):
+        # cross-ref subtag present but points to nonexistent block
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Contributor Nonexistent Person",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert mfdglobals.validator.has_syntax_err()
+
+    def test_required_crossref_present_and_valid_no_error(self):
+        lines = [
+            "@Institution MIT",
+            "@Institution-address 77 Massachusetts Ave",
+            "@Paper My Paper",
+            "@Paper-publisher MIT",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert not mfdglobals.validator.has_syntax_err()
+        assert not mfdglobals.validator.has_other_err()
+
+    def test_no_config_no_missing_subtag_checks(self):
+        lines = [
+            "@Paper My Paper",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        validator.validate()
+
+        assert not mfdglobals.validator.has_other_err()
         assert not mfdglobals.validator.has_syntax_err()
 
 

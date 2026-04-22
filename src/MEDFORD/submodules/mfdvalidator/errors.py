@@ -459,3 +459,93 @@ class MissingCrossReferenceError(MFDErr):
 
     def get_lineno_range(self) -> Tuple[int, int]:
         return self.lineno_range
+
+
+class MissingRequiredCrossRefSubtag(MFDErr):
+    def __init__(self, block, major_token: str, subtag_name: str, ref_type: str,
+                 available_names: List[str]):
+        self.errtype = ErrType.MISSING_CONTENT
+
+        from MEDFORD.objs.linecollections import Block
+        if not isinstance(block, Block):
+            raise ValueError("MissingRequiredCrossRefSubtag requires a Block object.")
+
+        self.block = block
+        self.major_token = major_token
+        self.subtag_name = subtag_name
+        self.ref_type = ref_type
+        self.available_names = available_names
+
+        linenos = block.head_detail.get_linenos()
+        self.lineno_all = linenos
+        self.lineno_range = (min(linenos), max(linenos))
+        self.lineno_head = self.lineno_range[0]
+
+        message = (
+            f"Line {self.lineno_head}: @{major_token} '{block.name}' is missing required "
+            f"@{major_token}-{subtag_name} (references @{ref_type})."
+        )
+
+        if available_names:
+            helpmsg = (
+                f"Add a line like: @{major_token}-{subtag_name} <{ref_type} name>\n"
+                f"Available @{ref_type} blocks: {', '.join(available_names)}."
+            )
+        else:
+            helpmsg = (
+                f"Add a line like: @{major_token}-{subtag_name} <{ref_type} name>\n"
+                f"No @{ref_type} blocks are defined yet. First add: @{ref_type} <name>"
+            )
+
+        super().__init__(type(self).__name__, message, helpmsg)
+
+    def get_head_lineno(self) -> int:
+        return self.lineno_head
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return self.lineno_range
+
+
+class MissingDesirableCrossRefSubtag(MFDErr):
+    def __init__(self, block, major_token: str, subtag_name: str, ref_type: str,
+                 available_names: List[str]):
+        self.errtype = ErrType.OTHER
+
+        from MEDFORD.objs.linecollections import Block
+        if not isinstance(block, Block):
+            raise ValueError("MissingDesirableCrossRefSubtag requires a Block object.")
+
+        self.block = block
+        self.major_token = major_token
+        self.subtag_name = subtag_name
+        self.ref_type = ref_type
+        self.available_names = available_names
+
+        linenos = block.head_detail.get_linenos()
+        self.lineno_all = linenos
+        self.lineno_range = (min(linenos), max(linenos))
+        self.lineno_head = self.lineno_range[0]
+
+        message = (
+            f"Line {self.lineno_head}: @{major_token} '{block.name}' is missing desirable "
+            f"@{major_token}-{subtag_name} (references @{ref_type})."
+        )
+
+        if available_names:
+            helpmsg = (
+                f"Consider adding: @{major_token}-{subtag_name} <{ref_type} name>\n"
+                f"Available @{ref_type} blocks: {', '.join(available_names)}."
+            )
+        else:
+            helpmsg = (
+                f"Consider adding: @{major_token}-{subtag_name} <{ref_type} name>\n"
+                f"No @{ref_type} blocks are defined."
+            )
+
+        super().__init__(type(self).__name__, message, helpmsg)
+
+    def get_head_lineno(self) -> int:
+        return self.lineno_head
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return self.lineno_range
