@@ -19,7 +19,7 @@ Repository = "https://github.com/TuftsBCB/medford"
 [project.scripts]
 medford = "MEDFORD:parse_args_and_go"
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "pytest>=8.4.1",
 ]
