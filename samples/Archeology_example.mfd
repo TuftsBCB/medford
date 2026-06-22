@@ -1,0 +1,68 @@
+@MEDFORD MEDFORD file modeling an archaeologist and excavation
+@MEDFORD-Version 1.0
+
+@Contributor Sir Arthur John Evans
+@Contributor-Role Principal excavator, Director
+@Contributor-Association British School at Athens
+@Contributor-Note Keeper of the Ashmolean Museum, Oxford, 1884-1908
+@Contributor-Note Coined the term "Minoan" for the Bronze Age civilisation of Crete
+@Contributor-Note Born 1851, Nash Mills, Hertfordshire, England; died 1941
+@Contributor-Funding Self-financed through inherited family wealth (Dickinson paper mills)
+
+@Contributor Duncan Mackenzie
+@Contributor-Role Field supervisor; kept the excavation daybooks
+@Contributor-Association British School at Athens
+
+@Contributor Theodore Fyfe
+@Contributor-Role Architect; recording of building and finds; early conservation shelter
+
+@Contributor Manolis Akoumianakis
+@Contributor-Role Local foreman
+@Contributor-Note Known as "Manolaki"
+
+
+@Site Knossos
+@Site-Location Kephala hill, ~5 km (3 mi) south of Heraklion, Crete, Greece
+@Site-Type Minoan palace complex ("Palace of Minos")
+@Site-Period Neolithic through Late Bronze Age (occupied to ~1350 BCE)
+@Site-Note First palace built ~1900 BCE; rebuilt after destruction ~1700 BCE
+@Site-Note Earlier trial trenches dug by Minos Kalokairinos in 1878-1879
+
+
+@Excavation Knossos main excavation
+@Excavation-Director @Contributor{Sir Arthur John Evans}
+@Excavation-StartDate 1900-03-23
+@Excavation-StartDate-Note Most scholarly sources give 23 March 1900; some give 16 March 1900
+@Excavation-EndDate 1905
+@Excavation-EndDate-Note Core excavation took ~4-6 seasons; Evans continued restoration/study at the site until the 1930s
+@Excavation-Method Open-area excavation with large local labour force
+@Excavation-Permit Acquired 1900 after Crete's independence from Ottoman rule
+
+
+@Find Throne Room
+@Find-Date 1900-04
+@Find-Note Room with a throne against the wall, uncovered within weeks of starting
+
+@Find Linear B tablets
+@Find-Type Inscribed clay tablets
+@Find-Count ~3000 (across the campaign)
+@Find-Note Script later named Linear B; Evans also defined Linear A and a pictographic script
+
+@Find Frescoes
+@Find-Type Wall paintings
+@Find-Note Motifs include bull-leaping, double axes, women with snakes
+
+@Find Material assemblage
+@Find-Type Pottery, sealings, figurines, stone vessels, metal objects
+
+
+@Paper The Palace of Minos at Knossos
+@Paper-Author @Contributor{Sir Arthur John Evans}
+@Paper-Type Excavation report (6 volumes)
+@Paper-Note Primary publication of the Knossos excavations
+
+
+@Data Sir Arthur Evans Archive
+@Data-Repository Ashmolean Museum, Oxford
+@Data-Note Includes excavation notebooks, photographs, and drawings
+@Data-Note Mackenzie's daybooks are the principal day-to-day field record
