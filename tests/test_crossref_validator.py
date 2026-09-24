@@ -1,0 +1,360 @@
+"""Tests for cross-reference validation (stage 3)."""
+
+import pytest
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+
+from MEDFORD import mfdglobals
+from MEDFORD.objs.crossref_validator import CrossRefValidator
+from MEDFORD.objs.linecollections import Block, Detail
+from MEDFORD.objs.linereader import LineReader, Line
+from MEDFORD.objs.linecollector import LineCollector
+from MEDFORD.submodules.mfdvalidator.errors import (
+    MissingCrossReferenceError,
+    MissingRequiredCrossRefSubtag,
+    MissingDesirableCrossRefSubtag,
+)
+
+
+def lines_to_named_blocks(lines: list[str]) -> dict:
+    line_objs = []
+    for idx, line in enumerate(lines):
+        obj = LineReader.process_line(line, idx)
+        if obj is not None:
+            line_objs.append(obj)
+
+    lc = LineCollector(line_objs)
+    return lc.named_blocks
+
+
+class TestCrossRefValidator:
+    def setup_method(self):
+        mfdglobals.ForceNewValidator()
+
+    def test_valid_contributor_reference(self):
+        lines = [
+            "@Contributor John Smith",
+            "@Contributor-Email john@example.com",
+            "@Paper My Paper",
+            "@Paper-Contributor John Smith",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is True
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_invalid_contributor_reference(self):
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Contributor Jane Doe",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is False
+        assert mfdglobals.validator.has_syntax_err()
+
+    def test_local_override_no_error(self):
+        validator = CrossRefValidator({})
+
+        # Test the _has_local_subtags method directly
+        minor_tokens = ["Contributor", "Contributor-Email"]
+        result = validator._has_local_subtags(minor_tokens, "Contributor")
+
+        assert result is True
+
+    def test_valid_institution_reference(self):
+        lines = [
+            "@Institution Tufts",
+            "@Institution-Address Medford, MA",
+            "@Paper My Paper",
+            "@Paper-Institution Tufts",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is True
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_invalid_institution_reference(self):
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Institution Unknown University",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is False
+        assert mfdglobals.validator.has_syntax_err()
+
+    def test_institution_local_override(self):
+        validator = CrossRefValidator({})
+
+        # Test the _has_local_subtags method directly
+        minor_tokens = ["Institution", "Institution-Address"]
+        result = validator._has_local_subtags(minor_tokens, "Institution")
+
+        assert result is True
+
+    def test_skip_contributor_block_itself(self):
+        lines = [
+            "@Contributor John Smith",
+            "@Contributor-Email john@example.com",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is True
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_multiple_references_some_invalid(self):
+        lines = [
+            "@Contributor John Smith",
+            "@Paper Paper 1",
+            "@Paper-Contributor John Smith",
+            "@Paper Paper 2",
+            "@Paper-Contributor Jane Doe",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is False
+        assert mfdglobals.validator.has_syntax_err()
+
+    def test_collect_major_tags(self):
+        lines = [
+            "@Contributor John Smith",
+            "@Contributor Jane Doe",
+            "@Institution Tufts",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        validator._collect_major_tags()
+
+        assert validator.defined_contributors == {"John Smith", "Jane Doe"}
+        assert validator.defined_institutions == {"Tufts"}
+
+    def test_has_local_subtags_true(self):
+        validator = CrossRefValidator({})
+
+        minor_tokens = ["Contributor", "Contributor-Email", "Link"]
+        result = validator._has_local_subtags(minor_tokens, "Contributor")
+
+        assert result is True
+
+    def test_has_local_subtags_false(self):
+        validator = CrossRefValidator({})
+
+        minor_tokens = ["Contributor", "Link", "DOI"]
+        result = validator._has_local_subtags(minor_tokens, "Contributor")
+
+        assert result is False
+
+    def test_empty_named_blocks(self):
+        named_blocks = {}
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is True
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_no_minor_tokens_block(self):
+        lines = [
+            "@Paper My Paper",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        result = validator.validate()
+
+        assert result is True
+        assert not mfdglobals.validator.has_syntax_err()
+
+
+class TestCrossRefValidatorWithConfig:
+    """Tests for Required/Desirable/Optional cross-reference"""
+
+    def setup_method(self):
+        mfdglobals.ForceNewValidator()
+
+    def test_required_crossref_absent_is_error(self):
+        # Paper.publisher is Required (Type: Institution) in medford.yaml
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Journal Nature",
+            # No @Paper-publisher line
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert mfdglobals.validator.has_other_err()
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_desirable_crossref_absent_is_warning(self):
+        lines = [
+            "@Contributor John Smith",
+            "@Contributor-Email john@example.com",
+            # No @Contributor-Institution line
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert mfdglobals.validator.has_other_err()
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_optional_crossref_absent_is_silent(self):
+        lines = [
+            "@Paper My Paper",
+            # No @Paper-author line
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        # publisher is Required, so we do expect an other_err for that.
+        # author absence should NOT add a separate error on top of publisher's.
+        assert not mfdglobals.validator.has_syntax_err()
+
+    def test_bad_reference_always_syntax_error(self):
+        # cross-ref subtag present but points to nonexistent block
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Contributor Nonexistent Person",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert mfdglobals.validator.has_syntax_err()
+
+    def test_required_crossref_present_and_valid_no_error(self):
+        lines = [
+            "@Institution MIT",
+            "@Institution-address 77 Massachusetts Ave",
+            "@Paper My Paper",
+            "@Paper-publisher MIT",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks, yaml_path="medford.yaml")
+        validator.validate()
+
+        assert not mfdglobals.validator.has_syntax_err()
+        assert not mfdglobals.validator.has_other_err()
+
+    def test_no_config_no_missing_subtag_checks(self):
+        lines = [
+            "@Paper My Paper",
+        ]
+
+        named_blocks = lines_to_named_blocks(lines)
+        validator = CrossRefValidator(named_blocks)
+        validator.validate()
+
+        assert not mfdglobals.validator.has_other_err()
+        assert not mfdglobals.validator.has_syntax_err()
+
+
+class TestMissingCrossReferenceError:
+
+    def setup_method(self):
+        mfdglobals.ForceNewValidator()
+
+    def test_error_message_with_available_names(self):
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Contributor Unknown Person",
+        ]
+
+        line_objs = []
+        for idx, line in enumerate(lines):
+            obj = LineReader.process_line(line, idx)
+            if obj is not None:
+                line_objs.append(obj)
+
+        lc = LineCollector(line_objs)
+
+        paper_block = lc.named_blocks["Paper"]["My Paper"]
+        detail = paper_block.minor_tokens[0][1]  # (minor_token_name, detail)
+
+        error = MissingCrossReferenceError(
+            detail, "Contributor", "Unknown Person", ["John Smith", "Jane Doe"]
+        )
+
+        assert "Line 1" in error.msg
+        assert "@Paper-Contributor" in error.msg
+        assert "Unknown Person" in error.msg
+        assert "@Contributor" in error.msg
+        assert "John Smith" in error.helpmsg
+        assert "Jane Doe" in error.helpmsg
+
+    def test_error_message_without_available_names(self):
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Contributor Unknown Person",
+        ]
+
+        line_objs = []
+        for idx, line in enumerate(lines):
+            obj = LineReader.process_line(line, idx)
+            if obj is not None:
+                line_objs.append(obj)
+
+        lc = LineCollector(line_objs)
+
+        # Get the detail from the block
+        paper_block = lc.named_blocks["Paper"]["My Paper"]
+        detail = paper_block.minor_tokens[0][1]
+
+        error = MissingCrossReferenceError(
+            detail, "Contributor", "Unknown Person", []
+        )
+
+        assert "No @Contributor blocks are defined" in error.helpmsg
+
+    def test_error_lineno_methods(self):
+        lines = [
+            "@Paper My Paper",
+            "@Paper-Contributor Unknown Person",
+        ]
+
+        line_objs = []
+        for idx, line in enumerate(lines):
+            obj = LineReader.process_line(line, idx)
+            if obj is not None:
+                line_objs.append(obj)
+
+        lc = LineCollector(line_objs)
+
+        # Get the detail from the block
+        paper_block = lc.named_blocks["Paper"]["My Paper"]
+        detail = paper_block.minor_tokens[0][1]
+
+        error = MissingCrossReferenceError(
+            detail, "Contributor", "Unknown Person", []
+        )
+
+        assert error.get_head_lineno() == 1
+        assert error.get_lineno_range() == (1, 1)

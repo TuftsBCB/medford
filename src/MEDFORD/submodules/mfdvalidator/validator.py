@@ -86,7 +86,6 @@ class MedfordValidator(object):
             self._other_err_coll[lineno].append(err)
         else:
             self._other_err_coll[lineno] = [err]
-        print(self._id)
 
     def has_other_err(self):
         return len(self._other_err_coll) > 0
