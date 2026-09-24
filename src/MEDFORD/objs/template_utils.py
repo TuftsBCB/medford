@@ -8,12 +8,15 @@ from dataclasses import dataclass
 
 @dataclass
 class TemplateDef:
+    """One multi-line template macro: name, parameter defaults, and body lines (``>@`` …)."""
+
     name: str
     params: Dict[str, Optional[str]]  # param -> default (None = no default)
     body_lines: List[str]
 
 
 def _strip_comment(s: str) -> str:
+    """Drop a trailing ``#`` comment from a line (used when parsing template directives)."""
     idx = s.find("#")
     return s[:idx].rstrip() if idx >= 0 else s
 

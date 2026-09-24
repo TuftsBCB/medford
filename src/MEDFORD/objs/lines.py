@@ -67,6 +67,7 @@ class ContentMixin:
         poss_tex: List[Tuple[int, int]],
         poss_macro: List[Tuple[int, int, str]],
     ) -> None:
+        """Resolve inline comment vs LaTeX vs macro spans on ``raw_content`` and set ``macro_uses`` when applicable."""
         # adjust to raw_content positions
         self._get_raw_content_offset()
         (poss_com, poss_tex, poss_macro) = self._offset_positions(
@@ -155,6 +156,7 @@ class ContentMixin:
     def recurse_macro_tex_overlap(
         self, poss_macro: List[Tuple[int, int, str]], poss_tex: List[Tuple[int, int]]
     ) -> List[Tuple[int, int, str]]:
+        """Keep macro uses that are not inside a ``$$`` TeX region; drop overlaps."""
         if len(poss_macro) == 0:
             return []
         elif len(poss_tex) == 0:
@@ -175,6 +177,7 @@ class ContentMixin:
             return self.recurse_macro_tex_overlap(poss_macro, poss_tex[1:])
 
     def find_macro_uses(self, poss_macro: List[Tuple[int, int, str]]) -> None:
+        """From candidate macro spans, set ``macro_uses`` (respecting inline comment and TeX boundaries)."""
         ind_last: int = -1
         if self.has_inline:
             for i in range(0, len(poss_macro)):
@@ -198,6 +201,7 @@ class ContentMixin:
                 self.macro_uses = poss_macro[: ind_last + 1]
 
     def replace_macros(self, macro_defs: Dict[str, str]) -> None:
+        """Rewrite ``self.line`` in place by substituting each macro span with ``macro_defs[name]`` (right-to-left)."""
         if not self.has_macros or len(self.macro_uses) == 0:
             raise ValueError("Attempted to replace macros in a line without macros.")
 
@@ -214,6 +218,7 @@ class ContentMixin:
             )
 
     def get_content(self, macro_defs: Dict[str, str], remove_comments=True) -> str:
+        """Return payload text, optionally stripping inline comments, then replacing macro uses with ``macro_defs``."""
         if remove_comments:
             temp_content = self.remove_inline_comment()
         else:
@@ -296,6 +301,7 @@ class MacroLine(ContentMixin, Line):
         poss_tex,
         poss_macro,
     ):
+        """Represents a macro definition line; ``raw_content`` is the defined value (body after the name)."""
         super(MacroLine, self).__init__(lineno, line)
         self.macro_name = macro_name
         self.raw_content = macro_body
@@ -378,6 +384,7 @@ class AtAtLine(NovelDetailLine):
         )
 
     def get_referenced_name(self, macro_defs: Dict[str, str]) -> str:
+        """Referenced block name with macro placeholders expanded using ``macro_defs``."""
         return self.get_content(macro_defs)
 
 

@@ -210,6 +210,7 @@ class LineCollector:
         return tdict
 
     def get_macros(self) -> Dict[str, Macro]:
+        """All simple macros collected from the parse (name → ``Macro``), for resolution and the dictionizer pass."""
         return self.defined_macros
 
     def get_include_lines(self) -> List[IncludeLine]:
