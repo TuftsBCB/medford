@@ -182,9 +182,6 @@ class Macro(LineCollection):
         else:
             cdepth: int = depth
 
-        # debug print
-        # print(self.name)
-        # print(cdepth)
         if self._is_resolved:
             return self.resolution
 
