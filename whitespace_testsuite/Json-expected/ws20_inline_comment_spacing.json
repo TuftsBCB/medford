@@ -1,0 +1,22 @@
+{
+  "MEDFORD": [
+    {
+      "value": "Inline Comment Spacing",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "value": "Alva Couch",
+      "Role": [
+        "Author #lead"
+      ],
+      "Email": [
+        "a@b.edu"
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,7 @@
+@MEDFORD Template Argument Spaces
+@MEDFORD-Version 1.0
+
+@>c name
+>@Contributor {name}
+
+@<c name={Alva   Couch}

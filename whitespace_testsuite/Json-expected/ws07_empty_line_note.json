@@ -1,0 +1,27 @@
+{
+  "MEDFORD": [
+    {
+      "value": "Empty Line Note",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "value": "Alva Couch",
+      "Association": [
+        "Tufts University"
+      ],
+      "Note": [
+        "Line one\nLine two"
+      ],
+      "Role": [
+        "Author"
+      ]
+    },
+    {
+      "value": "Lenore Cowen"
+    }
+  ]
+}

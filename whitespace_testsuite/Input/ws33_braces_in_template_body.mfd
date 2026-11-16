@@ -1,0 +1,11 @@
+@MEDFORD Braces In Template Body
+@MEDFORD-Version 1.0
+
+`@Inst Tufts University
+
+@>c name
+>@Contributor {name}
+>@Contributor-Association `{Inst}
+>@Contributor-Note uses {curly} braces
+
+@<c name={Alva Couch}

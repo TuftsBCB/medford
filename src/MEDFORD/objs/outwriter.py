@@ -39,7 +39,7 @@ class OutWriter:
             else:
                 header_value = block.details[0].get_content(resolved_macros).strip()
 
-        lines.append(f"@{major} {header_value}")
+        lines.append(self._with_comment(f"@{major} {header_value}", block.details[0]))
 
         # Minor details
         if getattr(block, "details", None):
@@ -49,9 +49,14 @@ class OutWriter:
                         content = d.get_raw_content().strip()
                     else:
                         content = d.get_content(resolved_macros).strip()
-                    lines.append(f"@{major}-{d.minor_token} {content}")
+                    lines.append(self._with_comment(f"@{major}-{d.minor_token} {content}", d))
 
         return "\n".join(lines)
+
+    def _with_comment(self, line: str, detail: Any) -> str:
+        """Appends the detail's inline comments, if any, to its --out line."""
+        comment = detail.get_inline_comments() if hasattr(detail, "get_inline_comments") else ""
+        return f"{line} {comment}" if comment else line
 
     def _is_build_date_block(self, block: Any) -> bool:
         tokens = getattr(block, "major_tokens", None)

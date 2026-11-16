@@ -164,3 +164,46 @@ def test_creating_comment_line():
 
 # TODO : add test to check indices of returned regex.
 #           reason: regex returns *were* including space after the regex *sometimes*. That is unacceptable.
+
+
+#################################
+# Tag names                     #
+#################################
+# Major and minor start with a letter (any language) or "_", then letters,
+# digits or "_". A digit can't start either.
+
+
+@pytest.mark.parametrize(
+    "line, majors, minor, content",
+    [
+        ("@a1 value", ["a1"], None, "value"),
+        ("@Contributor2 Alva", ["Contributor2"], None, "Alva"),
+        ("@Contributor-Role2 Author", ["Contributor"], "Role2", "Author"),
+        ("@Last_Name-initial M", ["Last", "Name"], "initial", "M"),
+        ("@Last_Name-first_name Alva", ["Last", "Name"], "first_name", "Alva"),
+        ("@Paper__Primary x", ["Paper", "", "Primary"], None, "x"),
+        ("@_-note value", ["", ""], "note", "value"),
+        ("@Über-Maß 3", ["Über"], "Maß", "3"),
+        ("@Автор-Роль x", ["Автор"], "Роль", "x"),
+        ("@Contributor\tAlva", ["Contributor"], None, "Alva"),
+    ],
+)
+def test_tag_names(line, majors, minor, content):
+    res = LineReader.process_line(line, 0)
+    assert isinstance(res, NovelDetailLine)
+    assert res.major_tokens == majors
+    assert res.minor_token == minor
+    assert res.raw_content == content
+
+
+@pytest.mark.parametrize("line", ["@1a value", "@2Contributor Alva", "email me @ noon"])
+def test_tag_name_cannot_start_with_digit(line):
+    assert isinstance(LineReader.process_line(line, 0), ContinueLine)
+
+
+@pytest.mark.parametrize(
+    "line", ["@Contributor-2Role Author", "@Contributor- x", "@Contributor:x", "@Contributor-Role"]
+)
+def test_tag_name_invalid(line):
+    with pytest.raises(NotImplementedError):
+        LineReader.process_line(line, 0)

@@ -25,21 +25,22 @@ def test_no_contributor(tmpdir) :
     provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
     return
 
-def test_lead_spacing_not_ignored(tmp_path) :
+def test_lead_spacing_ignored(tmp_path) :
     example_content = "\
         @MEDFORD asdf\n\
         @MEDFORD-Version 2.0\n\
         \n\
         @Journal journal\n\
         "
-    
+
     d = tmp_path / "tmp_testfiles"
     d.mkdir()
     tmpfile = d / "only_MEDFORD.mfd"
     tmpfile.write_text(example_content, encoding="utf-8")
 
-    with pytest.raises(ValueError) :
-        provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
+    # Leading whitespace is ignored, so this indented file must validate
+    # Any validation error exits (SystemExit) and fails the test.
+    provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
     return
 #from MEDFORD.medford import provide_args_and_go, ParserMode, OutputMode
 #import pytest
@@ -64,22 +65,4 @@ def test_no_contributor(tmp_path):
     tmpfile.write_text(example_content, encoding="utf-8")
 
     provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
-    return
-
-
-def test_lead_spacing_not_ignored(tmp_path):
-    example_content = "\
-        @MEDFORD asdf\n\
-        @MEDFORD-Version 2.0\n\
-        \n\
-        @Journal journal\n\
-        "
-
-    d = tmp_path / "tmp_testfiles"
-    d.mkdir()
-    tmpfile = d / "only_MEDFORD.mfd"
-    tmpfile.write_text(example_content, encoding="utf-8")
-
-    with pytest.raises(ValueError):
-        provide_args_and_go(ParserMode.VALIDATE, tmpfile, OutputMode.OTHER)
     return

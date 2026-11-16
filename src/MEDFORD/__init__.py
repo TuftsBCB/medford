@@ -360,7 +360,8 @@ class MFD:
     @classmethod
     def _get_line_objects(cls, filename: str) -> List[Line]:
         """Read the file, apply multi-line template macro expansion, then return parsed ``Line`` objects."""
-        with open(filename, "r", encoding="utf-8") as f:
+        # utf-8-sig drops a byte-order mark at the start of the file
+        with open(filename, "r", encoding="utf-8-sig") as f:
             raw_lines = f.readlines()
         
         # Previously, the parser wasn't handling the underscores infront of

@@ -308,14 +308,20 @@ class Detail(LineCollection):
         import traceback
 
         # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
-        out = str.strip(self.headline.raw_content)
+        # Continuation lines joined, whitespace becomes one space
+        out = self.headline.remove_inline_comment()
         if self.extralines is not None:
             for line in self.extralines:
-                out = out + " " + str.strip(line.raw_content)
+                out = out + " " + line.remove_inline_comment()
 
         if mfdglobals.debug:
             print(f"Inside get_raw_content: {out}", file=sys.stderr)
-        return out
+        return " ".join(out.split())
+
+    def get_inline_comments(self) -> str:
+        """Inline comments of this detail's lines, joined with a space ("" if none)."""
+        lines = [self.headline] + (self.extralines or [])
+        return " ".join(line.raw_content[line.comm_loc:].strip() for line in lines if line.has_inline)
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str:
         """Return this detail's text with macro placeholders replaced using ``resolved_macros``."""
@@ -327,8 +333,12 @@ class Detail(LineCollection):
         if mfdglobals.debug:
             print(f"Content: {out}", file=sys.stderr)
         out = self.headline.get_content(resolved_macros)
+        # Continuation lines are part of the value, whitespace becomes one space
+        if self.extralines is not None:
+            for line in self.extralines:
+                out = out + " " + line.get_content(resolved_macros)
 
-        return out
+        return " ".join(out.split())
 
 
     def __eq__(self, other) -> bool:

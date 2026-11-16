@@ -1,0 +1,24 @@
+{
+  "MEDFORD": [
+    {
+      "value": "Continuation Versus Note",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "value": "Alva Couch",
+      "Association": [
+        "Tufts University"
+      ],
+      "Note": [
+        "Line one\n    Line two"
+      ]
+    },
+    {
+      "value": "Lenore Cowen"
+    }
+  ]
+}

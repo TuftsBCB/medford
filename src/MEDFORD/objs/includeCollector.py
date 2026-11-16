@@ -117,7 +117,8 @@ class IncludeCollector:
         
         # Collect raw lines of the included files
         raw_lines: List[str] = []
-        with open(file_path, 'r', encoding='utf-8') as f:
+        # utf-8-sig drops a byte-order mark at the start of the file
+        with open(file_path, 'r', encoding='utf-8-sig') as f:
             raw_lines = f.readlines()
 
         # Pass #1: parse to collect macros for THIS file (file-scoped rule)

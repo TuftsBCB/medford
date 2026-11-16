@@ -34,16 +34,20 @@ class DetailStatics:
         _latex_marker
     )  # ensures that the LaTeX symbol is parsed by regex correctly.
 
-    major_minor_reg: str = "{}(?P<major>[A-Za-z_]+)(-(?P<minor>[A-Za-z]+))?\\s".format(
-        token_header
+    # Major: starts with a letter or "_" then letters, digits or "_"
+    # Minor(Optional): starts with a letter or "_", then letters digits or "_"
+    # A digit can't start either.
+    major_minor_reg: str = (
+        token_header + r"(?P<major>[^\W\d]\w*)(-(?P<minor>[^\W\d]\w*))?\s"
     )
 
-    # Macro use: `name or `{name} (no @). Definition is `@name so we avoid matching `@.
+    # Macro use: `name or `{name}, spaces allowed in brackets. Definition is `@name so we avoid matching `@.
     macro_use_regex: str = (
-        r"`(?!@)(?:(?P<r1>\{(?P<mname_closed>[a-zA-Z0-9_]+)\})|"
+        r"`(?!@)(?:(?P<r1>\{[ \t]*(?P<mname_closed>[a-zA-Z0-9_]+)[ \t]*\})|"
         r"(?P<r2>(?P<mname_open>[a-zA-Z0-9_]+))(?=\s|$|\}))"
     )
-    comment_use_regex: str = "(?=({}\\s.+))".format(comment_header)
+    # A comment is "#" + whitespace, at the start of the line or after whitespace ("C# x" is not a comment)
+    comment_use_regex: str = "(?<!\\S)(?=({}\\s.+))".format(comment_header)
     latex_use_regex: str = "{}[^({})]+{}".format(escaped_lm, escaped_lm, escaped_lm)
     atat_use_regex: str = "{}(?P<major>[A-Za-z_]+)-{}(?P<referenced>[A-Za-z_]+)(\\s(?P<name>.+))?$".format(
         token_header, token_header
@@ -111,10 +115,11 @@ class LineReader:
         """Parse simple macro definition: `@name Value or `@name {value}. Returns (name, value)."""
         return parse_simple_macro_def(line)
 
+    # A tag starts with "@" and a letter
     @staticmethod
     def is_novel_token_line(line: str) -> bool:
         """Returns whether the line contains a novel MEDFORD token."""
-        return re.match(f"{DetailStatics.token_header}[A-Za-z]", line) is not None
+        return re.match(f"{DetailStatics.token_header}[^\\W\\d]", line) is not None
 
     @staticmethod
     def get_major_minor(line: str) -> Tuple[List[str], str, str]:

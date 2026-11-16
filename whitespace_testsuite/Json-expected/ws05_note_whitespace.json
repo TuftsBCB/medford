@@ -1,0 +1,18 @@
+{
+  "MEDFORD": [
+    {
+      "value": "Note Whitespace",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "value": "Alva Couch",
+      "Note": [
+        "First line   with   gaps\n    indented second line\n\ttab-indented third line"
+      ]
+    }
+  ]
+}

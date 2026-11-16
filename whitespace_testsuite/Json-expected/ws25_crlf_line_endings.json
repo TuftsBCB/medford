@@ -1,0 +1,19 @@
+{
+  "MEDFORD": [
+    {
+      "value": "CRLF Line Endings",
+      "Version": [
+        "1.0"
+      ]
+    }
+  ],
+  "Contributor": [
+    {
+      "value": "Alva Couch",
+      "Note": [
+        "Line one Line two"
+      ]
+    }
+  ]
+}
+

@@ -31,9 +31,9 @@ def _run_medford_compile(input_path: Path, out_path: Path, cwd: Path):
 
     # Included file that uses macro (but doesn't define it)
     inc_content = textwrap.dedent("""\
-        @Photo `@{reef_photo}01
-        @Photo `@{reef_photo}02
-        @Photo `@{reef_photo}03
+        @Photo `{reef_photo}01
+        @Photo `{reef_photo}02
+        @Photo `{reef_photo}03
     """)
     inc_path = tmp_path / "inc.mfd"
     inc_path.write_text(inc_content, encoding="utf-8")
@@ -64,7 +64,7 @@ def _run_medford_compile(input_path: Path, out_path: Path, cwd: Path):
 
     # Macro syntax should dissapear
     assert "`@reef_photo" not in output_text
-    assert "`@{reef_photo}" not in output_text
+    assert "`{reef_photo}" not in output_text
 
 @pytest.mark.xfail(reason="Macros are file-scoped: macros defined in included files are not visible to main file.")
 def test_macro_defined_in_included_file_used_in_main(tmp_path):
@@ -87,9 +87,9 @@ def test_macro_defined_in_included_file_used_in_main(tmp_path):
 
         @include inc.mfd *
 
-        @Photo `@{reef_photo}01
-        @Photo `@{reef_photo}02
-        @Photo `@{reef_photo}03
+        @Photo `{reef_photo}01
+        @Photo `{reef_photo}02
+        @Photo `{reef_photo}03
     """)
     main_path = tmp_path / "main.mfd"
     main_path.write_text(main_content, encoding="utf-8")
@@ -108,7 +108,7 @@ def test_macro_defined_in_included_file_used_in_main(tmp_path):
 
     # Macro syntax should dissapear
     assert "`@reef_photo" not in output_text
-    assert "`@{reef_photo}" not in output_text
+    assert "`{reef_photo}" not in output_text
 
 #@pytest.mark.xfail(reason="Macros defined in included files are not collected/expanded (current behavior).")
 def test_macro_defined_and_used_within_included_file(tmp_path):
@@ -119,9 +119,9 @@ def test_macro_defined_and_used_within_included_file(tmp_path):
 
     inc_content = textwrap.dedent("""\
         `@reef_photo REEF_X_PHOTO_
-        @Photo `@{reef_photo}01
-        @Photo `@{reef_photo}02
-        @Photo `@{reef_photo}03
+        @Photo `{reef_photo}01
+        @Photo `{reef_photo}02
+        @Photo `{reef_photo}03
     """)
     inc_path = tmp_path / "inc.mfd"
     inc_path.write_text(inc_content, encoding="utf-8")
@@ -149,7 +149,7 @@ def test_macro_defined_and_used_within_included_file(tmp_path):
 
     # Macro syntax should dissapear
     assert "`@reef_photo" not in output_text
-    assert "`@{reef_photo}" not in output_text
+    assert "`{reef_photo}" not in output_text
 
 def test_out_idempotent_with_include_and_macro(tmp_path):
     """
@@ -158,9 +158,9 @@ def test_out_idempotent_with_include_and_macro(tmp_path):
     """
 
     inc_content = textwrap.dedent("""\
-        @Photo `@{reef_photo}01
-        @Photo `@{reef_photo}02
-        @Photo `@{reef_photo}03
+        @Photo `{reef_photo}01
+        @Photo `{reef_photo}02
+        @Photo `{reef_photo}03
     """)
     inc_path = tmp_path / "inc.mfd"
     inc_path.write_text(inc_content, encoding="utf-8")
@@ -185,7 +185,7 @@ def test_out_idempotent_with_include_and_macro(tmp_path):
 
     # expanded output exists
     assert "@Photo REEF_X_PHOTO_01" in first_run
-    assert "`@{reef_photo}" not in first_run
+    assert "`{reef_photo}" not in first_run
     assert "`@reef_photo" not in first_run
 
     # Second compile: compile the output again
@@ -258,10 +258,10 @@ def test_macro_expands_to_include_behavior(tmp_path):
         `@make_include @include source.mfd @Contributor Ada Lovelace
 
         # Case 1: macro-only line
-        `@{make_include}
+        `{make_include}
 
         # Case 2: embedded inside a normal tag line
-        @Note `@{make_include}
+        @Note `{make_include}
     """)
     main_path = tmp_path / "main.mfd"
     main_path.write_text(main_content, encoding="utf-8")
