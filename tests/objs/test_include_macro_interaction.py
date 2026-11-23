@@ -241,7 +241,8 @@ def test_macro_expands_to_include_behavior(tmp_path):
     a macro expands to an '@include ...' directive.
 
     Trying to document two behaviors:
-      (A) A standalone macro-only line may be dropped (producing no output).
+      (A) A standalone macro-only line after an empty line is an error (it belongs to no tag);
+          see test_macro_only_line_is_error.
       (B) If embedded in a normal tag line, the expansion should appear in output
           either as literal '@include ...' text OR trigger include processing .
     """
@@ -257,9 +258,6 @@ def test_macro_expands_to_include_behavior(tmp_path):
 
         `@make_include @include source.mfd @Contributor Ada Lovelace
 
-        # Case 1: macro-only line
-        `{make_include}
-
         # Case 2: embedded inside a normal tag line
         @Note `{make_include}
     """)
@@ -271,8 +269,6 @@ def test_macro_expands_to_include_behavior(tmp_path):
     assert code == 0, f"compile failed (macro->include):\n{err}"
 
     output_text = out_path.read_text(encoding="utf-8")
-
-    # --- Case 1: macro-only line behavior
 
     # --- Case 2: embedded behavior 
     included_effect_happened = "@Contributor Ada Lovelace" in output_text
@@ -290,3 +286,20 @@ def test_macro_expands_to_include_behavior(tmp_path):
         "but it did not."
     )
 
+
+# Case 1: a macro-only line after an empty line belongs to no tag, so it is an error
+def test_macro_only_line_is_error(tmp_path):
+    main_content = textwrap.dedent("""\
+        @MEDFORD description
+        @MEDFORD-Version 1.0
+
+        `@make_include @include source.mfd @Contributor Ada Lovelace
+
+        `{make_include}
+    """)
+    main_path = tmp_path / "main.mfd"
+    main_path.write_text(main_content, encoding="utf-8")
+
+    code, out, err = _run_medford_compile(main_path, tmp_path / "out.mfd", cwd=tmp_path)
+    assert code != 0, "expected an error for a macro-only line after an empty line"
+    assert "Traceback" not in err, f"expected an error message, but MEDFORD crashed:\n{err}"

@@ -11,6 +11,9 @@ from enum import Enum
 from pathlib import PurePath  # ?
 
 from .objs.linereader import LineReader, Line
+# For finding text that belongs to no tag
+from .objs.lines import CommentLine, ContinueLine, MacroLine
+from .submodules.mfdvalidator.errors import StrayText
 from .objs.linecollector import LineCollector, Macro, Block
 from .objs.template_utils import expand_templates
 from .objs.includeCollector import IncludeCollector
@@ -371,10 +374,40 @@ class MFD:
         raw_lines = [ln for ln in raw_lines if not ln.lstrip().startswith("@__BUILD_DATE")]
         expanded_lines = expand_templates(raw_lines)
         object_lines = []
+        after_empty = False  # the previous line was empty
+        owner = None  # last non-comment line, the one a text line would continue
         for idx, line in enumerate(expanded_lines):
+            # Empty lines are skipped, but remembered (an empty line ends a value)
+            if line.strip() == "":
+                after_empty = True
+                continue
             p_line = LineReader.process_line(line, idx)
-            if p_line is not None:
-                object_lines.append(p_line)
+            if p_line is None:
+                continue
+            # Keep the line's indentation (Notes use it)
+            p_line.indent = line[: len(line) - len(line.lstrip())]
+
+            # A text line must continue a value right above it
+            if isinstance(p_line, ContinueLine):
+                # "@2Contributor", "@ Contributor": not a tag, and not text either
+                if p_line.line.startswith("@"):
+                    reason = f"'{p_line.line.split()[0]}' is not a valid tag"
+                # Text after an empty line (or before any tag) belongs to no tag
+                elif owner is None or after_empty:
+                    reason = "an empty line ends the value above"
+                # A macro is one line, so nothing can continue it
+                elif isinstance(owner, MacroLine):
+                    reason = "a macro definition is one line"
+                else:
+                    reason = None
+                if reason is not None:
+                    mfdglobals.validator.add_error(StrayText(idx, reason))
+
+            # Comments are skipped over, so text after a comment still has an owner
+            after_empty = False
+            if not isinstance(p_line, CommentLine):
+                owner = p_line
+            object_lines.append(p_line)
 
         return object_lines
 

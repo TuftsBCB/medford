@@ -17,7 +17,13 @@ from ..submodules.mfdvalidator.errors import (
 )
 
 from .. import mfdglobals
+import re
 import sys
+
+
+# Spaces inside macro braces are dropped: `{ Inst } becomes `{Inst}
+def _tidy_macro_uses(text: str) -> str:
+    return re.sub(r"`\{[ \t]*([a-zA-Z0-9_]+)[ \t]*\}", r"`{\1}", text)
 
 # create mixin for macro, named obj handling
 # TODO: separate LineCollection into a LineCollection and FeatureContainer
@@ -308,6 +314,10 @@ class Detail(LineCollection):
         import traceback
 
         # print(f"Call stack: {traceback.format_stack()}", file=sys.stderr)
+        # Notes keep their line breaks and indentation
+        if self.minor_token == "Note":
+            return _tidy_macro_uses(self._join_note([line.remove_inline_comment() for line in self._lines()]))
+
         # Continuation lines joined, whitespace becomes one space
         out = self.headline.remove_inline_comment()
         if self.extralines is not None:
@@ -316,12 +326,22 @@ class Detail(LineCollection):
 
         if mfdglobals.debug:
             print(f"Inside get_raw_content: {out}", file=sys.stderr)
-        return " ".join(out.split())
+        return _tidy_macro_uses(" ".join(out.split()))
 
     def get_inline_comments(self) -> str:
         """Inline comments of this detail's lines, joined with a space ("" if none)."""
-        lines = [self.headline] + (self.extralines or [])
-        return " ".join(line.raw_content[line.comm_loc:].strip() for line in lines if line.has_inline)
+        return " ".join(line.raw_content[line.comm_loc:].strip() for line in self._lines() if line.has_inline)
+
+    def _lines(self) -> list:
+        """The headline followed by its continuation lines."""
+        return [self.headline] + (self.extralines or [])
+
+    def _join_note(self, texts: List[str]) -> str:
+        """A Note keeps its line breaks and each continuation line's indentation; trailing spaces are removed."""
+        out = [texts[0].strip()]
+        for line, text in zip(self.extralines or [], texts[1:]):
+            out.append((line.indent + text).rstrip())
+        return "\n".join(out)
 
     def get_content(self, resolved_macros: Dict[str, str]) -> str:
         """Return this detail's text with macro placeholders replaced using ``resolved_macros``."""
@@ -332,6 +352,10 @@ class Detail(LineCollection):
         out = self.headline.get_content(resolved_macros)
         if mfdglobals.debug:
             print(f"Content: {out}", file=sys.stderr)
+        # Notes keep their line breaks and indentation
+        if self.minor_token == "Note":
+            return self._join_note([line.get_content(resolved_macros) for line in self._lines()])
+
         out = self.headline.get_content(resolved_macros)
         # Continuation lines are part of the value, whitespace becomes one space
         if self.extralines is not None:

@@ -201,9 +201,18 @@ def test_tag_name_cannot_start_with_digit(line):
     assert isinstance(LineReader.process_line(line, 0), ContinueLine)
 
 
+# "@Contributor-Role" (no value) moved to test_tag_name_empty_value
 @pytest.mark.parametrize(
-    "line", ["@Contributor-2Role Author", "@Contributor- x", "@Contributor:x", "@Contributor-Role"]
+    "line", ["@Contributor-2Role Author", "@Contributor- x", "@Contributor:x"]
 )
 def test_tag_name_invalid(line):
     with pytest.raises(NotImplementedError):
         LineReader.process_line(line, 0)
+
+
+# A tag with nothing after it is read as a tag with an empty value (reported later as MissingContent)
+def test_tag_name_empty_value():
+    res = LineReader.process_line("@Contributor-Role", 0)
+    assert isinstance(res, NovelDetailLine)
+    assert res.minor_token == "Role"
+    assert res.raw_content == ""

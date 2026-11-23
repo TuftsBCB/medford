@@ -5,6 +5,11 @@ import re
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
+# For reporting a macro used inside a template body
+from .. import mfdglobals
+from .linereader import DetailStatics
+from ..submodules.mfdvalidator.errors import MacroInTemplate
+
 
 @dataclass
 class TemplateDef:
@@ -78,6 +83,9 @@ def expand_templates(raw_lines: List[str]) -> List[str]:
             body = []
             i += 1
             while i < len(raw_lines) and raw_lines[i].strip().startswith(">"):
+                # A macro used inside a template body is an error (for now)
+                if re.search(DetailStatics.macro_use_regex, raw_lines[i]):
+                    mfdglobals.validator.add_error(MacroInTemplate(name, i))
                 body.append(raw_lines[i])
                 i += 1
             templates[name] = TemplateDef(name, params, body)

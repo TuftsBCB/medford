@@ -110,7 +110,8 @@ class MissingContent(MFDErr):
     lineno_range: Tuple[int, int]
 
     def __init__(self, detailobj):
-        self.errtype = ErrType.MISSING_CONTENT
+        # A tag with no value is an error, so it stops the compile
+        self.errtype = ErrType.SYNTAX
 
         from MEDFORD.objs.linecollections import Detail
 
@@ -143,6 +144,42 @@ class MissingContent(MFDErr):
     def get_lineno_range(self) -> Tuple[int, int]:
         return self.lineno_range
 
+
+
+# Text that belongs to no tag
+class StrayText(MFDErr):
+    """A line of text that belongs to no tag (e.g. after an empty line, or continuing a macro)."""
+
+    def __init__(self, lineno: int, reason: str):
+        self.errtype = ErrType.SYNTAX
+        msg = f"Text on line {lineno} belongs to no tag: {reason}."
+        helpmsg = "Start the line with @ for a tag or # for a comment, or join it to the value above."
+        super().__init__(type(self).__name__, msg, helpmsg)
+        self.lineno = lineno
+
+    def get_head_lineno(self) -> int:
+        return self.lineno
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return (self.lineno, self.lineno)
+
+
+# A macro inside a template body
+class MacroInTemplate(MFDErr):
+    """A macro used inside a template body (not supported for now)."""
+
+    def __init__(self, template_name: str, lineno: int):
+        self.errtype = ErrType.SYNTAX
+        msg = f"Template '{template_name}' uses a macro on line {lineno}; macros inside a template body are not supported."
+        helpmsg = "Pass the value as a template parameter instead, e.g. @<template_name param={value}"
+        super().__init__(type(self).__name__, msg, helpmsg)
+        self.lineno = lineno
+
+    def get_head_lineno(self) -> int:
+        return self.lineno
+
+    def get_lineno_range(self) -> Tuple[int, int]:
+        return (self.lineno, self.lineno)
 
 
 class TemplateParamMissing(MFDErr):

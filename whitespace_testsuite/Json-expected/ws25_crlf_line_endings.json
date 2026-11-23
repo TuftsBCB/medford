@@ -11,7 +11,7 @@
     {
       "value": "Alva Couch",
       "Note": [
-        "Line one Line two"
+        "Line one\nLine two"
       ]
     }
   ]

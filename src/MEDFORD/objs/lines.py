@@ -259,6 +259,8 @@ class ContentMixin:
 class Line:
     lineno: int
     line: str
+    # Whitespace before the line in the file (Notes keep it)
+    indent: str = ""
 
     def __init__(self, lineno: int, line: str):
         self.lineno = lineno

@@ -36,9 +36,9 @@ class DetailStatics:
 
     # Major: starts with a letter or "_" then letters, digits or "_"
     # Minor(Optional): starts with a letter or "_", then letters digits or "_"
-    # A digit can't start either.
+    # A digit can't start either. The tag may end the line (empty value).
     major_minor_reg: str = (
-        token_header + r"(?P<major>[^\W\d]\w*)(-(?P<minor>[^\W\d]\w*))?\s"
+        token_header + r"(?P<major>[^\W\d]\w*)(-(?P<minor>[^\W\d]\w*))?(\s|$)"
     )
 
     # Macro use: `name or `{name}, spaces allowed in brackets. Definition is `@name so we avoid matching `@.
