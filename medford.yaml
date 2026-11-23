@@ -1,0 +1,99 @@
+Version: 
+- Required  # we have to have at least one. 
+- Singular  # we have to have at most one. 
+- Type: string # method in Validators class. 
+
+Contributor: 
+- Required  # or Optional or Desirable: one instance required. 
+- Multiple  # or Singular (in file)
+- Type: string # or int or float or bool or date or datetime 
+  # The value is the contributor name 
+- Contents: 
+  # These are the minor tags, listed without major name 
+  # - Name: 
+  #  - Required  # debatable because an institution can be a contributor 
+  #  - Type: string
+  - Address:      # @Contributor-address
+    - Optional    # no big deal if it's absent. Don't comment. 
+    - Type: string 
+  - Email:        # @Contributor-email 
+    - Desirable   # inform the user that an email address is desirable. 
+    - Type: Email # name of a method in Validators 
+  - URI: 
+    - Desirable
+    - Type: URI   # name of a method in Validators
+  - Institution: 
+    - Desirable
+    - Type: Institution  # check that there's an @Institution matching this. 
+
+Paper: 
+- Type: string # title of paper (unique in document) 
+- Optional # not required (default), and no comment necessary.  
+- Multiple # there can be more than one paper listed 
+- Contents: 
+  - author: 
+    - Type: Contributor # An author should have a contributor record 
+    - Multiple  # default
+    - First_author: Singular
+    - Corresponding_author: Multiple 
+
+    # In YAML, the notation 
+    # Foo: Bar
+    # is equivalent with 
+    # Foo: 
+    # - Bar 
+
+  - publisher: 
+    - Type: Institution # Check for an institution match 
+      # calls validators.Institution on the string, 
+      # which looks up the name and matches. 
+      # This means that the name here exactly matches an institution record
+    - Multiple
+    - Required 
+  - Journal: 
+    - Type: string
+    - Optional
+  - Magazine: 
+    - Type: string
+    - Optional
+  - Volume: 
+    - Type: number 
+    - Desirable: if Journal, Magazine
+  - Number: 
+    - Type: number
+    - Desirable: If Journal
+      # Only desirable if there is a Journal tag in the same clause. 
+      # Default is Optional. 
+  - Book: 
+    - String
+    - Optional
+  - Chapter: Desirable if Book
+
+Institution: # not in spec so far. 
+# Type -- in this version -- refers to a method in the validators class. 
+- Type: string
+- Required
+- Multiple # the default  
+- Contents:
+  - address: #street and apartment, etc.  
+    - Type: string
+    - Desirable
+  - city: 
+    - Type: string
+    - Desirable 
+  - province: # or something else more internationalized. 
+    - Desirable 
+  - country: 
+    - Type: string 
+  - URI: 
+    - Type: URI # method name in class Validators in Validators.py
+    - Desirable
+  - phone: 
+    - Type: phone
+    - Desirable
+
+# we don't have x < y < z. 
+# This is currently two lines in the validator 
+# > x: call Validators.gt(value, x)
+# < z: call Validators.lt(value, z) 
+

@@ -234,7 +234,7 @@ class LineReader:
         
         if line.strip() == "":
             return None
-        
+
         line = line.strip()
 
         if LineReader.is_comment_line(line):
